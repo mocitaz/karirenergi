@@ -176,7 +176,17 @@ export default function App() {
     return lokerData.map((job) => {
       const cleanTitle = clean(job["Judul Lowongan"]);
       const cleanCompany = clean(job["Perusahaan"], "PT Pertamina");
-      const cleanCity = clean(job["Kota"]);
+      
+      let rawCity = clean(job["Kota"]);
+      let cleanCity = rawCity;
+      if (cleanCity && cleanCity !== "Tidak tertera") {
+        cleanCity = cleanCity
+          .replace(/\b(kota administrasi|kota|kabupaten|kab\b\.?)\s+/gi, "")
+          .replace(/\s+\b(kota administrasi|kota|kabupaten|kab\b\.?)\b/gi, "")
+          .trim();
+        cleanCity = cleanCity.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase());
+      }
+
       const cleanEdu = clean(job["Pendidikan"]);
       const cleanMajor = clean(job["Jurusan"], "Semua Jurusan / Tidak tertera");
 
