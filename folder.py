@@ -38,7 +38,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 16px; font-weight: 800; color: #4fc3f7; letter-spacing: -0.3px;">KarirEnergi Scraper</span>
-                <span style="font-size: 9px; font-weight: bold; background: rgba(79, 195, 247, 0.15); color: #4fc3f7; padding: 2px 6px; rounded-radius: 4px; border: 1px solid rgba(79, 195, 247, 0.3); border-radius: 4px;">v2.0</span>
+                <span style="font-size: 9px; font-weight: bold; background: rgba(79, 195, 247, 0.15); color: #4fc3f7; padding: 2px 6px; rounded-radius: 4px; border: 1px solid rgba(79, 195, 247, 0.3); border-radius: 4px;">v2.1</span>
             </div>
             <div id="minimize-btn" style="cursor: pointer; font-size: 14px; opacity: 0.7; hover:opacity: 1;">➖</div>
         </div>
@@ -183,30 +183,28 @@
         await new Promise(resolve => setTimeout(resolve, 2500));
     }
 
-    // Helper fetch dengan Auto-Retry & Jitter
-    async function fetchWithRetry(url, retries = 3, backoff = 1000) {
-        for (let i = 0; i < retries; i++) {
-            try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`HTTP status ${res.status}`);
-                return await res.text();
-            } catch (err) {
-                if (i === retries - 1) throw err;
-                const waitTime = backoff * Math.pow(2, i) + Math.random() * 500;
-                console.warn(`Fetch gagal untuk ${url}. Mengulangi dalam ${Math.round(waitTime)}ms...`, err);
-                await new Promise(resolve => setTimeout(resolve, waitTime));
-            }
-        }
-    }
-
-    // --- PHASE 2: PARALEL DETAILS FETCH (5 CONCURRENT WORKERS) ---
+    // --- PHASE 2: PARALEL DETAILS FETCH (5 CONCURRENT IFRAMES) ---
+    // Menggunakan iframe untuk mengeksekusi Client-Side JS Pertamina agar data Kota/Industri ter-render sempurna
     if (uniqueJobs.length > 0 && !stopScraping) {
         document.getElementById("scrape-status").innerText = "Menghubungkan detail...";
         
         const concurrency = 5; 
         let currentIndex = 0;
 
-        async function worker() {
+        async function worker(workerId) {
+            // Buat iframe tunggal untuk pekerja ini untuk dipakai ulang (Hemat memori)
+            const iframe = document.createElement('iframe');
+            iframe.id = `scraper-worker-${workerId}`;
+            Object.assign(iframe.style, {
+                position: 'absolute',
+                width: '800px',
+                height: '600px',
+                left: '-9999px',
+                top: '-9999px',
+                visibility: 'hidden'
+            });
+            document.body.appendChild(iframe);
+
             while (currentIndex < uniqueJobs.length && !stopScraping) {
                 const index = currentIndex++;
                 if (index >= uniqueJobs.length) break;
@@ -220,12 +218,21 @@
                 document.getElementById("scrape-progress-text").innerText = `${progressPercent}%`;
 
                 try {
-                    // Fetch langsung via Fetch API (Vastly faster than iframe)
-                    const htmlText = await fetchWithRetry(job.detailUrl);
+                    iframe.src = job.detailUrl;
                     
-                    // Parse HTML string menjadi DOM Document
-                    const parser = new DOMParser();
-                    const iframeDoc = parser.parseFromString(htmlText, 'text/html');
+                    // Tunggu event load dari iframe
+                    await new Promise((resolve) => {
+                        iframe.onload = resolve;
+                    });
+                    
+                    // Tunggu 1500ms agar JS internal widget merender ikon & data di DOM
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (!iframeDoc) throw new Error("Iframe document not accessible");
+                    
+                    // Bersihkan tag script/style agar tidak merusak pencarian teks
+                    iframeDoc.querySelectorAll('script, style').forEach(el => el.remove());
                     
                     const fullText = iframeDoc.body.innerText || iframeDoc.body.textContent || "";
                     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -302,6 +309,17 @@
                         jurusan = val.trim();
                     }
 
+                    // Clean Jurusan from script injection
+                    const cleanJurusanStr = (jStr) => {
+                        const dirtyIndicator = "$(document).ready";
+                        if (jStr.includes(dirtyIndicator)) {
+                            const idx = jStr.indexOf(dirtyIndicator);
+                            return jStr.substring(0, idx).trim();
+                        }
+                        return jStr.trim();
+                    };
+                    jurusan = cleanJurusanStr(jurusan);
+
                     hasilScraping.push({
                         "Judul Lowongan": job.judul,
                         "Perusahaan": job.perusahaan,
@@ -319,14 +337,17 @@
                     console.error(`Gagal memproses detail ${job.judul}:`, err);
                 }
                 
-                // Jitter (delay acak antara 100-300ms agar lebih aman terhadap WAF)
-                await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
+                // Jitter (delay acak antara 150-300ms agar lebih aman terhadap WAF)
+                await new Promise(resolve => setTimeout(resolve, 150 + Math.random() * 150));
             }
+            
+            // Hapus iframe pekerja setelah selesai
+            document.body.removeChild(iframe);
         }
 
         const workers = [];
-        for (let w = 0; w < concurrency; w++) {
-            workers.push(worker());
+        for (let w = 1; w <= concurrency; w++) {
+            workers.push(worker(w));
         }
         await Promise.all(workers);
     }
@@ -343,7 +364,6 @@
         if (btnStop) btnStop.remove();
 
         // Siapkan File CSV
-        // Bersihkan text fields dari newlines agar tidak merusak baris CSV
         const cleanCSVField = (text) => {
             if (!text) return "";
             return String(text).replace(/[\r\n]+/g, ' ').replace(/"/g, '""').trim();
@@ -355,7 +375,6 @@
         });
 
         // Siapkan File JSON
-        // Format JSON dibungkus rapi sehingga siap pakai untuk loker_data.json
         const jsonContent = JSON.stringify(hasilScraping, null, 2);
 
         // Render Action Buttons
