@@ -551,7 +551,7 @@ export default function App() {
                     <select
                       value={selectedCompany}
                       onChange={(e) => setSelectedCompany(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all"
+                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Perusahaan</option>
                       {filterOptions.companies.map((c) => (
@@ -566,7 +566,7 @@ export default function App() {
                     <select
                       value={selectedMajor}
                       onChange={(e) => setSelectedMajor(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all"
+                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Jurusan</option>
                       {filterOptions.majors.map((m) => (
@@ -581,7 +581,7 @@ export default function App() {
                     <select
                       value={selectedCity}
                       onChange={(e) => setSelectedCity(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all"
+                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Lokasi</option>
                       {filterOptions.cities.map((ct) => (
@@ -596,7 +596,7 @@ export default function App() {
                     <select
                       value={selectedEdu}
                       onChange={(e) => setSelectedEdu(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all"
+                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Jenjang</option>
                       {filterOptions.educations.map((ed) => (
@@ -611,7 +611,7 @@ export default function App() {
                     <select
                       value={selectedSector}
                       onChange={(e) => setSelectedSector(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all"
+                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Sektor</option>
                       {filterOptions.sectors.map((s) => (
