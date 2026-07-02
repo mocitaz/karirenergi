@@ -827,7 +827,7 @@ export default function App() {
         {/* Top Header Logo */}
         <div className="p-5 flex items-center justify-between border-b border-[#edece9]/50 flex-shrink-0">
           <div className={`flex items-center gap-2.5 ${sidebarOpen ? "" : "mx-auto"}`}>
-            <img src="/logo.png" alt="Logo" className="h-6 w-auto object-contain flex-shrink-0" />
+            <img src="/logo.png" alt="Logo" className="h-9 w-auto object-contain flex-shrink-0" />
             {sidebarOpen && (
               <div className="flex flex-col animate-fade-in">
                 <span className="font-extrabold text-[14.5px] leading-none text-[#37352f] tracking-tight">KarirEnergi</span>
