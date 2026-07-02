@@ -42,7 +42,23 @@ dirty_jurusan_count = 0
 patched_kota_count = 0
 patched_industri_count = 0
 
-# Helper function to clean Jurusan field from script injection
+# Helper function to clean Jurusan field from script injection and requirement texts
+import re
+
+REQUIREMENT_KEYWORDS = [
+    "menguasai", "mampu", "memiliki", "detail", "big data", "advanced", "problem", 
+    "data analysis", "data visualization", "analytical", "soft skill", "hard skill", 
+    "communicative", "power bi", "excel", "word", "powerpoint", "canva", "adobe", 
+    "active", "presentation", "compliance", "procurement", "reporting", "critical", 
+    "discipline", "work ethic", "berdomisi", "bersedia", "dapat", "inisiatif", 
+    "observasi", "komunikatif", "leadership", "english", "menulis", "tulisan", 
+    "laporan", "minat", "pengalaman", "pemahaman", "proaktif", "attention", 
+    "teamwork", "learning", "claims", "contract", "machine learning", "procedure", 
+    "desain", "editing", "visualisasi", "stakeholder", "speaking", "planning", 
+    "strategic", "event", "office", "ms.", "microsoft", "kualifikasi", "requirements", 
+    "tata kelola", "document", "analisa data", "pengolahan data", "penyusunan materi"
+]
+
 def clean_jurusan(jurusan_str):
     global dirty_jurusan_count
     if not jurusan_str:
@@ -53,13 +69,37 @@ def clean_jurusan(jurusan_str):
         dirty_jurusan_count += 1
         idx = jurusan_str.find(dirty_indicator)
         jurusan_str = jurusan_str[:idx]
+        
+    # Insert space at camelCase boundary (e.g. EkonomiMenguasai -> Ekonomi, Menguasai)
+    cleaned = re.sub(r'([a-z])([A-Z])', r'\1, \2', jurusan_str)
     
-    # Strip any trailing boilerplate code or spaces
-    cleaned = jurusan_str.strip()
-    cleaned = cleaned.rstrip(",. ")
-    if not cleaned:
+    # Split by common separators
+    tokens = re.split(r',|;|dan|\bserta\b', cleaned, flags=re.IGNORECASE)
+    
+    valid_majors = []
+    for token in tokens:
+        token = token.strip()
+        if not token:
+            continue
+        
+        # Check if this token contains any requirement keywords
+        token_lower = token.lower()
+        has_keyword = False
+        for kw in REQUIREMENT_KEYWORDS:
+            if kw in token_lower:
+                has_keyword = True
+                break
+        
+        if has_keyword:
+            break
+            
+        valid_majors.append(token)
+        
+    if not valid_majors:
         return "Semua Jurusan / Tidak tertera"
-    return cleaned
+        
+    final_str = ", ".join(valid_majors).strip().rstrip(",. ")
+    return final_str if final_str else "Semua Jurusan / Tidak tertera"
 
 # Helper function to clean and patch Kota field
 def clean_kota(title, current_kota):
@@ -159,8 +199,13 @@ for json_file in json_files:
                 ref_edu = csv_ref.get("Pendidikan", "Tidak tertera")
                 pendidikan = ref_edu if ref_edu != "Tidak tertera" else item.get("Pendidikan", "Tidak tertera")
                 
-                # Jurusan (clean script tags)
-                jurusan = clean_jurusan(item.get("Jurusan", ""))
+                # Jurusan (prioritize clean reference from CSV)
+                ref_jur = csv_ref.get("Jurusan", "").strip()
+                is_ref_clean = ref_jur and not (len(ref_jur) > 80 or "Menguasai" in ref_jur or "Mampu" in ref_jur or "Memiliki" in ref_jur or "Detail Oriented" in ref_jur)
+                if is_ref_clean:
+                    jurusan = clean_jurusan(ref_jur)
+                else:
+                    jurusan = clean_jurusan(item.get("Jurusan", ""))
                 
                 # Make sure Kuota and Pelamar are ints (take the latest numbers from JSON)
                 try:

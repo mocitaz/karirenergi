@@ -309,14 +309,61 @@
                         jurusan = val.trim();
                     }
 
-                    // Clean Jurusan from script injection
+                    // Clean Jurusan from script injection & requirements text
                     const cleanJurusanStr = (jStr) => {
+                        if (!jStr) return "Semua Jurusan / Tidak tertera";
+                        
                         const dirtyIndicator = "$(document).ready";
                         if (jStr.includes(dirtyIndicator)) {
                             const idx = jStr.indexOf(dirtyIndicator);
-                            return jStr.substring(0, idx).trim();
+                            jStr = jStr.substring(0, idx).trim();
                         }
-                        return jStr.trim();
+                        
+                        // 1. Insert space at camelCase boundary (e.g. EkonomiMenguasai -> Ekonomi, Menguasai)
+                        let cleaned = jStr.replace(/([a-z])([A-Z])/g, '$1, $2');
+                        
+                        // 2. Split by separators
+                        const tokens = cleaned.split(/[,;\n\r]|\band\b|\bdan\b|\bserta\b/i);
+                        
+                        // Keywords indicating requirement start
+                        const requirementKeywords = [
+                            "menguasai", "mampu", "memiliki", "detail", "big data", "advanced", "problem", 
+                            "data analysis", "data visualization", "analytical", "soft skill", "hard skill", 
+                            "communicative", "power bi", "excel", "word", "powerpoint", "canva", "adobe", 
+                            "active", "presentation", "compliance", "procurement", "reporting", "critical", 
+                            "discipline", "work ethic", "berdomisi", "bersedia", "dapat", "inisiatif", 
+                            "observasi", "komunikatif", "leadership", "english", "menulis", "tulisan", 
+                            "laporan", "minat", "pengalaman", "pemahaman", "proaktif", "attention", 
+                            "teamwork", "learning", "claims", "contract", "machine learning", "procedure", 
+                            "desain", "editing", "visualisasi", "stakeholder", "speaking", "planning", 
+                            "strategic", "event", "office", "ms.", "microsoft", "kualifikasi", "requirements", 
+                            "tata kelola", "document", "analisa data", "pengolahan data", "penyusunan materi"
+                        ];
+                        
+                        const validMajors = [];
+                        for (let token of tokens) {
+                            token = token.strip ? token.strip() : token.trim();
+                            if (!token) continue;
+                            
+                            const tokenLower = token.toLowerCase();
+                            let hasKeyword = false;
+                            for (let kw of requirementKeywords) {
+                                if (tokenLower.includes(kw)) {
+                                    hasKeyword = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (hasKeyword) {
+                                break;
+                            }
+                            validMajors.push(token);
+                        }
+                        
+                        if (validMajors.length === 0) {
+                            return "Semua Jurusan / Tidak tertera";
+                        }
+                        return validMajors.join(", ").trim().replace(/[,.\s]+$/, '');
                     };
                     jurusan = cleanJurusanStr(jurusan);
 
