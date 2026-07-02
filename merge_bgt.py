@@ -67,10 +67,34 @@ for csv_file in csv_files:
                 except ValueError:
                     pass
 
+            # Parse and patch Kota
+            kota = (row.get("Kota") or "Tidak tertera").strip()
+            if kota == "Tidak tertera" or kota == "-" or not kota:
+                if "Kamojang" in title:
+                    kota = "Bandung"
+                elif "Ulubelu" in title:
+                    kota = "Kabupaten Tanggamus (Lampung)"
+                elif "Lumut Balai" in title:
+                    kota = "Kabupaten Muara Enim (Sumatera Selatan)"
+                elif "Cilacap" in title:
+                    kota = "Kabupaten Cilacap"
+                elif "Balongan" in title:
+                    kota = "Kabupaten Indramayu"
+                elif "Aviasi" in title:
+                    kota = "Kota Administrasi Jakarta Pusat"
+                elif "S&D JBB" in title:
+                    kota = "Kota Administrasi Jakarta Pusat"
+                elif "Legal Counsel" in title:
+                    kota = "Kota Administrasi Jakarta Pusat"
+                elif "Manager Engineering" in title:
+                    kota = "Kota Administrasi Jakarta Pusat"
+                elif "Laboratory" in title:
+                    kota = "Bandung"
+
             records.append({
                 "Judul Lowongan": title,
                 "Perusahaan": perusahaan,
-                "Kota": (row.get("Kota") or "Tidak tertera").strip(),
+                "Kota": kota,
                 "Industri": (row.get("Industri") or "Tidak tertera").strip(),
                 "Sektor": (row.get("Sektor") or "Tidak tertera").strip(),
                 "Pendidikan": (row.get("Pendidikan") or "Tidak tertera").strip(),
