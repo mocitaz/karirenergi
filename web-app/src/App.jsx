@@ -180,7 +180,7 @@ export default function App() {
     localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
   }, [sidebarOpen]);
 
-  // Filters State
+  // Filters State (Applied)
   const [search, setSearch] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("");
   const [selectedMajor, setSelectedMajor] = useState("");
@@ -188,6 +188,23 @@ export default function App() {
   const [selectedEdu, setSelectedEdu] = useState("");
   const [selectedSector, setSelectedSector] = useState("");
   const [sortBy, setSortBy] = useState("perusahaan"); // perusahaan | judul
+
+  // Draft Filters State (applied on clicking 'Cari' or pressing Enter)
+  const [draftSearch, setDraftSearch] = useState("");
+  const [draftCompany, setDraftCompany] = useState("");
+  const [draftMajor, setDraftMajor] = useState("");
+  const [draftCity, setDraftCity] = useState("");
+  const [draftEdu, setDraftEdu] = useState("");
+  const [draftSector, setDraftSector] = useState("");
+
+  const handleApplyFilters = () => {
+    setSearch(draftSearch);
+    setSelectedCompany(draftCompany);
+    setSelectedMajor(draftMajor);
+    setSelectedCity(draftCity);
+    setSelectedEdu(draftEdu);
+    setSelectedSector(draftSector);
+  };
 
   // Clean raw listings
   const listings = useMemo(() => {
@@ -399,6 +416,12 @@ export default function App() {
   }, [listings]);
 
   const handleResetFilters = () => {
+    setDraftSearch("");
+    setDraftCompany("");
+    setDraftMajor("");
+    setDraftCity("");
+    setDraftEdu("");
+    setDraftSector("");
     setSearch("");
     setSelectedCompany("");
     setSelectedMajor("");
@@ -519,7 +542,7 @@ export default function App() {
               <div className="flex flex-col gap-4 animate-fade-in">
                 <div className="text-[11px] font-bold text-[#9b9a97] uppercase tracking-wider flex items-center justify-between border-b border-[#edece9]/60 pb-1.5 px-2">
                   <span>Filter Lowongan</span>
-                  {(search || selectedCompany || selectedMajor || selectedCity || selectedEdu) && (
+                  {(draftSearch || draftCompany || draftMajor || draftCity || draftEdu || draftSector || search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
                     <button
                       onClick={handleResetFilters}
                       className="text-[11px] text-[#1d7bb8] hover:underline flex items-center gap-0.5 font-semibold"
@@ -538,8 +561,9 @@ export default function App() {
                       <input
                         type="text"
                         placeholder="Judul, jurusan..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                        value={draftSearch}
+                        onChange={(e) => setDraftSearch(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
                         className="w-full text-[12.5px] border border-[#edece9] rounded-md pl-8 pr-2.5 py-1.5 bg-white outline-none focus:border-[#5a5a57] shadow-sm transition-all"
                       />
                     </div>
@@ -549,8 +573,8 @@ export default function App() {
                   <div className="flex flex-col gap-1">
                     <label className="text-[11px] font-semibold text-[#5a5a57]">Perusahaan</label>
                     <select
-                      value={selectedCompany}
-                      onChange={(e) => setSelectedCompany(e.target.value)}
+                      value={draftCompany}
+                      onChange={(e) => setDraftCompany(e.target.value)}
                       className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Perusahaan</option>
@@ -564,8 +588,8 @@ export default function App() {
                   <div className="flex flex-col gap-1">
                     <label className="text-[11px] font-semibold text-[#5a5a57]">Jurusan</label>
                     <select
-                      value={selectedMajor}
-                      onChange={(e) => setSelectedMajor(e.target.value)}
+                      value={draftMajor}
+                      onChange={(e) => setDraftMajor(e.target.value)}
                       className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Jurusan</option>
@@ -579,8 +603,8 @@ export default function App() {
                   <div className="flex flex-col gap-1">
                     <label className="text-[11px] font-semibold text-[#5a5a57]">Lokasi / Kota</label>
                     <select
-                      value={selectedCity}
-                      onChange={(e) => setSelectedCity(e.target.value)}
+                      value={draftCity}
+                      onChange={(e) => setDraftCity(e.target.value)}
                       className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Lokasi</option>
@@ -594,8 +618,8 @@ export default function App() {
                   <div className="flex flex-col gap-1">
                     <label className="text-[11px] font-semibold text-[#5a5a57]">Pendidikan</label>
                     <select
-                      value={selectedEdu}
-                      onChange={(e) => setSelectedEdu(e.target.value)}
+                      value={draftEdu}
+                      onChange={(e) => setDraftEdu(e.target.value)}
                       className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Jenjang</option>
@@ -609,8 +633,8 @@ export default function App() {
                   <div className="flex flex-col gap-1">
                     <label className="text-[11px] font-semibold text-[#5a5a57]">Sektor Kerja</label>
                     <select
-                      value={selectedSector}
-                      onChange={(e) => setSelectedSector(e.target.value)}
+                      value={draftSector}
+                      onChange={(e) => setDraftSector(e.target.value)}
                       className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
                     >
                       <option value="">Semua Sektor</option>
@@ -619,6 +643,15 @@ export default function App() {
                       ))}
                     </select>
                   </div>
+
+                  {/* Apply Filters Button */}
+                  <button
+                    onClick={handleApplyFilters}
+                    className="w-full bg-[#1d7bb8] text-white hover:bg-[#155a8a] py-2 rounded-md text-[12.5px] font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer mt-1"
+                  >
+                    <Search className="w-3.5 h-3.5" />
+                    Cari Lowongan
+                  </button>
                 </div>
               </div>
             ) : (
@@ -777,16 +810,17 @@ export default function App() {
                 <input
                   type="text"
                   placeholder="Cari lowongan..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  value={draftSearch}
+                  onChange={(e) => setDraftSearch(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
                   className="w-full text-[12.5px] border border-[#edece9]/80 bg-[#f7f7f5]/40 focus:bg-white rounded-md pl-8 pr-3 py-1.5 outline-none focus:border-[#dfdfde] transition-all"
                 />
               </div>
 
               {/* Company dropdown */}
               <select
-                value={selectedCompany}
-                onChange={(e) => setSelectedCompany(e.target.value)}
+                value={draftCompany}
+                onChange={(e) => setDraftCompany(e.target.value)}
                 className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px] notion-select"
               >
                 <option value="">Semua Perusahaan</option>
@@ -797,8 +831,8 @@ export default function App() {
 
               {/* Major dropdown */}
               <select
-                value={selectedMajor}
-                onChange={(e) => setSelectedMajor(e.target.value)}
+                value={draftMajor}
+                onChange={(e) => setDraftMajor(e.target.value)}
                 className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px] notion-select"
               >
                 <option value="">Semua Jurusan</option>
@@ -809,8 +843,8 @@ export default function App() {
 
               {/* City dropdown */}
               <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
+                value={draftCity}
+                onChange={(e) => setDraftCity(e.target.value)}
                 className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[145px] notion-select"
               >
                 <option value="">Semua Lokasi</option>
@@ -821,8 +855,8 @@ export default function App() {
 
               {/* Education dropdown */}
               <select
-                value={selectedEdu}
-                onChange={(e) => setSelectedEdu(e.target.value)}
+                value={draftEdu}
+                onChange={(e) => setDraftEdu(e.target.value)}
                 className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[130px] notion-select"
               >
                 <option value="">Semua Jenjang</option>
@@ -833,8 +867,8 @@ export default function App() {
 
               {/* Sektor Kerja dropdown */}
               <select
-                value={selectedSector}
-                onChange={(e) => setSelectedSector(e.target.value)}
+                value={draftSector}
+                onChange={(e) => setDraftSector(e.target.value)}
                 className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[135px] notion-select"
               >
                 <option value="">Semua Sektor</option>
@@ -843,11 +877,20 @@ export default function App() {
                 ))}
               </select>
 
+              {/* Cari Button */}
+              <button
+                onClick={handleApplyFilters}
+                className="bg-[#1d7bb8] text-white hover:bg-[#155a8a] px-3.5 py-1.5 rounded-md text-[12.5px] font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
+              >
+                <Search className="w-3.5 h-3.5" />
+                Cari
+              </button>
+
               {/* Reset button */}
-              {(search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
+              {(draftSearch || draftCompany || draftMajor || draftCity || draftEdu || draftSector || search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
                 <button
                   onClick={handleResetFilters}
-                  className="text-[12.5px] text-[#1d7bb8] hover:bg-[#e8f4fa] px-2.5 py-1 rounded transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+                  className="text-[12.5px] text-[#1d7bb8] hover:bg-[#e8f4fa] px-2.5 py-1.5 rounded transition-colors flex items-center gap-1 font-semibold cursor-pointer"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   Reset Filter
