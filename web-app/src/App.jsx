@@ -18,7 +18,9 @@ import {
   Users,
   UserCheck,
   TrendingUp,
-  Bookmark
+  Bookmark,
+  SlidersHorizontal,
+  Timer
 } from "lucide-react";
 import lokerData from "./data/loker_data.json";
 
@@ -205,6 +207,39 @@ export default function App() {
     setSelectedEdu(draftEdu);
     setSelectedSector(draftSector);
   };
+
+  // Countdown Timer State (Target: 5 July 2026 at 23:59 WIB)
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isExpired: false
+  });
+
+  useEffect(() => {
+    const targetDate = new Date("2026-07-05T23:59:00+07:00").getTime();
+
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true });
+      } else {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        setTimeLeft({ days, hours, minutes, seconds, isExpired: false });
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Clean raw listings
   const listings = useMemo(() => {
@@ -721,6 +756,71 @@ export default function App() {
             <p className="text-[12px] md:text-[12.5px] text-[#5a5a57] max-w-4xl leading-relaxed mt-1">
               Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
             </p>
+          </div>
+        </div>
+
+        {/* Countdown Banner */}
+        <div className={`px-6 md:px-10 flex-shrink-0 transition-all duration-300 ease-in-out
+          ${isScrolled ? "h-0 opacity-0 overflow-hidden pb-0 pt-0 border-none pointer-events-none" : "pt-2 pb-1"}
+        `}>
+          <div className="max-w-6xl mx-auto bg-gradient-to-r from-[#fdf6e2] to-[#fcfcfc] border border-[#f5ebcc] rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs select-none animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#fdf2e9] flex items-center justify-center text-[#c26100] flex-shrink-0">
+                <Timer className="w-4 h-4" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-[#c26100] text-[13px] leading-tight">Penutupan Pendaftaran Magang Pertamina</span>
+                <span className="text-[11.5px] text-[#5a5a57] mt-0.5 font-medium">Batas resmi portal rekrutmen: 5 Juli 2026, 23:59 WIB</span>
+              </div>
+            </div>
+            
+            {/* Live Timer Grid */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {timeLeft.isExpired ? (
+                <span className="text-[12.5px] font-bold text-[#c52447] bg-[#fdf0f2] border border-[#f9d5db] px-3 py-1.5 rounded-md">
+                  Pendaftaran Telah Ditutup ⛔
+                </span>
+              ) : (
+                <>
+                  <div className="flex items-center gap-1">
+                    <div className="flex flex-col items-center">
+                      <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
+                        {timeLeft.days}
+                      </div>
+                      <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Hari</span>
+                    </div>
+                    <span className="text-[14px] font-bold text-[#8a8a86] -mt-4">:</span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <div className="flex flex-col items-center">
+                      <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
+                        {String(timeLeft.hours).padStart(2, "0")}
+                      </div>
+                      <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Jam</span>
+                    </div>
+                    <span className="text-[14px] font-bold text-[#8a8a86] -mt-4">:</span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <div className="flex flex-col items-center">
+                      <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
+                        {String(timeLeft.minutes).padStart(2, "0")}
+                      </div>
+                      <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Menit</span>
+                    </div>
+                    <span className="text-[14px] font-bold text-[#8a8a86] -mt-4">:</span>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
+                      {String(timeLeft.seconds).padStart(2, "0")}
+                    </div>
+                    <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Detik</span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
