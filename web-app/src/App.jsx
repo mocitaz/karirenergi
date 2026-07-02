@@ -1037,97 +1037,82 @@ export default function App() {
           </div>
         </div>
 
-        {/* Header Title & Description */}
-        <div className="px-6 md:px-10 pt-4 md:pt-5 pb-1 flex-shrink-0">
-          <div className="max-w-6xl mx-auto flex flex-col gap-1">
-            <h1 className="text-xl md:text-2xl font-bold text-[#37352f] tracking-tight flex flex-wrap items-center gap-2">
-              KarirEnergi Database
-              <span className="text-[10px] font-semibold text-[#8a8a86] bg-[#edece9]/50 border border-[#edece9] px-2 py-0.5 rounded-full select-none">
-                Non-Official
-              </span>
-            </h1>
-            
-            {/* Terakhir Diupdate di bawah judul */}
-            <div className="flex items-center gap-1.5 text-[11px] text-[#43873e] font-medium mt-0.5 select-none">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#43873e] animate-pulse flex-shrink-0"></span>
-              <span>Terakhir Diupdate: 2 Juli 2026, 22:06 WIB</span>
-            </div>
-
-            <p className="text-[12px] md:text-[12.5px] text-[#5a5a57] max-w-4xl leading-relaxed mt-1">
-              Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
-            </p>
-          </div>
-        </div>
-
-        {/* Countdown Banner */}
-        <div className={`px-6 md:px-10 flex-shrink-0 transition-all duration-300 ease-in-out
-          ${isScrolled ? "h-0 opacity-0 overflow-hidden pb-0 pt-0 border-none pointer-events-none" : "pt-2 pb-1"}
-        `}>
-          <div className="max-w-6xl mx-auto bg-gradient-to-r from-[#37352f]/3 to-[#37352f]/1 border border-[#edece9] hover:border-[#dfdfde] rounded-lg px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 transition-all duration-200 select-none animate-fade-in shadow-2xs">
-            <div className="flex items-center gap-2 text-[12.5px]">
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#fdf2e9] text-[#c26100] flex-shrink-0">
-                <Timer className="w-3.5 h-3.5 animate-pulse" />
-              </span>
-              <span className="font-bold text-[#37352f] tracking-tight">Batas Registrasi Magang Pertamina</span>
-              <span className="hidden sm:inline text-[#edece9] font-light">|</span>
-              <span className="text-[#8a8a86] font-medium text-[11px]">(5 Juli 2026, 23:59 WIB)</span>
-            </div>
-            
-            {/* Compact Monospace Timer Pill */}
-            <div className="flex items-center bg-[#fdf2e9] border border-[#f5ebcc] text-[#c26100] px-3 py-0.75 rounded-full font-bold text-[12px] w-fit shadow-3xs">
-              {timeLeft.isExpired ? (
-                <span className="text-[11px] tracking-tight">Pendaftaran Telah Ditutup ⛔</span>
-              ) : (
-                <span className="font-mono flex items-center gap-1 select-none">
-                  <span>{timeLeft.days}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">d</span></span>
-                  <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
-                  <span>{String(timeLeft.hours).padStart(2, "0")}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">h</span></span>
-                  <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
-                  <span>{String(timeLeft.minutes).padStart(2, "0")}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">m</span></span>
-                  <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
-                  <span className="inline-block min-w-[26px]">{String(timeLeft.seconds).padStart(2, "0")}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">s</span></span>
+        {/* Header Title, Description & Countdown */}
+        <div className="px-6 md:px-10 pt-4 md:pt-5 pb-3.5 flex-shrink-0 border-b border-[#edece9]/60 bg-white">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg md:text-xl font-extrabold text-[#37352f] tracking-tight">KarirEnergi Database</h1>
+                <span className="text-[10px] font-bold text-[#43873e] bg-[#eaf5ea] border border-[#d2ebd2] px-2 py-0.5 rounded-full select-none flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#43873e] animate-pulse"></span>
+                  Live Tracker
                 </span>
-              )}
+                <span className="text-[10px] font-semibold text-[#8a8a86] bg-[#edece9]/50 border border-[#edece9] px-2 py-0.5 rounded-full select-none">
+                  Non-Official
+                </span>
+              </div>
+              <p className="text-[12.5px] text-[#5a5a57] max-w-2xl leading-relaxed mt-0.5">
+                Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
+              </p>
+              <div className="text-[10.5px] text-[#9b9a97] mt-0.5">
+                Terakhir Diupdate: 2 Juli 2026, 22:06 WIB
+              </div>
             </div>
+
+            {/* Compact Monospace Countdown */}
+            {!timeLeft.isExpired && (
+              <div className="flex items-center bg-[#fdf2e9] border border-[#f5ebcc] text-[#c26100] px-3.5 py-1.5 rounded-lg text-[12px] w-fit shadow-3xs self-start sm:self-center">
+                <Timer className="w-3.5 h-3.5 mr-2 animate-pulse text-[#c26100] flex-shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-[#c26100]/60 leading-none mb-0.5">Batas Registrasi</span>
+                  <span className="font-mono font-bold leading-none select-none flex items-center gap-0.5">
+                    <span>{timeLeft.days}<span className="text-[8px] font-sans font-semibold text-[#c26100]/70">d</span></span>
+                    <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
+                    <span>{String(timeLeft.hours).padStart(2, "0")}<span className="text-[8px] font-sans font-semibold text-[#c26100]/70">h</span></span>
+                    <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
+                    <span>{String(timeLeft.minutes).padStart(2, "0")}<span className="text-[8px] font-sans font-semibold text-[#c26100]/70">m</span></span>
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Notion Dashboard Metrics Grid */}
-        <div className={`px-6 md:px-10 flex-shrink-0 transition-all duration-300 ease-in-out
-          ${isScrolled ? "h-0 opacity-0 overflow-hidden pb-0 pt-0 border-none pointer-events-none" : "pt-2.5 md:pt-3 pb-3"}
-        `}>
-          <div className={`max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 border-b border-[#edece9]/80 pb-4 transition-all duration-300 ease-in-out
-            ${isScrolled ? "pb-0 border-none" : ""}
-          `}>
-            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
-              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Total Lowongan</span>
-              <span className="text-[17px] md:text-[19px] font-bold text-[#37352f] leading-none mt-0.5">{totalCount}</span>
+        {/* Inline Statistics Bar */}
+        <div className="px-6 md:px-10 py-3 flex-shrink-0 border-b border-[#edece9]/40 bg-[#f7f7f5]/30">
+          <div className="max-w-6xl mx-auto flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-[#5a5a57] select-none font-medium">
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-[#37352f]">{totalCount}</span>
+              <span className="text-[#8a8a86]">Total Lowongan</span>
             </div>
-            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
-              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Total Pendaftar</span>
-              <span className="text-[17px] md:text-[19px] font-bold text-[#37352f] leading-none mt-0.5">{databaseStats.pelamar.toLocaleString('id-ID')}</span>
+            <span className="text-[#edece9] hidden xs:inline">•</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-[#37352f]">{databaseStats.pelamar.toLocaleString('id-ID')}</span>
+              <span className="text-[#8a8a86]">Total Pendaftar</span>
             </div>
-            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
-              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Total Kuota</span>
-              <span className="text-[17px] md:text-[19px] font-bold text-[#37352f] leading-none mt-0.5">{databaseStats.kuota.toLocaleString('id-ID')}</span>
+            <span className="text-[#edece9] hidden xs:inline">•</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-[#37352f]">{databaseStats.kuota.toLocaleString('id-ID')}</span>
+              <span className="text-[#8a8a86]">Total Kuota</span>
             </div>
-            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
-              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Khusus Jenjang S1</span>
-              <span className="text-[17px] md:text-[19px] font-bold text-[#c52447] leading-none mt-0.5">{s1Count}</span>
+            <span className="text-[#edece9] hidden xs:inline">•</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-[#c52447]">{s1Count}</span>
+              <span className="text-[#c52447]/70">Khusus Jenjang S1</span>
             </div>
           </div>
         </div>
 
         {/* Database Filters & View Toggle Panel */}
-        <div className="px-6 md:px-10 py-4 flex-shrink-0 border-b border-[#edece9]">
-          <div className="max-w-6xl mx-auto flex flex-col gap-4">
+        <div className="px-6 md:px-10 py-3.5 flex-shrink-0 border-b border-[#edece9]">
+          <div className="max-w-6xl mx-auto flex flex-col gap-3">
 
-            {/* View Tabs Selector & Sorting */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center bg-[#edece9]/40 p-0.5 rounded-lg border border-[#edece9]/30 w-fit">
+            {/* View Tabs Selector, Sorting, and Search */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center bg-[#edece9]/40 p-0.5 rounded-lg border border-[#edece9]/30 w-fit flex-shrink-0">
                 <button
                   onClick={() => setViewTab("gallery")}
-                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12.5px] transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12px] transition-all cursor-pointer ${
                     viewTab === "gallery"
                       ? "bg-white text-[#37352f] font-bold shadow-xs"
                       : "text-[#5a5a57] hover:text-[#37352f]"
@@ -1138,7 +1123,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setViewTab("table")}
-                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12.5px] transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12px] transition-all cursor-pointer ${
                     viewTab === "table"
                       ? "bg-white text-[#37352f] font-bold shadow-xs"
                       : "text-[#5a5a57] hover:text-[#37352f]"
@@ -1149,7 +1134,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setViewTab("analytics")}
-                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12.5px] transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12px] transition-all cursor-pointer ${
                     viewTab === "analytics"
                       ? "bg-white text-[#37352f] font-bold shadow-xs"
                       : "text-[#5a5a57] hover:text-[#37352f]"
@@ -1160,33 +1145,10 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="flex items-center gap-4">
-                <span className="text-[12.5px] text-[#9b9a97]">
-                  Menampilkan <span className="font-semibold text-[#37352f]">{filteredListings.length}</span> lowongan
-                </span>
-                <div className="h-4 w-[1px] bg-[#edece9]"></div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[12px] text-[#9b9a97]">Urutkan:</span>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.25 outline-none cursor-pointer transition-all notion-select"
-                  >
-                    <option value="perusahaan">Nama Perusahaan</option>
-                    <option value="judul">Judul Lowongan</option>
-                    <option value="peluang-desc">Peluang Lolos (Tertinggi)</option>
-                    <option value="peluang-asc">Peluang Lolos (Terendah)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            {/* Inline Filter Controls on Main Page */}
-            <div className="flex flex-col gap-3 pt-2.5 border-t border-[#edece9]/60">
-              
-              {/* Row 1: Search and Mobile Filter Toggle */}
-              <div className="flex items-center gap-2.5 w-full">
-                {/* Inline Search - Always visible */}
-                <div className="relative flex-grow max-w-md">
+              {/* Search, Sort & Filters in One Line */}
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                {/* Search Bar - Always Visible */}
+                <div className="relative flex-grow sm:w-60 max-w-md">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
                   <input
                     type="text"
@@ -1194,14 +1156,14 @@ export default function App() {
                     value={draftSearch}
                     onChange={(e) => setDraftSearch(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
-                    className="w-full text-[12.5px] border border-[#edece9] bg-[#f7f7f5]/40 focus:bg-white rounded-md pl-8 pr-3 py-1.75 outline-none focus:border-[#dfdfde] transition-all"
+                    className="w-full text-[12.5px] border border-[#edece9] bg-[#f7f7f5]/40 focus:bg-white rounded-md pl-8 pr-3 py-1.5 outline-none focus:border-[#dfdfde] transition-all"
                   />
                 </div>
 
-                {/* Mobile Filter Button - only visible on mobile (under md) */}
+                {/* Mobile Filter Button - only visible on mobile (under md) to open sidebar */}
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.75 bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] rounded-md text-[12.5px] font-semibold border border-[#edece9] transition-all cursor-pointer"
+                  className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] rounded-md text-[12.5px] font-semibold border border-[#edece9] transition-all cursor-pointer flex-shrink-0"
                   title="Buka Panel Filter Lengkap"
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -1215,86 +1177,124 @@ export default function App() {
                 {(draftSearch || draftCompany || draftMajor || draftCity || draftEdu || draftSector || search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
                   <button
                     onClick={handleResetFilters}
-                    className="text-[12.5px] text-[#1d7bb8] hover:bg-[#e8f4fa] px-2.5 py-1.75 rounded transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+                    className="text-[12px] text-[#1d7bb8] hover:bg-[#e8f4fa] px-2.5 py-1.5 rounded transition-colors flex items-center gap-1 font-semibold cursor-pointer flex-shrink-0"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Reset</span>
                   </button>
                 )}
               </div>
+            </div>
 
-              {/* Advanced Dropdowns Row - Hidden on mobile, shown on desktop (md and larger) */}
-              <div className="hidden md:flex flex-wrap items-center gap-2 w-full mt-0.5">
-                {/* Company dropdown */}
+            {/* Advanced Filters Row - Hidden on mobile, shown on desktop (md and larger) */}
+            <div className="hidden md:flex flex-wrap items-center gap-2 w-full pt-2 border-t border-[#edece9]/40">
+              {/* Sort By Dropdown */}
+              <div className="flex items-center gap-1.5 mr-2">
+                <span className="text-[11.5px] text-[#9b9a97]">Urutkan:</span>
                 <select
-                  value={draftCompany}
-                  onChange={(e) => setDraftCompany(e.target.value)}
-                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[155px] notion-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="text-[12px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2 py-1 outline-none cursor-pointer transition-all notion-select"
                 >
-                  <option value="">Semua Perusahaan</option>
-                  {filterOptions.companies.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
+                  <option value="perusahaan">Nama Perusahaan</option>
+                  <option value="judul">Judul Lowongan</option>
+                  <option value="peluang-desc">Peluang Lolos (Tertinggi)</option>
+                  <option value="peluang-asc">Peluang Lolos (Terendah)</option>
                 </select>
+              </div>
 
-                {/* Major dropdown */}
+              <div className="h-4 w-[1px] bg-[#edece9] mr-2"></div>
+
+              {/* Company dropdown */}
+              <select
+                value={draftCompany}
+                onChange={(e) => setDraftCompany(e.target.value)}
+                className="text-[12px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[155px] notion-select"
+              >
+                <option value="">Semua Perusahaan</option>
+                {filterOptions.companies.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+
+              {/* Major dropdown */}
+              <select
+                value={draftMajor}
+                onChange={(e) => setDraftMajor(e.target.value)}
+                className="text-[12px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[155px] notion-select"
+              >
+                <option value="">Semua Jurusan</option>
+                {filterOptions.majors.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+
+              {/* City dropdown */}
+              <select
+                value={draftCity}
+                onChange={(e) => setDraftCity(e.target.value)}
+                className="text-[12px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[145px] notion-select"
+              >
+                <option value="">Semua Lokasi</option>
+                {filterOptions.cities.map((ct) => (
+                  <option key={ct} value={ct}>{ct}</option>
+                ))}
+              </select>
+
+              {/* Education dropdown */}
+              <select
+                value={draftEdu}
+                onChange={(e) => setDraftEdu(e.target.value)}
+                className="text-[12px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[125px] notion-select"
+              >
+                <option value="">Semua Jenjang</option>
+                {filterOptions.educations.map((ed) => (
+                  <option key={ed} value={ed}>{ed}</option>
+                ))}
+              </select>
+
+              {/* Sektor Kerja dropdown */}
+              <select
+                value={draftSector}
+                onChange={(e) => setDraftSector(e.target.value)}
+                className="text-[12px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[130px] notion-select"
+              >
+                <option value="">Semua Sektor</option>
+                {filterOptions.sectors.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+
+              {/* Cari Button */}
+              <button
+                onClick={handleApplyFilters}
+                className="bg-[#1d7bb8] text-white hover:bg-[#155a8a] px-4 py-1.25 rounded-md text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer ml-auto"
+              >
+                <Search className="w-3.5 h-3.5" />
+                Cari
+              </button>
+            </div>
+
+            {/* Mobile Result Count & Sorting */}
+            <div className="flex items-center justify-between text-[11.5px] text-[#9b9a97] md:hidden pt-1 border-t border-[#edece9]/40">
+              <span>
+                Menampilkan <span className="font-semibold text-[#37352f]">{filteredListings.length}</span> lowongan
+              </span>
+              <div className="flex items-center gap-1">
+                <span>Urut:</span>
                 <select
-                  value={draftMajor}
-                  onChange={(e) => setDraftMajor(e.target.value)}
-                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[155px] notion-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-transparent text-[#5a5a57] font-semibold outline-none cursor-pointer"
                 >
-                  <option value="">Semua Jurusan</option>
-                  {filterOptions.majors.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
+                  <option value="perusahaan">Instansi</option>
+                  <option value="judul">Judul</option>
+                  <option value="peluang-desc">Peluang ↑</option>
+                  <option value="peluang-asc">Peluang ↓</option>
                 </select>
-
-                {/* City dropdown */}
-                <select
-                  value={draftCity}
-                  onChange={(e) => setDraftCity(e.target.value)}
-                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[145px] notion-select"
-                >
-                  <option value="">Semua Lokasi</option>
-                  {filterOptions.cities.map((ct) => (
-                    <option key={ct} value={ct}>{ct}</option>
-                  ))}
-                </select>
-
-                {/* Education dropdown */}
-                <select
-                  value={draftEdu}
-                  onChange={(e) => setDraftEdu(e.target.value)}
-                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[125px] notion-select"
-                >
-                  <option value="">Semua Jenjang</option>
-                  {filterOptions.educations.map((ed) => (
-                    <option key={ed} value={ed}>{ed}</option>
-                  ))}
-                </select>
-
-                {/* Sektor Kerja dropdown */}
-                <select
-                  value={draftSector}
-                  onChange={(e) => setDraftSector(e.target.value)}
-                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[130px] notion-select"
-                >
-                  <option value="">Semua Sektor</option>
-                  {filterOptions.sectors.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-
-                {/* Cari Button */}
-                <button
-                  onClick={handleApplyFilters}
-                  className="bg-[#1d7bb8] text-white hover:bg-[#155a8a] px-4 py-1.5 rounded-md text-[12.5px] font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer ml-auto"
-                >
-                  <Search className="w-3.5 h-3.5" />
-                  Cari
-                </button>
               </div>
             </div>
+
           </div>
         </div>
 
