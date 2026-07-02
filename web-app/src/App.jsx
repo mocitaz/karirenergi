@@ -779,17 +779,17 @@ export default function App() {
 
       {/* Notion Sidebar */}
       <aside
-        className={`flex-shrink-0 bg-[#f7f7f5] flex flex-col fixed md:relative top-0 bottom-0 left-0 transition-all duration-300 ease-in-out z-45 border-[#edece9]
+        className={`flex-shrink-0 bg-[#f7f7f5] flex flex-col fixed md:relative top-0 bottom-0 left-0 transition-all duration-300 ease-in-out z-45 border-r border-[#edece9]/80
           ${sidebarOpen
-            ? "w-[280px] translate-x-0 shadow-2xl border-r md:shadow-none"
-            : "w-0 -translate-x-full border-none md:w-[72px] md:translate-x-0 md:border-r max-md:pointer-events-none max-md:invisible"
+            ? "w-[280px] translate-x-0 shadow-2xl md:shadow-none"
+            : "-translate-x-full md:translate-x-0 w-[280px] md:w-[72px] shadow-none"
           }
         `}
       >
         {/* Toggle Button Overlapping Right Border */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute top-[68px] -right-3 w-6 h-6 bg-white border border-[#edece9] rounded-full shadow-md items-center justify-center text-[#5a5a57] hover:text-[#37352f] hover:scale-105 transition-all z-50 cursor-pointer hidden md:flex"
+          className="absolute top-[68px] -right-3 w-6 h-6 bg-white border border-[#edece9] rounded-full shadow-md flex items-center justify-center text-[#5a5a57] hover:text-[#37352f] hover:scale-105 transition-all z-50 cursor-pointer"
           title={sidebarOpen ? "Tutup Sidebar" : "Buka Sidebar"}
         >
           {sidebarOpen ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -1020,7 +1020,7 @@ export default function App() {
 
         {/* Top Header / Breadcrumb Bar */}
         <div className={`border-b border-[#edece9]/60 px-6 md:px-10 flex items-center justify-between flex-shrink-0 text-[11px] text-[#9b9a97] transition-all duration-300 ease-in-out
-          ${isScrolled ? "h-0 opacity-0 overflow-hidden border-none pointer-events-none" : "h-10 opacity-100"}
+          ${isScrolled ? "md:h-0 md:opacity-0 md:overflow-hidden md:border-none md:pointer-events-none h-10 opacity-100" : "h-10 opacity-100"}
         `}>
           <div className="flex items-center gap-2">
             {/* Mobile Hamburger toggle button */}
