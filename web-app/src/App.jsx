@@ -667,10 +667,6 @@ export default function App() {
             <span>/</span>
             <span className="text-[#37352f] font-medium truncate max-w-[100px] sm:max-w-none">Database Lowongan</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.2 h-1.2 rounded-full bg-[#43873e] animate-pulse flex-shrink-0"></span>
-            <span className="text-[#43873e] font-medium truncate max-w-[150px] sm:max-w-none">Terakhir Diupdate: 2 Juli 2026, 14:48 WIB</span>
-          </div>
         </div>
 
         {/* Header Title & Description */}
@@ -682,7 +678,14 @@ export default function App() {
                 Non-Official
               </span>
             </h1>
-            <p className="text-[12px] md:text-[12.5px] text-[#5a5a57] max-w-4xl leading-relaxed mt-0.5">
+            
+            {/* Terakhir Diupdate di bawah judul */}
+            <div className="flex items-center gap-1.5 text-[11px] text-[#43873e] font-medium mt-0.5 select-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#43873e] animate-pulse flex-shrink-0"></span>
+              <span>Terakhir Diupdate: 2 Juli 2026, 14:48 WIB</span>
+            </div>
+
+            <p className="text-[12px] md:text-[12.5px] text-[#5a5a57] max-w-4xl leading-relaxed mt-1">
               Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
             </p>
           </div>
