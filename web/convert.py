@@ -43,8 +43,14 @@ for _, row in df_excel.iterrows():
 # Ensure output directory exists
 os.makedirs(os.path.dirname(json_output_path), exist_ok=True)
 
-# Write to JSON file
+# Write to JSON file in web directory
 with open(json_output_path, "w", encoding="utf-8") as f:
     json.dump(records, f, indent=4, ensure_ascii=False)
 
-print(f"Successfully processed {len(records)} records with subsidiary extraction.")
+# Also write directly to the web-app src data directory
+react_json_output_path = os.path.join(base_dir, "web-app", "src", "data", "loker_data.json")
+os.makedirs(os.path.dirname(react_json_output_path), exist_ok=True)
+with open(react_json_output_path, "w", encoding="utf-8") as f:
+    json.dump(records, f, indent=4, ensure_ascii=False)
+
+print(f"Successfully processed {len(records)} records and updated both JSON destinations.")
