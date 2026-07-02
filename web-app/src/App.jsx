@@ -676,11 +676,14 @@ export default function App() {
         {/* Header Title & Description */}
         <div className="px-6 md:px-10 pt-4 md:pt-5 pb-1 flex-shrink-0">
           <div className="max-w-6xl mx-auto flex flex-col gap-1">
-            <h1 className="text-xl md:text-2xl font-bold text-[#37352f] tracking-tight">
+            <h1 className="text-xl md:text-2xl font-bold text-[#37352f] tracking-tight flex flex-wrap items-center gap-2">
               KarirEnergi Database
+              <span className="text-[10px] font-semibold text-[#8a8a86] bg-[#edece9]/50 border border-[#edece9] px-2 py-0.5 rounded-full select-none">
+                Non-Official
+              </span>
             </h1>
-            <p className="text-[12px] md:text-[12.5px] text-[#5a5a57] max-w-4xl leading-relaxed">
-              Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina (Non-Official).
+            <p className="text-[12px] md:text-[12.5px] text-[#5a5a57] max-w-4xl leading-relaxed mt-0.5">
+              Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
             </p>
           </div>
         </div>
@@ -689,24 +692,24 @@ export default function App() {
         <div className={`px-6 md:px-10 flex-shrink-0 transition-all duration-300 ease-in-out
           ${isScrolled ? "h-0 opacity-0 overflow-hidden pb-0 pt-0 border-none pointer-events-none" : "pt-2.5 md:pt-3 pb-3"}
         `}>
-          <div className={`max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2.5 md:gap-3 border-b border-[#edece9]/80 pb-3 transition-all duration-300 ease-in-out
+          <div className={`max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 border-b border-[#edece9]/80 pb-4 transition-all duration-300 ease-in-out
             ${isScrolled ? "pb-0 border-none" : ""}
           `}>
-            <div className="px-2.5 py-1.5 bg-[#f7f7f5]/80 hover:bg-[#edece9]/40 rounded-lg border border-[#edece9]/80 transition-all duration-200 flex flex-col shadow-sm">
-              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Total Lowongan</span>
-              <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{totalCount}</span>
+            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
+              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Total Lowongan</span>
+              <span className="text-[17px] md:text-[19px] font-bold text-[#37352f] leading-none mt-0.5">{totalCount}</span>
             </div>
-            <div className="px-2.5 py-1.5 bg-[#f7f7f5]/80 hover:bg-[#edece9]/40 rounded-lg border border-[#edece9]/80 transition-all duration-200 flex flex-col shadow-sm">
-              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Total Pendaftar</span>
-              <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{databaseStats.pelamar.toLocaleString('id-ID')}</span>
+            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
+              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Total Pendaftar</span>
+              <span className="text-[17px] md:text-[19px] font-bold text-[#37352f] leading-none mt-0.5">{databaseStats.pelamar.toLocaleString('id-ID')}</span>
             </div>
-            <div className="px-2.5 py-1.5 bg-[#f7f7f5]/80 hover:bg-[#edece9]/40 rounded-lg border border-[#edece9]/80 transition-all duration-200 flex flex-col shadow-sm">
-              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Total Kuota</span>
-              <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{databaseStats.kuota.toLocaleString('id-ID')}</span>
+            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
+              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Total Kuota</span>
+              <span className="text-[17px] md:text-[19px] font-bold text-[#37352f] leading-none mt-0.5">{databaseStats.kuota.toLocaleString('id-ID')}</span>
             </div>
-            <div className="px-2.5 py-1.5 bg-[#f7f7f5]/80 hover:bg-[#edece9]/40 rounded-lg border border-[#edece9]/80 transition-all duration-200 flex flex-col shadow-sm">
-              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Khusus Jenjang S1</span>
-              <span className="text-[15px] md:text-[16px] font-bold text-[#c52447] mt-0.5">{s1Count}</span>
+            <div className="px-3.5 py-2.5 bg-white rounded-lg border border-[#edece9] hover:border-[#dfdfde] hover:shadow-[0_4px_20px_rgba(0,0,0,0.015)] transition-all duration-200 flex flex-col gap-0.5">
+              <span className="text-[9px] md:text-[9.5px] text-[#8a8a86] font-bold uppercase tracking-wider">Khusus Jenjang S1</span>
+              <span className="text-[17px] md:text-[19px] font-bold text-[#c52447] leading-none mt-0.5">{s1Count}</span>
             </div>
           </div>
         </div>
@@ -717,23 +720,25 @@ export default function App() {
 
             {/* View Tabs Selector & Sorting */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-1 border-b md:border-b-0 pb-2 md:pb-0">
+              <div className="flex items-center bg-[#edece9]/40 p-0.5 rounded-lg border border-[#edece9]/30 w-fit">
                 <button
                   onClick={() => setViewTab("gallery")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] transition-colors cursor-pointer ${viewTab === "gallery"
-                      ? "bg-[#edece9] text-[#37352f] font-semibold"
-                      : "text-[#5a5a57] hover:bg-[#f7f7f5]"
-                    }`}
+                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12.5px] transition-all cursor-pointer ${
+                    viewTab === "gallery"
+                      ? "bg-white text-[#37352f] font-bold shadow-xs"
+                      : "text-[#5a5a57] hover:text-[#37352f]"
+                  }`}
                 >
                   <LayoutGrid className="w-3.5 h-3.5" />
                   Gallery
                 </button>
                 <button
                   onClick={() => setViewTab("table")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] transition-colors cursor-pointer ${viewTab === "table"
-                      ? "bg-[#edece9] text-[#37352f] font-semibold"
-                      : "text-[#5a5a57] hover:bg-[#f7f7f5]"
-                    }`}
+                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12.5px] transition-all cursor-pointer ${
+                    viewTab === "table"
+                      ? "bg-white text-[#37352f] font-bold shadow-xs"
+                      : "text-[#5a5a57] hover:text-[#37352f]"
+                  }`}
                 >
                   <TableIcon className="w-3.5 h-3.5" />
                   Table
@@ -750,7 +755,7 @@ export default function App() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="text-[12.5px] border border-[#edece9] rounded-md px-2 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm"
+                    className="text-[12.5px] border border-[#edece9] rounded-md px-2.5 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all"
                   >
                     <option value="perusahaan">Nama Perusahaan</option>
                     <option value="judul">Judul Lowongan</option>
