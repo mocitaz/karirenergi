@@ -135,6 +135,7 @@ export default function App() {
   const [viewTab, setViewTab] = useState("gallery"); // gallery | table
   const [selectedJob, setSelectedJob] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   // Bookmarking / Saved Jobs State
   const [savedJobs, setSavedJobs] = useState(() => {
@@ -224,6 +225,7 @@ export default function App() {
     setSelectedEdu(draftEdu);
     setSelectedSector(draftSector);
     setSidebarOpen(false);
+    setFilterDrawerOpen(false);
   };
 
   // Countdown Timer State (Target: 5 July 2026 at 23:59 WIB)
@@ -874,8 +876,8 @@ export default function App() {
             </nav>
           </div>
 
-          {/* Filters Area */}
-          <div className="flex flex-col gap-2">
+          {/* Filters Area - Only visible on desktop (hidden on mobile) */}
+          <div className="hidden md:flex flex-col gap-2">
             {sidebarOpen ? (
               <div className="flex flex-col gap-4 animate-fade-in">
                 <div className="text-[10px] font-extrabold text-[#9b9a97] uppercase tracking-wider flex items-center justify-between border-b border-[#edece9]/60 pb-1.5 px-2.5">
@@ -1163,9 +1165,9 @@ export default function App() {
                   />
                 </div>
 
-                {/* Mobile Filter Button - only visible on mobile (under md) to open sidebar */}
+                {/* Mobile Filter Button - only visible on mobile (under md) to open bottom sheet */}
                 <button
-                  onClick={() => setSidebarOpen(true)}
+                  onClick={() => setFilterDrawerOpen(true)}
                   className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] rounded-md text-[12.5px] font-semibold border border-[#edece9] transition-all cursor-pointer flex-shrink-0"
                   title="Buka Panel Filter Lengkap"
                 >
@@ -2114,7 +2116,7 @@ export default function App() {
       {/* Thumb-Friendly Mobile Filter Floating Action Button (FAB) */}
       {!sidebarOpen && viewTab !== "analytics" && (
         <button
-          onClick={() => setSidebarOpen(true)}
+          onClick={() => setFilterDrawerOpen(true)}
           className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#37352f] text-white rounded-full px-5 py-3 shadow-xl flex items-center gap-2 text-[12.5px] font-bold z-40 hover:bg-[#4d4b47] active:scale-95 transition-all select-none border border-[#4d4b47] animate-fade-in"
           title="Filter & Cari Lowongan"
         >
@@ -2124,6 +2126,145 @@ export default function App() {
             <span className="w-2.5 h-2.5 bg-[#43873e] rounded-full animate-pulse flex-shrink-0"></span>
           )}
         </button>
+      )}
+
+      {/* Mobile Filter Bottom Sheet */}
+      {filterDrawerOpen && (
+        <>
+          {/* Backdrop blur overlay */}
+          <div
+            className="md:hidden fixed inset-0 bg-black/35 backdrop-blur-xs z-50 transition-opacity duration-300"
+            onClick={() => setFilterDrawerOpen(false)}
+          />
+
+          {/* Bottom Sheet Modal Container */}
+          <div className="md:hidden fixed bottom-0 left-0 right-0 max-h-[85vh] bg-white rounded-t-2xl z-55 flex flex-col shadow-2xl animate-slide-up border-t border-[#edece9] overflow-hidden">
+            {/* Grab handle/Drag line at top */}
+            <div className="w-12 h-1.5 bg-[#edece9] rounded-full mx-auto my-3 flex-shrink-0" />
+
+            {/* Header */}
+            <div className="px-5 pb-3 border-b border-[#edece9]/60 flex items-center justify-between flex-shrink-0">
+              <h2 className="text-[14px] font-bold text-[#37352f]">Filter Lowongan</h2>
+              <button
+                onClick={() => setFilterDrawerOpen(false)}
+                className="p-1 text-[#5a5a57] hover:bg-[#edece9] rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4.5 h-4.5" />
+              </button>
+            </div>
+
+            {/* Scrollable Filters Content */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+              {/* Search */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Cari Kata Kunci</label>
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
+                  <input
+                    type="text"
+                    placeholder="Judul, jurusan, atau lokasi..."
+                    value={draftSearch}
+                    onChange={(e) => setDraftSearch(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
+                    className="w-full text-[13px] border border-[#edece9] rounded-lg pl-9 pr-3 py-2 bg-[#f7f7f5]/50 outline-none focus:bg-white focus:border-[#c4c4c2] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Company select */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Perusahaan</label>
+                <select
+                  value={draftCompany}
+                  onChange={(e) => setDraftCompany(e.target.value)}
+                  className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                >
+                  <option value="">Semua Perusahaan</option>
+                  {filterOptions.companies.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Major select */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Jurusan</label>
+                <select
+                  value={draftMajor}
+                  onChange={(e) => setDraftMajor(e.target.value)}
+                  className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                >
+                  <option value="">Semua Jurusan</option>
+                  {filterOptions.majors.map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* City select */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Lokasi / Kota</label>
+                <select
+                  value={draftCity}
+                  onChange={(e) => setDraftCity(e.target.value)}
+                  className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                >
+                  <option value="">Semua Lokasi</option>
+                  {filterOptions.cities.map((ct) => (
+                    <option key={ct} value={ct}>{ct}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Education select */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Pendidikan</label>
+                <select
+                  value={draftEdu}
+                  onChange={(e) => setDraftEdu(e.target.value)}
+                  className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                >
+                  <option value="">Semua Jenjang</option>
+                  {filterOptions.educations.map((ed) => (
+                    <option key={ed} value={ed}>{ed}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sektor select */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Sektor Kerja</label>
+                <select
+                  value={draftSector}
+                  onChange={(e) => setDraftSector(e.target.value)}
+                  className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                >
+                  <option value="">Semua Sektor</option>
+                  {filterOptions.sectors.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Bottom sticky action bar */}
+            <div className="px-5 py-4 border-t border-[#edece9] bg-[#fbfbfa] flex items-center gap-3 flex-shrink-0">
+              <button
+                onClick={handleResetFilters}
+                className="flex-1 py-2.5 rounded-lg border border-[#edece9] text-[#5a5a57] hover:bg-[#edece9]/50 text-[13px] font-bold transition-all cursor-pointer text-center"
+              >
+                Reset
+              </button>
+              <button
+                onClick={handleApplyFilters}
+                className="flex-[2] py-2.5 rounded-lg bg-[#1d7bb8] text-white hover:bg-[#155a8a] text-[13px] font-bold transition-all cursor-pointer text-center shadow-sm flex items-center justify-center gap-1.5"
+              >
+                <Search className="w-4 h-4" />
+                Terapkan Filter
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
     </div>
