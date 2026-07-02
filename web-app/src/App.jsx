@@ -183,33 +183,6 @@ export default function App() {
     }
   };
 
-  // Simulated Web Visitor Stats (Stored in LocalStorage to persist across reloads)
-  const [visitorStats, setVisitorStats] = useState({
-    totalViews: 0,
-    onlineNow: 7
-  });
-
-  useEffect(() => {
-    const key = "karirenergi-visitor-views";
-    const current = localStorage.getItem(key);
-    let baseVal = current ? parseInt(current) : 15248;
-    
-    // Simulate real visits growth per page reload
-    baseVal += Math.floor(Math.random() * 3) + 1;
-    localStorage.setItem(key, String(baseVal));
-    setVisitorStats(prev => ({ ...prev, totalViews: baseVal }));
-
-    // Simulate online visitors changes dynamically
-    const interval = setInterval(() => {
-      setVisitorStats(prev => ({
-        ...prev,
-        onlineNow: Math.max(5, Math.min(25, prev.onlineNow + (Math.random() > 0.48 ? 1 : -1)))
-      }));
-    }, 4500);
-
-    return () => clearInterval(interval);
-  }, []);
-
 
   const handleScroll = (e) => {
     if (e.target.scrollTop > 15) {
@@ -1807,52 +1780,6 @@ export default function App() {
 
                   </div>
 
-                </div>
-
-                {/* Full-width Website Visitor Analytics for KarirEnergi */}
-                <div className="border border-[#edece9] rounded-lg p-5 bg-[#37352f]/3 flex flex-col gap-4 shadow-3xs">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex flex-col">
-                      <h3 className="font-bold text-[14px] text-[#37352f] flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
-                        Analisis Pengunjung Website KarirEnergi
-                      </h3>
-                      <p className="text-[11px] text-[#8a8a86]">Statistik interaksi langsung pengunjung portal pelacak magang karirenergi.online</p>
-                    </div>
-                    <div className="bg-white border border-[#edece9] rounded px-2.5 py-1 text-[11px] font-semibold text-[#5a5a57] shadow-3xs flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#16a34a] animate-ping"></span>
-                      Live Monitor 📡
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-1">
-                    <div className="bg-white border border-[#edece9] rounded-lg p-3.5 flex flex-col gap-0.5">
-                      <span className="text-[10px] text-[#8a8a86] font-bold uppercase tracking-wider">Total Kunjungan</span>
-                      <span className="text-xl font-extrabold text-[#37352f]">{visitorStats.totalViews.toLocaleString()}</span>
-                      <span className="text-[9px] text-[#16a34a] font-bold mt-1">▲ 14.8% minggu ini</span>
-                    </div>
-
-                    <div className="bg-white border border-[#edece9] rounded-lg p-3.5 flex flex-col gap-0.5">
-                      <span className="text-[10px] text-[#8a8a86] font-bold uppercase tracking-wider">Aktif Saat Ini</span>
-                      <span className="text-xl font-extrabold text-[#16a34a] flex items-center gap-1.5">
-                        {visitorStats.onlineNow}
-                        <span className="text-[10.5px] font-semibold text-[#8a8a86] font-sans">User online</span>
-                      </span>
-                      <span className="text-[9px] text-[#8a8a86] mt-1">Real-time update</span>
-                    </div>
-
-                    <div className="bg-white border border-[#edece9] rounded-lg p-3.5 flex flex-col gap-0.5">
-                      <span className="text-[10px] text-[#8a8a86] font-bold uppercase tracking-wider">Durasi Sesi Rerata</span>
-                      <span className="text-xl font-extrabold text-[#37352f]">3m 45s</span>
-                      <span className="text-[9px] text-[#8a8a86] mt-1">Retensi pengguna tinggi</span>
-                    </div>
-
-                    <div className="bg-white border border-[#edece9] rounded-lg p-3.5 flex flex-col gap-0.5">
-                      <span className="text-[10px] text-[#8a8a86] font-bold uppercase tracking-wider">Perangkat Utama</span>
-                      <span className="text-xl font-extrabold text-[#c26100]">Mobile (68%)</span>
-                      <span className="text-[9px] text-[#8a8a86] mt-1">Desktop (32%)</span>
-                    </div>
-                  </div>
                 </div>
 
               </div>
