@@ -755,7 +755,7 @@ export default function App() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="text-[12.5px] border border-[#edece9] rounded-md px-2.5 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all"
+                    className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.25 outline-none cursor-pointer transition-all"
                   >
                     <option value="perusahaan">Nama Perusahaan</option>
                     <option value="judul">Judul Lowongan</option>
@@ -767,16 +767,16 @@ export default function App() {
             </div>
 
             {/* Inline Filter Controls on Main Page */}
-            <div className="hidden md:flex flex-wrap items-center gap-2 pt-1.5 border-t border-[#edece9]/50">
+            <div className="hidden md:flex flex-wrap items-center gap-2 pt-2.5 border-t border-[#edece9]/60">
               {/* Inline Search */}
               <div className="relative flex-1 min-w-[200px] max-w-xs">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
                 <input
                   type="text"
-                  placeholder="Cari kata kunci..."
+                  placeholder="Cari lowongan..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full text-[12.5px] border border-[#edece9] rounded-md pl-8 pr-2.5 py-1 bg-white outline-none focus:border-[#5a5a57] shadow-sm transition-all"
+                  className="w-full text-[12.5px] border border-[#edece9]/80 bg-[#f7f7f5]/40 focus:bg-white rounded-md pl-8 pr-3 py-1.5 outline-none focus:border-[#dfdfde] transition-all"
                 />
               </div>
 
@@ -784,7 +784,7 @@ export default function App() {
               <select
                 value={selectedCompany}
                 onChange={(e) => setSelectedCompany(e.target.value)}
-                className="text-[12.5px] border border-[#edece9] rounded-md px-2.5 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all flex-1 min-w-[130px] md:max-w-[180px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px]"
               >
                 <option value="">Semua Perusahaan</option>
                 {filterOptions.companies.map((c) => (
@@ -796,7 +796,7 @@ export default function App() {
               <select
                 value={selectedMajor}
                 onChange={(e) => setSelectedMajor(e.target.value)}
-                className="text-[12.5px] border border-[#edece9] rounded-md px-2.5 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all flex-1 min-w-[130px] md:max-w-[180px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px]"
               >
                 <option value="">Semua Jurusan</option>
                 {filterOptions.majors.map((m) => (
@@ -808,7 +808,7 @@ export default function App() {
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="text-[12.5px] border border-[#edece9] rounded-md px-2.5 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all flex-1 min-w-[120px] md:max-w-[150px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[145px]"
               >
                 <option value="">Semua Lokasi</option>
                 {filterOptions.cities.map((ct) => (
@@ -820,7 +820,7 @@ export default function App() {
               <select
                 value={selectedEdu}
                 onChange={(e) => setSelectedEdu(e.target.value)}
-                className="text-[12.5px] border border-[#edece9] rounded-md px-2.5 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all flex-1 min-w-[110px] md:max-w-[135px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[130px]"
               >
                 <option value="">Semua Jenjang</option>
                 {filterOptions.educations.map((ed) => (
@@ -832,7 +832,7 @@ export default function App() {
               <select
                 value={selectedSector}
                 onChange={(e) => setSelectedSector(e.target.value)}
-                className="text-[12.5px] border border-[#edece9] rounded-md px-2.5 py-1 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all flex-1 min-w-[120px] md:max-w-[150px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[135px]"
               >
                 <option value="">Semua Sektor</option>
                 {filterOptions.sectors.map((s) => (
