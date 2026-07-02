@@ -100,6 +100,30 @@ export function getCompetitionLevel(passRateStr) {
   }
 }
 
+// Clean and swap title parts: "INTERNSHIP 2026 - PT Company - Position" -> "Position - PT Company"
+export function formatTitle(rawTitle) {
+  if (!rawTitle) return "";
+  const parts = rawTitle.split(/\s*[-–]\s*/);
+  if (parts.length < 2) {
+    return rawTitle.replace(/^INTERNSHIP\s*\d*\s*[-–]?\s*/i, "").trim();
+  }
+
+  const firstPart = parts[0].trim();
+  const isInternshipPrefix = /^INTERNSHIP\s*\d*$/i.test(firstPart);
+
+  if (isInternshipPrefix) {
+    if (parts.length === 2) {
+      return parts[1].trim();
+    } else if (parts.length >= 3) {
+      const company = parts[1].trim();
+      const position = parts.slice(2).join(" - ").trim();
+      return `${position} - ${company}`;
+    }
+  }
+
+  return rawTitle;
+}
+
 export default function App() {
   // Navigation & View States
   const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -174,7 +198,7 @@ export default function App() {
     };
 
     return lokerData.map((job) => {
-      const cleanTitle = clean(job["Judul Lowongan"]);
+      const cleanTitle = formatTitle(clean(job["Judul Lowongan"]));
       const cleanCompany = clean(job["Perusahaan"], "PT Pertamina");
       
       let rawCity = clean(job["Kota"]);
