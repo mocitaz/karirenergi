@@ -1,53 +1,92 @@
 (async function() {
-    // --- 1. DUA INDIKATOR WIDGET JALUR DETAIL ---
+    // --- 1. CONFIGURATION & UUIDS ---
     const widgetDetailUUID = "845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2";
     const vacancyRegex = /845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2\/\?id=([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;
 
     const uniqueJobs = [];
+    const hasilScraping = [];
     let pageNum = 1;
     let stopScraping = false;
 
-    // --- 2. PEMBUATAN DASHBOARD VISUAL DI LAYAR ---
+    // --- 2. PREMIUM NOTION-STYLE GLASSMORPHIC DASHBOARD UI ---
     const oldDash = document.getElementById("scraping-dashboard");
     if (oldDash) oldDash.remove();
 
     const dashboard = document.createElement("div");
     dashboard.id = "scraping-dashboard";
-    dashboard.style.position = "fixed";
-    dashboard.style.top = "20px";
-    dashboard.style.right = "20px";
-    dashboard.style.zIndex = "9999999";
-    dashboard.style.padding = "20px";
-    dashboard.style.backgroundColor = "#1e1e2f";
-    dashboard.style.color = "#ffffff";
-    dashboard.style.borderRadius = "12px";
-    dashboard.style.boxShadow = "0 8px 30px rgba(0,0,0,0.3)";
-    dashboard.style.fontFamily = "sans-serif";
-    dashboard.style.width = "320px";
-    dashboard.style.border = "1px solid #3f3f5f";
+    
+    // Apply styling
+    Object.assign(dashboard.style, {
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        zIndex: "9999999",
+        padding: "22px",
+        backgroundColor: "rgba(30, 30, 45, 0.95)",
+        backdropFilter: "blur(8px)",
+        color: "#ffffff",
+        borderRadius: "14px",
+        boxShadow: "0 12px 40px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1)",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        width: "340px",
+        border: "1px solid rgba(255, 255, 255, 0.15)",
+        userSelect: "none",
+        transition: "all 0.3s ease"
+    });
 
     dashboard.innerHTML = `
-        <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #4fc3f7; border-bottom: 1px solid #3f3f5f; padding-bottom: 8px;">Pertamina Web Scraper</h3>
-        <div style="margin-bottom: 15px; font-size: 14px; line-height: 1.6;">
-            <div>Status: <span id="scrape-status" style="color: #ffb74d; font-weight: bold;">Mencari halaman...</span></div>
-            <div>Halaman Aktif: <span id="scrape-page" style="font-weight: bold; color: #4fc3f7;">1</span></div>
-            <div>Loker Terdeteksi: <span id="scrape-count" style="font-weight: bold; color: #81c784;">0</span></div>
-            <div style="margin-top: 10px; height: 8px; background-color: #37474f; border-radius: 4px; overflow: hidden;">
-                <div id="scrape-progress" style="width: 0%; height: 100%; background-color: #4fc3f7; transition: width 0.3s;"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px; font-weight: 800; color: #4fc3f7; letter-spacing: -0.3px;">KarirEnergi Scraper</span>
+                <span style="font-size: 9px; font-weight: bold; background: rgba(79, 195, 247, 0.15); color: #4fc3f7; padding: 2px 6px; rounded-radius: 4px; border: 1px solid rgba(79, 195, 247, 0.3); border-radius: 4px;">v2.0</span>
+            </div>
+            <div id="minimize-btn" style="cursor: pointer; font-size: 14px; opacity: 0.7; hover:opacity: 1;">➖</div>
+        </div>
+        <div id="dashboard-content" style="font-size: 13.5px; line-height: 1.65; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between;"><span>Status:</span><span id="scrape-status" style="color: #ffb74d; font-weight: bold;">Mencari halaman...</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>Halaman Aktif:</span><span id="scrape-page" style="font-weight: bold; color: #4fc3f7;">1</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>Loker Terdeteksi:</span><span id="scrape-count" style="font-weight: bold; color: #81c784;">0</span></div>
+            <div style="margin: 14px 0 10px 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">
+                    <span>Progress Pemindaian</span>
+                    <span id="scrape-progress-text">0%</span>
+                </div>
+                <div style="height: 6px; background-color: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                    <div id="scrape-progress" style="width: 0%; height: 100%; background-color: #4fc3f7; transition: width 0.3s; border-radius: 3px;"></div>
+                </div>
+            </div>
+            <div id="dashboard-actions" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+                <button id="btn-stop-download" style="width: 100%; padding: 10px; background-color: #e57373; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 10px rgba(229,115,115,0.25);">Hentikan Scraping</button>
             </div>
         </div>
-        <button id="btn-stop-download" style="width: 100%; padding: 12px; background-color: #e57373; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background-color 0.2s;">Hentikan & Unduh CSV</button>
     `;
     document.body.appendChild(dashboard);
 
-    // Fungsi tombol stop
+    // Minimize toggle
+    let isMinimized = false;
+    document.getElementById("minimize-btn").onclick = function() {
+        isMinimized = !isMinimized;
+        const content = document.getElementById("dashboard-content");
+        if (isMinimized) {
+            content.style.display = "none";
+            this.innerText = "➕";
+            dashboard.style.padding = "12px 20px";
+        } else {
+            content.style.display = "block";
+            this.innerText = "➖";
+            dashboard.style.padding = "22px";
+        }
+    };
+
+    // Tombol stop
     document.getElementById("btn-stop-download").onclick = function() {
         stopScraping = true;
         this.innerText = "Menghentikan proses...";
         this.style.backgroundColor = "#ffb74d";
+        this.style.boxShadow = "none";
     };
 
-    // --- 3. DETEKSI PAGINATION & CARTU SECARA CERDAS ---
+    // --- 3. DETEKSI PAGINATION & JALUR LOKER ---
     function getNextButton() {
         let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
         if (btn && !isDisabled(btn)) return btn;
@@ -83,7 +122,6 @@
 
     function collectJobsFromCurrentPage() {
         const jobCards = document.querySelectorAll('.job-item, .card, tr, [class*="card"]');
-        let count = 0;
         jobCards.forEach(card => {
             const htmlContent = card.outerHTML || "";
             const match = htmlContent.match(vacancyRegex);
@@ -119,16 +157,15 @@
                         kuota: kuota,
                         pelamar: pelamar
                     });
-                    count++;
                 }
             }
         });
         document.getElementById("scrape-count").innerText = uniqueJobs.length;
     }
 
-    // --- PHASE 1: COLLECT HALAMAN LIST ---
+    // --- PHASE 1: COLLECTING LISTINGS ---
     while (!stopScraping) {
-        document.getElementById("scrape-status").innerText = "Mengumpulkan daftar lowongan...";
+        document.getElementById("scrape-status").innerText = "Mengumpulkan loker...";
         document.getElementById("scrape-page").innerText = pageNum;
         
         collectJobsFromCurrentPage();
@@ -146,46 +183,49 @@
         await new Promise(resolve => setTimeout(resolve, 2500));
     }
 
-    // --- PHASE 2: SCRAPE DETAIL PARALEL (5 WORKERS) ---
-    const hasilScraping = [];
-    
-    if (uniqueJobs.length > 0) {
-        document.getElementById("scrape-status").innerText = "Menyiapkan pemindaian detail...";
+    // Helper fetch dengan Auto-Retry & Jitter
+    async function fetchWithRetry(url, retries = 3, backoff = 1000) {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+                return await res.text();
+            } catch (err) {
+                if (i === retries - 1) throw err;
+                const waitTime = backoff * Math.pow(2, i) + Math.random() * 500;
+                console.warn(`Fetch gagal untuk ${url}. Mengulangi dalam ${Math.round(waitTime)}ms...`, err);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+            }
+        }
+    }
+
+    // --- PHASE 2: PARALEL DETAILS FETCH (5 CONCURRENT WORKERS) ---
+    if (uniqueJobs.length > 0 && !stopScraping) {
+        document.getElementById("scrape-status").innerText = "Menghubungkan detail...";
         
         const concurrency = 5; 
         let currentIndex = 0;
 
-        async function worker(workerId) {
-            const iframe = document.createElement('iframe');
-            iframe.style.position = 'absolute';
-            iframe.style.width = '800px';
-            iframe.style.height = '600px';
-            iframe.style.left = '-9999px';
-            iframe.style.top = '-9999px';
-            document.body.appendChild(iframe);
-
+        async function worker() {
             while (currentIndex < uniqueJobs.length && !stopScraping) {
                 const index = currentIndex++;
                 if (index >= uniqueJobs.length) break;
 
                 const job = uniqueJobs[index];
                 
-                // Update Dashboard Status
-                document.getElementById("scrape-status").innerText = `Memproses (${index + 1}/${uniqueJobs.length})`;
-                const progressPercent = ((index + 1) / uniqueJobs.length) * 100;
+                // Update Dashboard Status & Progress
+                const progressPercent = Math.round(((index + 1) / uniqueJobs.length) * 100);
+                document.getElementById("scrape-status").innerText = `Memindai (${index + 1}/${uniqueJobs.length})`;
                 document.getElementById("scrape-progress").style.width = `${progressPercent}%`;
+                document.getElementById("scrape-progress-text").innerText = `${progressPercent}%`;
 
                 try {
-                    iframe.src = job.detailUrl;
+                    // Fetch langsung via Fetch API (Vastly faster than iframe)
+                    const htmlText = await fetchWithRetry(job.detailUrl);
                     
-                    await new Promise((resolve) => {
-                        iframe.onload = resolve;
-                    });
-                    
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                    
-                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                    iframeDoc.querySelectorAll('script, style').forEach(el => el.remove());
+                    // Parse HTML string menjadi DOM Document
+                    const parser = new DOMParser();
+                    const iframeDoc = parser.parseFromString(htmlText, 'text/html');
                     
                     const fullText = iframeDoc.body.innerText || iframeDoc.body.textContent || "";
                     const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -196,25 +236,25 @@
                     let industri = "Tidak tertera";
                     let sektor = "Tidak tertera";
 
-                    // 1. Deteksi Kota berdasarkan icon lokasi (misal: icon--location, icon-location)
+                    // 1. Deteksi Kota
                     const iconLocation = iframeDoc.querySelector('.icon--location, .icon-location, i[class*="location"], i[class*="map"], i[class*="pin"]');
                     if (iconLocation && iconLocation.parentElement) {
                         kota = iconLocation.parentElement.innerText.trim();
                     }
 
-                    // 2. Deteksi Industri berdasarkan icon tag
+                    // 2. Deteksi Industri
                     const iconIndustry = iframeDoc.querySelector('.icon--tag, .icon-tag, i[class*="tag"], i[class*="industry"]');
                     if (iconIndustry && iconIndustry.parentElement) {
                         industri = iconIndustry.parentElement.innerText.trim();
                     }
 
-                    // 3. Deteksi Sektor berdasarkan icon briefcase/bag
+                    // 3. Deteksi Sektor
                     const iconSector = iframeDoc.querySelector('.icon--briefcase, .icon-briefcase, .icon--bag, .icon-bag, i[class*="briefcase"], i[class*="bag"], i[class*="work"]');
                     if (iconSector && iconSector.parentElement) {
                         sektor = iconSector.parentElement.innerText.trim();
                     }
 
-                    // Fallback jika deteksi icon tidak menemukan data
+                    // Fallback Kota, Industri, Sektor dari baris text
                     let indexKota = -1;
                     for (let j = 0; j < lines.length; j++) {
                         const line = lines[j];
@@ -236,6 +276,11 @@
                             sektor = lines[indexKota + 2].trim();
                         }
                     }
+
+                    // Bersihkan tag / format kota
+                    kota = kota.replace(/[\s\-\•\.\,]+$/, '').trim();
+                    industri = industri.replace(/[\s\-\•\.\,]+$/, '').trim();
+                    sektor = sektor.replace(/[\s\-\•\.\,]+$/, '').trim();
 
                     const matchPendidikan = fullText.match(/(?:Tingkat\s+)?Pendidikan\s*:\s*([^\n\r]+)/i);
                     if (matchPendidikan) {
@@ -271,52 +316,85 @@
                     });
 
                 } catch (err) {
-                    console.error(`Gagal memproses ${job.judul}:`, err);
+                    console.error(`Gagal memproses detail ${job.judul}:`, err);
                 }
+                
+                // Jitter (delay acak antara 100-300ms agar lebih aman terhadap WAF)
+                await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
             }
-            document.body.removeChild(iframe);
         }
 
         const workers = [];
-        for (let w = 1; w <= concurrency; w++) {
-            workers.push(worker(w));
+        for (let w = 0; w < concurrency; w++) {
+            workers.push(worker());
         }
         await Promise.all(workers);
     }
 
-    // --- PHASE 3: SELESAI & UNDUH DATA ---
+    // --- PHASE 3: SELESAI & EKSPORT DATA ---
     if (hasilScraping.length > 0) {
         document.getElementById("scrape-status").innerText = "Selesai!";
         document.getElementById("scrape-status").style.color = "#81c784";
         document.getElementById("scrape-progress").style.backgroundColor = "#81c784";
+        document.getElementById("scrape-progress-text").innerText = "100%";
+
+        // Hilangkan tombol Hentikan Scraping
+        const btnStop = document.getElementById("btn-stop-download");
+        if (btnStop) btnStop.remove();
+
+        // Siapkan File CSV
+        // Bersihkan text fields dari newlines agar tidak merusak baris CSV
+        const cleanCSVField = (text) => {
+            if (!text) return "";
+            return String(text).replace(/[\r\n]+/g, ' ').replace(/"/g, '""').trim();
+        };
 
         let csvContent = "\uFEFFJudul Lowongan,Perusahaan,Kota,Industri,Sektor,Pendidikan,Jurusan,Link Detail,Kuota,Pelamar\n";
         hasilScraping.forEach(row => {
-            csvContent += `"${row["Judul Lowongan"].replace(/"/g, '""')}","${row["Perusahaan"].replace(/"/g, '""')}","${row["Kota"].replace(/"/g, '""')}","${row["Industri"].replace(/"/g, '""')}","${row["Sektor"].replace(/"/g, '""')}","${row["Pendidikan"].replace(/"/g, '""')}","${row["Jurusan"].replace(/"/g, '""')}","${row["Link Detail"].replace(/"/g, '""')}","${row["Kuota"]}","${row["Pelamar"]}"\n`;
+            csvContent += `"${cleanCSVField(row["Judul Lowongan"])}","${cleanCSVField(row["Perusahaan"])}","${cleanCSVField(row["Kota"])}","${cleanCSVField(row["Industri"])}","${cleanCSVField(row["Sektor"])}","${cleanCSVField(row["Pendidikan"])}","${cleanCSVField(row["Jurusan"])}","${cleanCSVField(row["Link Detail"])}","${row["Kuota"]}","${row["Pelamar"]}"\n`;
         });
 
-        // Modifikasi tombol stop menjadi tombol download besar
-        const actionBtn = document.getElementById("btn-stop-download");
-        actionBtn.innerText = "UNDUH CSV LENGKAP";
-        actionBtn.style.backgroundColor = "#28a745";
-        
-        actionBtn.onclick = function() {
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        // Siapkan File JSON
+        // Format JSON dibungkus rapi sehingga siap pakai untuk loker_data.json
+        const jsonContent = JSON.stringify(hasilScraping, null, 2);
+
+        // Render Action Buttons
+        const actionArea = document.getElementById("dashboard-actions");
+        actionArea.innerHTML = `
+            <button id="btn-download-json" style="width: 100%; padding: 11px; background-color: #4fc3f7; color: #1e1e2f; border: none; border-radius: 6px; font-weight: bold; font-size: 13.5px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(79,195,247,0.3);">📥 UNDUH DATA (.JSON)</button>
+            <button id="btn-download-csv" style="width: 100%; padding: 10px; background-color: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; transition: all 0.2s; hover:background:rgba(255,255,255,0.15)">📥 Unduh CSV Kerja</button>
+        `;
+
+        // Handle Download JSON (Database Siap Pakai)
+        document.getElementById("btn-download-json").onclick = function() {
+            const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const downloadLink = document.createElement("a");
             downloadLink.setAttribute("href", url);
-            downloadLink.setAttribute("download", "loker_magang_pertamina_semua.csv");
+            downloadLink.setAttribute("download", "loker_data.json");
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
         };
 
-        // Picu download otomatis
-        actionBtn.click();
-        console.log("Selesai! Klik tombol hijau di kanan atas jika file belum terunduh otomatis.");
+        // Handle Download CSV
+        document.getElementById("btn-download-csv").onclick = function() {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.createElement("a");
+            downloadLink.setAttribute("href", url);
+            downloadLink.setAttribute("download", "loker_magang_pertamina_lengkap.csv");
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        };
+
+        // Otomatis download JSON demi efisiensi database website
+        document.getElementById("btn-download-json").click();
+        console.log("Scraping berhasil selesai! File database 'loker_data.json' telah diunduh otomatis.");
     } else {
         document.getElementById("scrape-status").innerText = "Gagal/Dihentikan";
         document.getElementById("scrape-status").style.color = "#e57373";
-        console.log("Tidak ada data lowongan yang berhasil dikumpulkan.");
+        console.log("Tidak ada data loker yang dikumpulkan.");
     }
 })();
