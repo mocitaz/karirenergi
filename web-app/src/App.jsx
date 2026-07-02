@@ -877,22 +877,6 @@ export default function App() {
                           {job["Judul Lowongan"]}
                         </h3>
 
-                        {/* Location & Persaingan */}
-                        <div className="flex items-center justify-between text-[11.5px] text-[#5a5a57]">
-                          <div className="flex items-center gap-1.5 truncate max-w-[130px]">
-                            <MapPin className="w-3.5 h-3.5 text-[#9b9a97] flex-shrink-0" />
-                            <span className="truncate">{job["Kota"]}</span>
-                          </div>
-                          {(() => {
-                            const comp = getCompetitionLevel(stats.passRate);
-                            return (
-                              <span className={`text-[9.5px] font-semibold px-1.5 py-0.5 rounded flex-shrink-0 ${comp.bg} ${comp.text}`}>
-                                {comp.label}
-                              </span>
-                            );
-                          })()}
-                        </div>
-
                         {/* Majors list */}
                         {majorTags.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-1">
@@ -904,21 +888,36 @@ export default function App() {
                           </div>
                         )}
 
-                        {/* Quota & Applicants Mini Panel */}
-                        <div className="grid grid-cols-3 gap-1 bg-[#f7f7f5]/70 rounded p-1.5 text-center text-[10px] border border-[#edece9]/50 mt-1.5">
-                          <div className="flex flex-col">
-                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Kuota</span>
-                            <span className="text-[#37352f] font-bold">{stats.kuota} org</span>
-                          </div>
-                          <div className="flex flex-col border-x border-[#edece9]">
-                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Pelamar</span>
-                            <span className="text-[#5a5a57] font-semibold">{stats.pelamar}</span>
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Peluang</span>
-                            <span className="text-[#c52447] font-bold">{stats.passRate}%</span>
-                          </div>
+                        {/* Location */}
+                        <div className="flex items-center gap-1.5 text-[11.5px] text-[#5a5a57] mt-0.5">
+                          <MapPin className="w-3.5 h-3.5 text-[#9b9a97] flex-shrink-0" />
+                          <span className="truncate">{job["Kota"]}</span>
                         </div>
+
+                        {/* Quota & Applicants Mini Panel */}
+                        {(() => {
+                          const comp = getCompetitionLevel(stats.passRate);
+                          return (
+                            <div className="grid grid-cols-4 gap-0.5 bg-[#f7f7f5]/70 rounded p-1.5 text-center text-[10px] border border-[#edece9]/50 mt-1.5">
+                              <div className="flex flex-col">
+                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Kuota</span>
+                                <span className="text-[#37352f] font-bold">{stats.kuota} org</span>
+                              </div>
+                              <div className="flex flex-col border-l border-[#edece9]">
+                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Pelamar</span>
+                                <span className="text-[#5a5a57] font-semibold">{stats.pelamar}</span>
+                              </div>
+                              <div className="flex flex-col border-l border-[#edece9]">
+                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Peluang</span>
+                                <span className="text-[#c52447] font-bold">{stats.passRate}%</span>
+                              </div>
+                              <div className="flex flex-col border-l border-[#edece9]">
+                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Persaingan</span>
+                                <span className={`font-bold text-[9px] ${comp.text}`}>{comp.label.replace("Persaingan ", "")}</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Footer border / info */}
