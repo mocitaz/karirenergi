@@ -544,7 +544,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2">
             <span className="w-1.2 h-1.2 rounded-full bg-[#43873e] animate-pulse flex-shrink-0"></span>
-            <span className="text-[#43873e] font-medium truncate max-w-[150px] sm:max-w-none">Terakhir Diupdate: 2 Juli 2026, 11:07 WIB</span>
+            <span className="text-[#43873e] font-medium truncate max-w-[150px] sm:max-w-none">Terakhir Diupdate: 2 Juli 2026, 13:06 WIB</span>
           </div>
         </div>
 
