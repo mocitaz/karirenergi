@@ -17,8 +17,7 @@ import {
   HelpCircle,
   Users,
   UserCheck,
-  TrendingUp,
-  AlertTriangle
+  TrendingUp
 } from "lucide-react";
 import lokerData from "./data/loker_data.json";
 
@@ -97,12 +96,7 @@ export default function App() {
   const [viewTab, setViewTab] = useState("gallery"); // gallery | table
   const [selectedJob, setSelectedJob] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showAnnouncement, setShowAnnouncement] = useState(false);
 
-  const handleDismissAnnouncement = () => {
-    localStorage.setItem("karirenergi-announcement-dismissed", "true");
-    setShowAnnouncement(false);
-  };
 
   const handleScroll = (e) => {
     if (e.target.scrollTop > 15) {
@@ -1080,43 +1074,6 @@ export default function App() {
         </div>
       )}
 
-      {/* System Announcement Modal */}
-      {showAnnouncement && (
-        <div className="fixed inset-0 bg-[#0f0f15]/50 backdrop-blur-xs z-[60] flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white border border-[#edece9] rounded-lg w-full max-w-[500px] shadow-2xl relative p-6 flex flex-col gap-4 animate-scale-in">
-            <div className="flex items-center gap-3 border-b border-[#edece9]/80 pb-3">
-              <span className="p-2 bg-[#fdf6e2] rounded-lg text-[#b78103] flex-shrink-0">
-                <AlertTriangle className="w-5 h-5" />
-              </span>
-              <div>
-                <h3 className="font-bold text-[15px] text-[#37352f]">Informasi Sinkronisasi Data</h3>
-                <p className="text-[11px] text-[#9b9a97]">System Update & Maintenance Notice</p>
-              </div>
-            </div>
-            
-            <div className="text-[12.5px] text-[#5a5a57] leading-relaxed flex flex-col gap-2.5">
-              <p>
-                Halo Rekan Energi! Kami ingin menginformasikan bahwa data <strong>Kuota Lowongan</strong> dan <strong>Jumlah Pelamar</strong> saat ini masih menggunakan metode <strong>estimasi simulasi</strong> sistem dan belum sepenuhnya presisi dengan portal resmi Pertamina.
-              </p>
-              <p>
-                Saat ini tim sedang melakukan <strong>pemeliharaan & migrasi sistem (maintenance)</strong> agar data kuota serta pelamar dapat tersinkronisasi secara langsung (real-time) dengan sistem rekrutmen pusat.
-              </p>
-              <p className="text-[12px] bg-[#f7f7f5] p-2.5 rounded border border-[#edece9] text-[#37352f]">
-                <strong>Catatan:</strong> Fitur pencarian lowongan, filter perusahaan, kualifikasi pendidikan, dan detail deskripsi pekerjaan tetap aktif dan dapat digunakan dengan normal.
-              </p>
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button
-                onClick={handleDismissAnnouncement}
-                className="w-full sm:w-auto px-5 py-2 bg-[#37352f] text-white hover:bg-[#5a5a57] rounded text-[12.5px] font-semibold transition-colors cursor-pointer text-center"
-              >
-                Pahami & Tutup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
