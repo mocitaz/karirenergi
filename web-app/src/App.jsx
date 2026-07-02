@@ -18,7 +18,7 @@ import {
   Users,
   UserCheck,
   TrendingUp,
-  Star
+  Bookmark
 } from "lucide-react";
 import lokerData from "./data/loker_data.json";
 
@@ -489,7 +489,7 @@ export default function App() {
                 title="Tersimpan"
               >
                 <div className="flex items-center">
-                  <Star className={`w-4 h-4 flex-shrink-0 ${showSavedOnly || savedJobs.length > 0 ? "fill-[#b78103] text-[#b78103]" : ""}`} />
+                  <Bookmark className={`w-4 h-4 flex-shrink-0 ${showSavedOnly || savedJobs.length > 0 ? "fill-[#b78103] text-[#b78103]" : ""}`} />
                   {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in">Tersimpan</span>}
                 </div>
                 {sidebarOpen && savedJobs.length > 0 && (
@@ -879,21 +879,12 @@ export default function App() {
                       <div className="flex flex-col gap-2">
                         {/* Tags Row */}
                         <div className="flex items-center justify-between">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded w-fit truncate max-w-[140px] ${tagColor.bg} ${tagColor.text}`}>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded w-fit truncate max-w-[170px] ${tagColor.bg} ${tagColor.text}`}>
                             {job["Perusahaan"]}
                           </span>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <span className="text-[10.5px] font-bold text-[#9041a8] bg-[#f6edf9] px-1.5 py-0.5 rounded">
-                              {job["Pendidikan"]}
-                            </span>
-                            <button
-                              onClick={(e) => toggleSaveJob(job["Link Detail"], e)}
-                              className="p-1 rounded-full hover:bg-[#edece9] text-[#9b9a97] hover:text-[#b78103] transition-colors cursor-pointer"
-                              title={savedJobs.includes(job["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
-                            >
-                              <Star className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
-                            </button>
-                          </div>
+                          <span className="text-[10.5px] font-bold text-[#9041a8] bg-[#f6edf9] px-1.5 py-0.5 rounded flex-shrink-0">
+                            {job["Pendidikan"]}
+                          </span>
                         </div>
 
                         {/* Title */}
@@ -946,8 +937,17 @@ export default function App() {
 
                       {/* Footer border / info */}
                       <div className="flex items-center justify-between text-[11px] pt-2.5 border-t border-[#edece9]/50 text-[#9b9a97]">
-                        <span>Detail Loker</span>
-                        <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all text-[#1d7bb8]" />
+                        <span className="group-hover:text-[#1d7bb8] transition-colors flex items-center gap-1 font-medium">
+                          Detail Loker
+                          <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                        </span>
+                        <button
+                          onClick={(e) => toggleSaveJob(job["Link Detail"], e)}
+                          className="p-1 rounded hover:bg-[#edece9] text-[#9b9a97] hover:text-[#b78103] transition-colors cursor-pointer flex items-center justify-center"
+                          title={savedJobs.includes(job["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
+                        </button>
                       </div>
                     </div>
                   );
@@ -988,7 +988,7 @@ export default function App() {
                                 className="p-1 rounded-full hover:bg-[#edece9] text-[#9b9a97] hover:text-[#b78103] transition-colors cursor-pointer"
                                 title={savedJobs.includes(job["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
                               >
-                                <Star className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
+                                <Bookmark className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
                               </button>
                             </td>
                             <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate">{job["Perusahaan"]}</td>
@@ -1071,7 +1071,7 @@ export default function App() {
                   className="p-1 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#b78103] transition-colors cursor-pointer flex items-center gap-1"
                   title={savedJobs.includes(selectedJob["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
                 >
-                  <Star className={`w-4 h-4 ${savedJobs.includes(selectedJob["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
+                  <Bookmark className={`w-4 h-4 ${savedJobs.includes(selectedJob["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
                   <span className="text-[11px] font-medium hidden sm:inline">
                     {savedJobs.includes(selectedJob["Link Detail"]) ? "Tersimpan" : "Simpan"}
                   </span>
