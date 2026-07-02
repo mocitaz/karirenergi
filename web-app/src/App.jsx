@@ -961,7 +961,7 @@ export default function App() {
                     >
                       <option value="">Semua Jurusan</option>
                       {filterOptions.majors.map((m) => (
-                        <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
+                        <option key={m} value={m}>{m}</option>
                       ))}
                     </select>
                   </div>
@@ -1285,7 +1285,7 @@ export default function App() {
               >
                 <option value="">Semua Jurusan</option>
                 {filterOptions.majors.map((m) => (
-                  <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
+                  <option key={m} value={m}>{m}</option>
                 ))}
               </select>
 
@@ -2255,7 +2255,7 @@ export default function App() {
                 >
                   <option value="">Semua Jurusan</option>
                   {filterOptions.majors.map((m) => (
-                    <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
+                    <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
               </div>
