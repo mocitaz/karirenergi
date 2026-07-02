@@ -281,13 +281,22 @@ export default function App() {
 
   // Stats
   const totalCount = listings.length;
-  const companiesCount = filterOptions.companies.length;
-  const citiesCount = filterOptions.cities.length;
   const s1Count = useMemo(() => {
     return listings.filter((j) => {
       const edu = j["Pendidikan"].toLowerCase();
       return edu.includes("s1") || edu.includes("sarjana") || edu.includes("d4/s1");
     }).length;
+  }, [listings]);
+
+  const databaseStats = useMemo(() => {
+    let kuota = 0;
+    let pelamar = 0;
+    listings.forEach((job) => {
+      const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"]);
+      kuota += stats.kuota;
+      pelamar += parseInt(stats.pelamar);
+    });
+    return { kuota, pelamar };
   }, [listings]);
 
   const handleResetFilters = () => {
@@ -563,12 +572,12 @@ export default function App() {
               <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{totalCount}</span>
             </div>
             <div className="px-2.5 py-1.5 bg-[#f7f7f5]/80 hover:bg-[#edece9]/40 rounded-lg border border-[#edece9]/80 transition-all duration-200 flex flex-col shadow-sm">
-              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Subsidiary Aktif</span>
-              <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{companiesCount}</span>
+              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Total Pendaftar</span>
+              <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{databaseStats.pelamar.toLocaleString('id-ID')}</span>
             </div>
             <div className="px-2.5 py-1.5 bg-[#f7f7f5]/80 hover:bg-[#edece9]/40 rounded-lg border border-[#edece9]/80 transition-all duration-200 flex flex-col shadow-sm">
-              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Kota Penempatan</span>
-              <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{citiesCount}</span>
+              <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Total Kuota</span>
+              <span className="text-[15px] md:text-[16px] font-bold text-[#37352f] mt-0.5">{databaseStats.kuota.toLocaleString('id-ID')}</span>
             </div>
             <div className="px-2.5 py-1.5 bg-[#f7f7f5]/80 hover:bg-[#edece9]/40 rounded-lg border border-[#edece9]/80 transition-all duration-200 flex flex-col shadow-sm">
               <span className="text-[9px] md:text-[9.5px] text-[#9b9a97] font-semibold uppercase tracking-wider">Khusus Jenjang S1</span>
