@@ -975,7 +975,7 @@ export default function App() {
                         <th className="p-3 border-r border-[#edece9]">Perusahaan</th>
                         <th className="p-3 border-r border-[#edece9]">Judul Lowongan</th>
                         <th className="p-3 border-r border-[#edece9]">Lokasi / Kota</th>
-                        <th className="p-3 border-r border-[#edece9]">Pendidikan</th>
+                        <th className="p-3 border-r border-[#edece9] text-center w-24">Pendidikan</th>
                         <th className="p-3 border-r border-[#edece9]">Kuota & Pelamar</th>
                         <th className="p-3 border-r border-[#edece9]">Peluang Lolos</th>
                         <th className="p-3">Jurusan</th>
@@ -1002,7 +1002,7 @@ export default function App() {
                             <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate">{job["Perusahaan"]}</td>
                             <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate">{job["Judul Lowongan"]}</td>
                             <td className="p-3 border-r border-[#edece9] max-w-[140px] truncate">{job["Kota"]}</td>
-                            <td className="p-3 border-r border-[#edece9] font-bold text-[#9041a8]">{job["Pendidikan"]}</td>
+                            <td className="p-3 border-r border-[#edece9] font-bold text-[#9041a8] text-center">{job["Pendidikan"]}</td>
                             <td className="p-3 border-r border-[#edece9] text-[#5a5a57]">
                               <span className="font-semibold text-[#37352f]">{stats.kuota}</span>
                               <span className="text-[#9b9a97] text-[11.5px]"> / {stats.pelamar} pelamar</span>
