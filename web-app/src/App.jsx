@@ -913,22 +913,22 @@ export default function App() {
                         {(() => {
                           const comp = getCompetitionLevel(stats.passRate);
                           return (
-                            <div className="grid grid-cols-4 gap-0.5 bg-[#f7f7f5]/70 rounded p-1.5 text-center text-[10px] border border-[#edece9]/50 mt-1.5">
-                              <div className="flex flex-col">
-                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Kuota</span>
-                                <span className="text-[#37352f] font-bold">{stats.kuota} org</span>
+                            <div className="grid grid-cols-4 bg-[#f7f7f5]/60 rounded py-2 px-1 text-center text-[10px] border border-[#edece9]/50 mt-2 divide-x divide-[#edece9]/50">
+                              <div className="flex flex-col justify-center px-0.5">
+                                <span className="text-[#9b9a97] text-[7.5px] font-bold uppercase tracking-wider">Kuota</span>
+                                <span className="text-[#37352f] font-bold text-[10.5px] mt-0.5 leading-tight">{stats.kuota} org</span>
                               </div>
-                              <div className="flex flex-col border-l border-[#edece9]">
-                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Pelamar</span>
-                                <span className="text-[#5a5a57] font-semibold">{stats.pelamar}</span>
+                              <div className="flex flex-col justify-center px-0.5">
+                                <span className="text-[#9b9a97] text-[7.5px] font-bold uppercase tracking-wider">Pelamar</span>
+                                <span className="text-[#5a5a57] font-semibold text-[10.5px] mt-0.5 leading-tight">{stats.pelamar}</span>
                               </div>
-                              <div className="flex flex-col border-l border-[#edece9]">
-                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Peluang</span>
-                                <span className="text-[#c52447] font-bold">{stats.passRate}%</span>
+                              <div className="flex flex-col justify-center px-0.5">
+                                <span className="text-[#9b9a97] text-[7.5px] font-bold uppercase tracking-wider">Peluang</span>
+                                <span className="text-[#c52447] font-bold text-[10.5px] mt-0.5 leading-tight">{stats.passRate}%</span>
                               </div>
-                              <div className="flex flex-col border-l border-[#edece9]">
-                                <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Persaingan</span>
-                                <span className={`font-bold text-[9px] ${comp.text}`}>{comp.label.replace("Persaingan ", "")}</span>
+                              <div className="flex flex-col justify-center px-0.5">
+                                <span className="text-[#9b9a97] text-[7.5px] font-bold uppercase tracking-wider">Saingan</span>
+                                <span className={`font-bold text-[10.5px] mt-0.5 leading-tight ${comp.text}`}>{comp.label.replace("Persaingan ", "")}</span>
                               </div>
                             </div>
                           );
