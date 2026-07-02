@@ -763,62 +763,30 @@ export default function App() {
         <div className={`px-6 md:px-10 flex-shrink-0 transition-all duration-300 ease-in-out
           ${isScrolled ? "h-0 opacity-0 overflow-hidden pb-0 pt-0 border-none pointer-events-none" : "pt-2 pb-1"}
         `}>
-          <div className="max-w-6xl mx-auto bg-gradient-to-r from-[#fdf6e2] to-[#fcfcfc] border border-[#f5ebcc] rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs select-none animate-fade-in">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#fdf2e9] flex items-center justify-center text-[#c26100] flex-shrink-0">
-                <Timer className="w-4 h-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-[#c26100] text-[13px] leading-tight">Penutupan Pendaftaran Magang Pertamina</span>
-                <span className="text-[11.5px] text-[#5a5a57] mt-0.5 font-medium">Batas resmi portal rekrutmen: 5 Juli 2026, 23:59 WIB</span>
-              </div>
+          <div className="max-w-6xl mx-auto bg-gradient-to-r from-[#37352f]/3 to-[#37352f]/1 border border-[#edece9] hover:border-[#dfdfde] rounded-lg px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 transition-all duration-200 select-none animate-fade-in shadow-2xs">
+            <div className="flex items-center gap-2 text-[12.5px]">
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#fdf2e9] text-[#c26100] flex-shrink-0">
+                <Timer className="w-3.5 h-3.5 animate-pulse" />
+              </span>
+              <span className="font-bold text-[#37352f] tracking-tight">Batas Registrasi Magang Pertamina</span>
+              <span className="hidden sm:inline text-[#edece9] font-light">|</span>
+              <span className="text-[#8a8a86] font-medium text-[11px]">(5 Juli 2026, 23:59 WIB)</span>
             </div>
             
-            {/* Live Timer Grid */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Compact Monospace Timer Pill */}
+            <div className="flex items-center bg-[#fdf2e9] border border-[#f5ebcc] text-[#c26100] px-3 py-0.75 rounded-full font-bold text-[12px] w-fit shadow-3xs">
               {timeLeft.isExpired ? (
-                <span className="text-[12.5px] font-bold text-[#c52447] bg-[#fdf0f2] border border-[#f9d5db] px-3 py-1.5 rounded-md">
-                  Pendaftaran Telah Ditutup ⛔
-                </span>
+                <span className="text-[11px] tracking-tight">Pendaftaran Telah Ditutup ⛔</span>
               ) : (
-                <>
-                  <div className="flex items-center gap-1">
-                    <div className="flex flex-col items-center">
-                      <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
-                        {timeLeft.days}
-                      </div>
-                      <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Hari</span>
-                    </div>
-                    <span className="text-[14px] font-bold text-[#8a8a86] -mt-4">:</span>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <div className="flex flex-col items-center">
-                      <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
-                        {String(timeLeft.hours).padStart(2, "0")}
-                      </div>
-                      <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Jam</span>
-                    </div>
-                    <span className="text-[14px] font-bold text-[#8a8a86] -mt-4">:</span>
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <div className="flex flex-col items-center">
-                      <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
-                        {String(timeLeft.minutes).padStart(2, "0")}
-                      </div>
-                      <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Menit</span>
-                    </div>
-                    <span className="text-[14px] font-bold text-[#8a8a86] -mt-4">:</span>
-                  </div>
-
-                  <div className="flex flex-col items-center">
-                    <div className="bg-white px-2 py-1 rounded border border-[#edece9] shadow-xs font-bold text-[14px] text-[#37352f] min-w-[32px] text-center leading-none">
-                      {String(timeLeft.seconds).padStart(2, "0")}
-                    </div>
-                    <span className="text-[8px] text-[#8a8a86] uppercase font-bold mt-1 tracking-wider">Detik</span>
-                  </div>
-                </>
+                <span className="font-mono flex items-center gap-1 select-none">
+                  <span>{timeLeft.days}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">d</span></span>
+                  <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
+                  <span>{String(timeLeft.hours).padStart(2, "0")}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">h</span></span>
+                  <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
+                  <span>{String(timeLeft.minutes).padStart(2, "0")}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">m</span></span>
+                  <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
+                  <span className="inline-block min-w-[26px]">{String(timeLeft.seconds).padStart(2, "0")}<span className="text-[9px] font-sans font-semibold text-[#c26100]/70 ml-0.5">s</span></span>
+                </span>
               )}
             </div>
           </div>
