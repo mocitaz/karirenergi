@@ -88,20 +88,62 @@ def clean_jurusan(jurusan_str):
 
 
 def run():
-    print("[*] Memulai browser Chromium (Playwright)...")
+    session_file = "pertamina_session.json"
     
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+        # Check if we need interactive login setup
+        has_session = os.path.exists(session_file)
         
-        # Go to main Pertamina recruitment page
-        print("[*] Menghubungi https://recruitment.pertamina.com ...")
-        page.goto("https://recruitment.pertamina.com", timeout=60000)
-        
-        # Wait for listings container to load
-        print("[*] Menunggu widget lowongan dimuat...")
-        page.wait_for_timeout(4000) # Jeda awal untuk inisialisasi iframe widget
-        
+        if not has_session:
+            print("\n============================================================")
+            print("                 INISIALISASI LOGIN PERTAMINA")
+            print("============================================================")
+            print("[*] Sesi login tidak ditemukan. Membuka browser visual...")
+            
+            browser = p.chromium.launch(headless=False)
+            context = browser.new_context()
+            page = context.new_page()
+            
+            print("[*] Menghubungi https://recruitment.pertamina.com ...")
+            page.goto("https://recruitment.pertamina.com")
+            
+            print("\n[!] TINDAKAN DIPERLUKAN:")
+            print("    1. Silakan login ke akun Pertamina Anda pada jendela browser yang terbuka.")
+            print("    2. Masuk ke halaman daftar lowongan/magang.")
+            print("    3. Setelah halaman daftar lowongan terbuka sempurna,")
+            print("       kembali ke terminal ini dan tekan [ENTER] untuk mulai scraping.")
+            
+            input("\nTekan [ENTER] setelah Anda siap...")
+            
+            # Save storage state for next runs
+            context.storage_state(path=session_file)
+            print(f"[+] Sesi login sukses disimpan ke '{session_file}'!")
+        else:
+            print("[*] Menggunakan sesi login tersimpan dari pertamina_session.json...")
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context(storage_state=session_file)
+            page = context.new_page()
+            print("[*] Menghubungi https://recruitment.pertamina.com ...")
+            page.goto("https://recruitment.pertamina.com")
+            page.wait_for_timeout(5000) # Tunggu loading widget
+            
+        # Close cookies modal if present to prevent overlapping clicks
+        try:
+            cookie_btn = page.query_selector("button:has-text('I understand'), :text('I understand')")
+            if cookie_btn:
+                cookie_btn.click()
+                print("[*] Menutup Cookies Consent...")
+        except Exception:
+            pass
+            
+        try:
+            warning_btn = page.query_selector("button:has-text('Ya, saya mengerti'), :text('Ya, saya mengerti')")
+            if warning_btn:
+                warning_btn.click()
+                print("[*] Menutup Pengumuman Waspada...")
+        except Exception:
+            pass
+            
         unique_jobs = []
         page_num = 1
         
@@ -160,19 +202,25 @@ def run():
                         "pelamar": pelamar
                     })
             
-            # Find next page button
-            next_btn = page.query_selector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next')
-            if not next_btn:
-                # Fallback text check
-                elements = page.query_selector_all("a, button, li, span")
-                for el in elements:
-                    txt = el.inner_text().strip().lower()
-                    if txt in ['next', 'selanjutnya', '>', '»']:
-                        # Make sure it is not disabled
-                        is_disabled = el.evaluate("el => el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')")
-                        if not is_disabled:
-                            next_btn = el
-                            break
+            # Find next page button using client-side JS evaluation (extremely fast IPC)
+            next_btn_handle = page.evaluate_handle("""() => {
+                let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
+                if (btn && !btn.disabled && !btn.hasAttribute('disabled') && !btn.classList.contains('disabled')) {
+                    if (btn.parentElement && btn.parentElement.classList.contains('disabled')) return null;
+                    return btn;
+                }
+                
+                const elements = Array.from(document.querySelectorAll('a, button, li, span'));
+                for (let el of elements) {
+                    const txt = el.innerText.trim().toLowerCase();
+                    if (txt === 'next' || txt === 'selanjutnya' || txt === '>' || txt === '»') {
+                        const isD = el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled') || (el.parentElement && el.parentElement.classList.contains('disabled'));
+                        if (!isD) return el;
+                    }
+                }
+                return null;
+            }""")
+            next_btn = next_btn_handle.as_element()
             
             if next_btn:
                 is_disabled = next_btn.evaluate("el => el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')")
