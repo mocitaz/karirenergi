@@ -1878,7 +1878,7 @@ export default function App() {
           onClick={() => setSelectedJob(null)}
         >
           <div
-            className="bg-white border border-[#edece9] rounded-lg w-full max-w-[620px] shadow-2xl relative flex flex-col overflow-hidden max-h-[90vh] md:max-h-[85vh] animate-scale-in"
+            className="bg-white border border-[#edece9] rounded-2xl w-full max-w-[660px] shadow-2xl relative flex flex-col overflow-hidden max-h-[90vh] md:max-h-[85vh] animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Elegant Notion Peek Top Bar */}
@@ -1930,144 +1930,148 @@ export default function App() {
             </div>
 
             {/* Modal Body Container */}
-            <div className="flex-1 overflow-y-auto px-5 md:px-8 pt-6 pb-6 md:pt-7 md:pb-8 flex flex-col gap-6.5">
+            <div className="flex-1 overflow-y-auto px-5 md:px-8 pt-5 pb-6 flex flex-col gap-5">
 
               {/* Job Title & Corporate Identity */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-6 h-6 text-[#5a5a57] flex-shrink-0" />
-                  <span className="text-[12px] font-bold uppercase tracking-wider text-[#1d7bb8] bg-[#e8f4fa] px-2.5 py-0.5 rounded-md">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d7bb8] bg-[#e8f4fa] px-2.5 py-0.5 rounded-full border border-[#1d7bb8]/15">
                     {selectedJob["Perusahaan"]}
                   </span>
                 </div>
-                <h2 className="text-[21px] font-bold text-[#37352f] leading-snug tracking-tight mt-2.5">
+                <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#37352f] leading-snug tracking-tight mt-1">
                   {selectedJob["Judul Lowongan"]}
                 </h2>
               </div>
 
-              {/* Notion Table-Style Property Grid */}
-              <div className="flex flex-col gap-3.5 border-t border-b border-[#edece9]/80 py-5">
-                {/* Penempatan */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <MapPin className="w-4 h-4 text-[#9b9a97]" />
-                    Penempatan
-                  </span>
-                  <span className="text-[#37352f] font-semibold">{selectedJob["Kota"]}</span>
-                </div>
+              {/* 2-Column Responsive Dashboard Layout */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-b border-[#edece9]/80 py-4.5 select-none">
+                {/* Column 1: Core Metadata (Left) */}
+                <div className="flex flex-col gap-3">
+                  <span className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Spesifikasi Loker</span>
+                  
+                  {/* Penempatan */}
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-[#9b9a97] flex items-center gap-1 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-[#9b9a97]" />
+                      Penempatan
+                    </span>
+                    <span className="text-[13px] text-[#37352f] font-semibold pl-4.5">{selectedJob["Kota"]}</span>
+                  </div>
 
-                {/* Jenjang Studi */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <GraduationCap className="w-4 h-4 text-[#9b9a97]" />
-                    Jenjang Studi
-                  </span>
-                  <span className="text-[#9041a8] bg-[#f6edf9] px-2 py-0.5 rounded font-bold text-[12px] w-fit">
-                    {selectedJob["Pendidikan"]}
-                  </span>
-                </div>
-
-                {/* Sektor & Industri */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <Building className="w-4 h-4 text-[#9b9a97]" />
-                    Sektor Kerja
-                  </span>
-                  <span className="text-[#37352f] font-semibold">
-                    {(() => {
-                      const s = selectedJob["Sektor"];
-                      const i = selectedJob["Industri"];
-                      if (s === "Tidak tertera" && i === "Tidak tertera") return "Tidak tertera";
-                      if (s === "Tidak tertera") return i;
-                      if (i === "Tidak tertera") return s;
-                      if (s === i) return s;
-                      return `${s} • ${i}`;
-                    })()}
-                  </span>
-                </div>
-
-                {/* Kuota Magang */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <Users className="w-4 h-4 text-[#9b9a97]" />
-                    Kuota Magang
-                  </span>
-                  <span className="text-[#37352f] font-semibold">
-                    {selectedJobStats?.kuota} Orang
-                  </span>
-                </div>
-
-                {/* Total Pelamar */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <UserCheck className="w-4 h-4 text-[#9b9a97]" />
-                    Total Pelamar
-                  </span>
-                  <span className="text-[#37352f] font-semibold">
-                    {selectedJobStats?.pelamar} Pelamar
-                  </span>
-                </div>
-
-                {/* Peluang Lolos */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <TrendingUp className="w-4 h-4 text-[#9b9a97]" />
-                    Peluang Lolos
-                  </span>
-                  <span className="text-[#c52447] bg-[#fdf2f2] px-2 py-0.5 rounded font-bold text-[12px] flex items-center gap-1.5 w-fit">
-                    {selectedJobStats?.passRate}%
-                    <span className="text-[10px] text-[#9b9a97] font-normal">(Peluang Kelulusan)</span>
-                  </span>
-                </div>
-
-                {/* Tingkat Persaingan */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <TrendingUp className="w-4 h-4 text-[#9b9a97] rotate-90" />
-                    Persaingan
-                  </span>
-                  {(() => {
-                    const comp = getCompetitionLevel(selectedJobStats?.passRate);
-                    return (
-                      <span className={`px-2 py-0.5 rounded font-bold text-[11px] w-fit ${comp.bg} ${comp.text}`}>
-                        {comp.label}
+                  {/* Jenjang Studi */}
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-[#9b9a97] flex items-center gap-1 font-medium">
+                      <GraduationCap className="w-3.5 h-3.5 text-[#9b9a97]" />
+                      Jenjang Studi
+                    </span>
+                    <div className="pl-4.5 mt-0.5">
+                      <span className="text-[#9041a8] bg-[#f6edf9] px-2 py-0.5 rounded font-bold text-[11.5px] w-fit">
+                        {selectedJob["Pendidikan"]}
                       </span>
-                    );
-                  })()}
+                    </div>
+                  </div>
+
+                  {/* Sektor Kerja */}
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[11px] text-[#9b9a97] flex items-center gap-1 font-medium">
+                      <Building className="w-3.5 h-3.5 text-[#9b9a97]" />
+                      Sektor Kerja
+                    </span>
+                    <span className="text-[13px] text-[#37352f] font-semibold pl-4.5 truncate">
+                      {(() => {
+                        const s = selectedJob["Sektor"];
+                        const i = selectedJob["Industri"];
+                        if (s === "Tidak tertera" && i === "Tidak tertera") return "Tidak tertera";
+                        if (s === "Tidak tertera") return i;
+                        if (i === "Tidak tertera") return s;
+                        if (s === i) return s;
+                        return `${s} • ${i}`;
+                      })()}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Kualifikasi Jurusan */}
-                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-2 sm:gap-0 py-1.5 sm:py-0.5 last:border-none pb-2 sm:pb-0.5">
-                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
-                    <Tags className="w-4 h-4 text-[#9b9a97]" />
-                    Kualifikasi
-                  </span>
-                  <div className="flex flex-wrap gap-1.5 flex-1">
-                    {selectedJob["Jurusan"]
-                      .split(/,|\bserta\b|dan|;/gi)
-                      .map((j) => j.trim())
-                      .filter(Boolean)
-                      .map((item, idx) => {
-                        const tagColors = getNotionColor(item);
+                {/* Column 2: Statistical Insights Card (Right) */}
+                <div className="flex flex-col gap-3 bg-[#f7f7f5]/55 p-3.5 rounded-xl border border-[#edece9]/80 shadow-3xs">
+                  <span className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Statistik & Peluang</span>
+                  
+                  {/* Kuota & Pendaftar Row */}
+                  <div className="grid grid-cols-2 gap-2 border-b border-[#edece9]/50 pb-2.5">
+                    <div className="flex flex-col">
+                      <span className="text-[10.5px] text-[#9b9a97] flex items-center gap-1 font-medium">
+                        <Users className="w-3.5 h-3.5 text-[#9b9a97]" />
+                        Kuota
+                      </span>
+                      <span className="text-[13px] text-[#37352f] font-bold mt-0.5">{selectedJobStats?.kuota} Orang</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10.5px] text-[#9b9a97] flex items-center gap-1 font-medium">
+                        <UserCheck className="w-3.5 h-3.5 text-[#9b9a97]" />
+                        Pelamar
+                      </span>
+                      <span className="text-[13px] text-[#37352f] font-bold mt-0.5">{selectedJobStats?.pelamar} Pelamar</span>
+                    </div>
+                  </div>
+
+                  {/* Peluang Lolos & Persaingan */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between text-[11.5px]">
+                      <span className="text-[#9b9a97] font-medium flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5 text-[#9b9a97]" />
+                        Peluang Lolos
+                      </span>
+                      <span className="text-[#c52447] bg-[#fdf2f2] px-2 py-0.5 rounded font-extrabold text-[12px]">
+                        {selectedJobStats?.passRate}%
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11.5px]">
+                      <span className="text-[#9b9a97] font-medium flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5 text-[#9b9a97] rotate-90" />
+                        Tingkat Persaingan
+                      </span>
+                      {(() => {
+                        const comp = getCompetitionLevel(selectedJobStats?.passRate);
                         return (
-                          <span
-                            key={idx}
-                            className={`text-[11.5px] px-2 py-0.5 rounded font-medium border border-[#edece9]/60 ${tagColors.bg} ${tagColors.text}`}
-                          >
-                            {item}
+                          <span className={`px-2 py-0.5 rounded font-extrabold text-[11px] ${comp.bg} ${comp.text}`}>
+                            {comp.label}
                           </span>
                         );
-                      })}
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Informational Section */}
-              <div className="flex flex-col gap-2.5">
-                <h4 className="text-[11.5px] font-bold text-[#9b9a97] uppercase tracking-wider">
-                  Informasi Tambahan
+              {/* Kualifikasi Jurusan */}
+              <div className="flex flex-col gap-2">
+                <h4 className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider flex items-center gap-1 px-1">
+                  <Tags className="w-3.5 h-3.5 text-[#8a8a86]" />
+                  Kualifikasi Jurusan
                 </h4>
-                <p className="text-[13px] text-[#5a5a57] leading-relaxed">
+                <div className="flex flex-wrap gap-1.5 p-1">
+                  {selectedJob["Jurusan"]
+                    .split(/,|\bserta\b|dan|;/gi)
+                    .map((j) => j.trim())
+                    .filter(Boolean)
+                    .map((item, idx) => {
+                      const tagColors = getNotionColor(item);
+                      return (
+                        <span
+                          key={idx}
+                          className={`text-[11.5px] px-2 py-0.75 rounded-md font-semibold border border-[#edece9]/70 ${tagColors.bg} ${tagColors.text}`}
+                        >
+                          {item}
+                        </span>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* Informational Section */}
+              <div className="flex flex-col gap-1.5 p-3.5 bg-[#f7f7f5]/30 rounded-xl border border-[#edece9]/40 text-[12.5px] text-[#5a5a57] leading-relaxed">
+                <p>
                   Program magang ini diposkan langsung oleh pihak <strong>{selectedJob["Perusahaan"]}</strong>. Harap verifikasi kesesuaian kualifikasi program studi Anda dan kumpulkan berkas yang diperlukan sebelum mendaftar. Seluruh proses pendaftaran bersifat gratis.
                 </p>
               </div>
@@ -2075,12 +2079,12 @@ export default function App() {
             </div>
 
             {/* Modal Footer (Action Bar) */}
-            <div className="p-5.5 bg-[#f7f7f5] border-t border-[#edece9]/80 flex-shrink-0">
+            <div className="p-4 bg-[#f7f7f5] border-t border-[#edece9]/80 flex-shrink-0">
               <a
                 href={selectedJob["Link Detail"]}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full bg-[#37352f] text-white hover:bg-[#4d4b47] font-semibold py-2.5 px-4 rounded-md flex items-center justify-center gap-2 text-[13px] transition-colors shadow-sm cursor-pointer"
+                className="w-full bg-[#37352f] text-white hover:bg-[#4d4b47] font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-[13px] transition-all shadow-sm hover:shadow-md cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
               >
                 Daftar Melalui Portal Resmi
                 <ArrowUpRight className="w-4 h-4" />
