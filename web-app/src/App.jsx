@@ -694,6 +694,18 @@ export default function App() {
       percentage: totalJobs > 0 ? Math.round((sectorCounts[name] / totalJobs) * 100) : 0
     })).sort((a, b) => b.count - a.count);
 
+    // F. Industry Breakdown (Top 6)
+    const industryCounts = {};
+    listingsWithStats.forEach(j => {
+      const ind = j.Industri || "Tidak tertera";
+      industryCounts[ind] = (industryCounts[ind] || 0) + 1;
+    });
+    const industryBreakdown = Object.keys(industryCounts).map(name => ({
+      name,
+      count: industryCounts[name],
+      percentage: totalJobs > 0 ? Math.round((industryCounts[name] / totalJobs) * 100) : 0
+    })).sort((a, b) => b.count - a.count).slice(0, 6);
+
     return {
       totalJobs,
       totalQuota,
@@ -710,7 +722,8 @@ export default function App() {
       rolesBreakdown,
       regionalDistribution,
       avgPassRateByCompany,
-      sectorBreakdown
+      sectorBreakdown,
+      industryBreakdown
     };
   }, [filteredListings]);
 
@@ -1470,304 +1483,332 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 2-Column Dashboard Layout */}
+                {/* 2-Column Dashboard Layout (Flat Symmetrical Grid) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   
-                  {/* Left Column */}
-                  <div className="flex flex-col gap-6">
+                  {/* Row 1: Leaderboard Anak Perusahaan vs Kebutuhan Rumpun Jurusan Terbanyak */}
+                  {/* Card 1: Leaderboard Anak Perusahaan */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Leaderboard Anak Perusahaan</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Anak perusahaan/subsidiari Pertamina dengan jumlah loker magang terbanyak</p>
+                    </div>
                     
-                    {/* Subsidiary Leaderboard */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Leaderboard Anak Perusahaan</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Anak perusahaan/subsidiari Pertamina dengan jumlah loker magang terbanyak</p>
-                      </div>
-                      
-                      <div className="flex flex-col gap-3.5">
-                        {analyticsData.companyLeaderboard.map((item, idx) => {
-                          const maxVacancies = analyticsData.companyLeaderboard[0]?.vacancies || 1;
-                          const pct = (item.vacancies / maxVacancies) * 100;
-                          return (
-                            <div key={idx} className="flex flex-col gap-1.5">
-                              <div className="flex justify-between items-center text-[12px]">
-                                <span className="font-bold text-[#37352f] truncate max-w-[260px]">{idx + 1}. {item.name}</span>
-                                <span className="text-[#5a5a57] font-semibold text-[11px]">
-                                  {item.vacancies} Posisi <span className="text-[#8a8a86] font-normal">• {item.applicants.toLocaleString()} pelamar</span>
-                                </span>
-                              </div>
-                              <div className="w-full bg-[#edece9]/50 h-2.5 rounded-full overflow-hidden">
-                                <div 
-                                  className="bg-gradient-to-r from-[#b78103] to-[#c26100] h-full rounded-full transition-all duration-500" 
-                                  style={{ width: `${pct}%` }}
-                                ></div>
-                              </div>
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.companyLeaderboard.map((item, idx) => {
+                        const maxVacancies = analyticsData.companyLeaderboard[0]?.vacancies || 1;
+                        const pct = (item.vacancies / maxVacancies) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1.5">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-bold text-[#37352f] truncate max-w-[240px]">{idx + 1}. {item.name}</span>
+                              <span className="text-[#5a5a57] font-semibold text-[11px] flex-shrink-0">
+                                {item.vacancies} Posisi <span className="text-[#8a8a86] font-normal">• {item.applicants.toLocaleString()} pelamar</span>
+                              </span>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Top 5 Most Competitive Internships */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Posisi Paling Kompetitif</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio jumlah pelamar per kuota kursi tertinggi (Klik untuk buka detail)</p>
-                      </div>
-
-                      <div className="flex flex-col divide-y divide-[#edece9]/60">
-                        {analyticsData.competitiveJobs.map((job, idx) => (
-                          <div 
-                            key={idx} 
-                            onClick={() => setSelectedJob(job)}
-                            className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3 cursor-pointer group hover:bg-[#f7f7f5]/30 rounded-md transition-colors px-1"
-                          >
-                            <div className="flex flex-col gap-0.5 min-w-0">
-                              <span className="text-[12.5px] font-bold text-[#1d7bb8] group-hover:underline truncate">{job["Judul Lowongan"]}</span>
-                              <span className="text-[10px] text-[#8a8a86]">{job["Perusahaan"]}</span>
-                            </div>
-                            <div className="flex flex-col items-end flex-shrink-0 text-right">
-                              <span className="text-[11.5px] font-extrabold text-[#c52447]">1 : {job.ratio}</span>
-                              <span className="text-[9.5px] text-[#8a8a86] font-medium">({job["Kuota"]} kuota / {job["Pelamar"]} pelamar)</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Top 5 Most User-Friendly Internships (Peluang Lolos Tertinggi) */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Peluang Lolos Tertinggi</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio persaingan terendah (Paling ramah pelamar - Klik untuk detail)</p>
-                      </div>
-
-                      <div className="flex flex-col divide-y divide-[#edece9]/60">
-                        {analyticsData.userFriendlyJobs.map((job, idx) => (
-                          <div 
-                            key={idx} 
-                            onClick={() => setSelectedJob(job)}
-                            className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3 cursor-pointer group hover:bg-[#f7f7f5]/30 rounded-md transition-colors px-1"
-                          >
-                            <div className="flex flex-col gap-0.5 min-w-0">
-                              <span className="text-[12.5px] font-bold text-[#16a34a] group-hover:underline truncate">{job["Judul Lowongan"]}</span>
-                              <span className="text-[10px] text-[#8a8a86]">{job["Perusahaan"]}</span>
-                            </div>
-                            <div className="flex flex-col items-end flex-shrink-0 text-right">
-                              <span className="text-[11.5px] font-extrabold text-[#16a34a]">{job.passRate}% Lolos</span>
-                              <span className="text-[9.5px] text-[#8a8a86] font-medium">(Rasio 1:{job.ratio})</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Geographic Location breakdown */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Distribusi Lokasi / Kota</h3>
-                        <p className="text-[11px] text-[#8a8a86]">6 Kota teratas dengan sebaran penempatan magang terbanyak</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        {analyticsData.topCities.map((item, idx) => (
-                          <div key={idx} className="bg-[#f7f7f5]/50 border border-[#edece9]/80 rounded-lg p-3 flex justify-between items-center">
-                            <div className="flex flex-col gap-0.5 min-w-0">
-                              <span className="text-[12px] font-bold text-[#37352f] truncate">{item.name}</span>
-                              <span className="text-[10px] text-[#8a8a86]">{item.count} Lowongan</span>
-                            </div>
-                            <span className="text-[12px] font-extrabold text-[#c26100] ml-2">{item.percentage}%</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Regional Geographic Distribution (Wilayah Barat vs Timur) */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Sebaran Wilayah / Region</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Pembagian penempatan magang berdasarkan kluster wilayah Indonesia</p>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        {analyticsData.regionalDistribution.map((item, idx) => {
-                          const maxCount = analyticsData.regionalDistribution[0]?.count || 1;
-                          const pct = (item.count / maxCount) * 100;
-                          return (
-                            <div key={idx} className="flex flex-col gap-1.5">
-                              <div className="flex justify-between items-center text-[12px]">
-                                <span className="font-semibold text-[#37352f]">{item.name}</span>
-                                <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                  {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
-                                </span>
-                              </div>
-                              <div className="w-full bg-[#edece9]/50 h-2 rounded-full overflow-hidden">
-                                <div 
-                                  className="bg-[#c26100] h-full rounded-full" 
-                                  style={{ width: `${pct}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Right Column */}
-                  <div className="flex flex-col gap-6">
-                    
-                    {/* Competition Heat Zone classification */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Klasifikasi Tingkat Persaingan</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Distribusi tingkat keketatan persaingan masuk lowongan magang</p>
-                      </div>
-
-                      <div className="flex flex-col gap-4">
-                        {analyticsData.heatClassification.map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-4 p-2.5 rounded-lg border border-[#edece9]/50" style={{ backgroundColor: item.bg }}>
-                            <div className="flex flex-col gap-0.5">
-                              <span className="text-[12px] font-bold" style={{ color: item.color }}>{item.label}</span>
-                              <span className="text-[10.5px] text-[#5a5a57]">{item.count} Posisi Loker ({item.percentage}%)</span>
-                            </div>
-                            
-                            {/* Simple Mini Ring Indicator */}
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[11px] border-2" style={{ borderColor: item.color, color: item.color, backgroundColor: 'white' }}>
-                              {item.percentage}%
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Average Pass Rate by Subsidiary */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Avg Peluang Lolos Anak Perusahaan</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Anak perusahaan Pertamina dengan peluang kelulusan magang rata-rata tertinggi</p>
-                      </div>
-
-                      <div className="flex flex-col gap-3.5">
-                        {analyticsData.avgPassRateByCompany.map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-2.5">
-                            <span className="text-[12px] font-bold text-[#37352f] truncate max-w-[240px]">{idx + 1}. {item.name}</span>
-                            <span className="text-[11.5px] font-extrabold text-[#16a34a] bg-[#dcfce7] border border-[#bbf7d0] px-2 py-0.5 rounded flex-shrink-0">
-                              {item.avgRate}% Lolos
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Popular Majors In-Demand Categories */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Kebutuhan Rumpun Jurusan Terbanyak</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Kategori program studi yang paling sering dicari pada prasyarat pendaftaran</p>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        {analyticsData.sortedMajors.map((item, idx) => {
-                          const maxCount = analyticsData.sortedMajors[0]?.count || 1;
-                          const pct = (item.count / maxCount) * 100;
-                          return (
-                            <div key={idx} className="flex flex-col gap-1">
-                              <div className="flex justify-between items-center text-[12px]">
-                                <span className="font-semibold text-[#37352f]">{item.name}</span>
-                                <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                  {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
-                                </span>
-                              </div>
-                              <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
-                                <div 
-                                  className="bg-[#b78103] h-full rounded-full transition-all duration-500" 
-                                  style={{ width: `${pct}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Sektor / Industri Breakdown */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Berdasarkan Sektor Kerja</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Pembagian lowongan magang berdasarkan sektor industri terkait</p>
-                      </div>
-
-                      <div className="flex flex-col gap-3.5">
-                        {analyticsData.sectorBreakdown.map((item, idx) => {
-                          const maxCount = analyticsData.sectorBreakdown[0]?.count || 1;
-                          const pct = (item.count / maxCount) * 100;
-                          return (
-                            <div key={idx} className="flex flex-col gap-1">
-                              <div className="flex justify-between items-center text-[12px]">
-                                <span className="font-semibold text-[#37352f]">{item.name}</span>
-                                <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                  {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
-                                </span>
-                              </div>
-                              <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
-                                <div 
-                                  className="bg-[#8a8a86] h-full rounded-full" 
-                                  style={{ width: `${pct}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Education Level breakdown */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Kualifikasi Jenjang Pendidikan</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Persentase prasyarat tingkat pendidikan minimal bagi calon pelamar</p>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        {analyticsData.eduBreakdown.map((item, idx) => (
-                          <div key={idx} className="flex items-center justify-between gap-4">
-                            <span className="text-[12px] font-bold text-[#37352f] w-14">{item.name}</span>
-                            <div className="flex-1 bg-[#edece9]/50 h-3.5 rounded overflow-hidden flex">
+                            <div className="w-full bg-[#edece9]/50 h-2.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-[#9041a8] h-full transition-all duration-500 rounded-r" 
-                                style={{ width: `${item.percentage}%` }}
+                                className="bg-gradient-to-r from-[#b78103] to-[#c26100] h-full rounded-full transition-all duration-500" 
+                                style={{ width: `${pct}%` }}
                               ></div>
                             </div>
-                            <span className="text-[11.5px] text-[#5a5a57] font-semibold w-16 text-right">
-                              {item.count} Loker <span className="text-[10px] text-[#8a8a86] font-normal">({item.percentage}%)</span>
-                            </span>
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Card 2: Kebutuhan Rumpun Jurusan Terbanyak */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Kebutuhan Rumpun Jurusan Terbanyak</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Kategori program studi yang paling sering dicari pada prasyarat pendaftaran</p>
                     </div>
 
-                    {/* Job Role / Fungsi Pekerjaan Categories */}
-                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
-                      <div className="flex flex-col">
-                        <h3 className="font-bold text-[14px] text-[#37352f]">Kategori Fungsi & Peran Pekerjaan</h3>
-                        <p className="text-[11px] text-[#8a8a86]">Klasifikasi penempatan posisi magang berdasarkan divisi bidang peran</p>
-                      </div>
+                    <div className="flex flex-col gap-3 mt-4 flex-grow justify-center">
+                      {analyticsData.sortedMajors.map((item, idx) => {
+                        const maxCount = analyticsData.sortedMajors[0]?.count || 1;
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#b78103] h-full rounded-full transition-all duration-500" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-                      <div className="flex flex-col gap-3.5">
-                        {analyticsData.rolesBreakdown.map((item, idx) => {
-                          const maxCount = analyticsData.rolesBreakdown[0]?.count || 1;
-                          const pct = (item.count / maxCount) * 100;
-                          return (
-                            <div key={idx} className="flex flex-col gap-1.5">
-                              <div className="flex justify-between items-center text-[12px]">
-                                <span className="font-semibold text-[#37352f]">{item.name}</span>
-                                <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                  {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
-                                </span>
-                              </div>
-                              <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
-                                <div 
+                  {/* Row 2: Top 5 Posisi Paling Kompetitif vs Top 5 Peluang Lolos Tertinggi */}
+                  {/* Card 3: Top 5 Posisi Paling Kompetitif */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Posisi Paling Kompetitif</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio jumlah pelamar per kuota kursi tertinggi (Klik untuk buka detail)</p>
+                    </div>
+
+                    <div className="flex flex-col divide-y divide-[#edece9]/60 mt-4 flex-grow justify-center">
+                      {analyticsData.competitiveJobs.map((job, idx) => (
+                        <div 
+                          key={idx} 
+                          onClick={() => setSelectedJob(job)}
+                          className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 cursor-pointer group hover:bg-[#f7f7f5]/30 rounded-md transition-colors px-1"
+                        >
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <span className="text-[12.5px] font-bold text-[#1d7bb8] group-hover:underline truncate">{job["Judul Lowongan"]}</span>
+                            <span className="text-[10px] text-[#8a8a86]">{job["Perusahaan"]}</span>
+                          </div>
+                          <div className="flex flex-col items-end flex-shrink-0 text-right">
+                            <span className="text-[11.5px] font-extrabold text-[#c52447]">1 : {job.ratio}</span>
+                            <span className="text-[9.5px] text-[#8a8a86] font-medium">({job["Kuota"]} kuota / {job["Pelamar"]} pelamar)</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card 4: Top 5 Peluang Lolos Tertinggi */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Peluang Lolos Tertinggi</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio persaingan terendah (Paling ramah pelamar - Klik untuk detail)</p>
+                    </div>
+
+                    <div className="flex flex-col divide-y divide-[#edece9]/60 mt-4 flex-grow justify-center">
+                      {analyticsData.userFriendlyJobs.map((job, idx) => (
+                        <div 
+                          key={idx} 
+                          onClick={() => setSelectedJob(job)}
+                          className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 cursor-pointer group hover:bg-[#f7f7f5]/30 rounded-md transition-colors px-1"
+                        >
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <span className="text-[12.5px] font-bold text-[#16a34a] group-hover:underline truncate">{job["Judul Lowongan"]}</span>
+                            <span className="text-[10px] text-[#8a8a86]">{job["Perusahaan"]}</span>
+                          </div>
+                          <div className="flex flex-col items-end flex-shrink-0 text-right">
+                            <span className="text-[11.5px] font-extrabold text-[#16a34a]">{job.passRate}% Lolos</span>
+                            <span className="text-[9.5px] text-[#8a8a86] font-medium">(Rasio 1:{job.ratio})</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Row 3: Klasifikasi Tingkat Persaingan vs Avg Peluang Lolos Anak Perusahaan */}
+                  {/* Card 5: Klasifikasi Tingkat Persaingan */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Klasifikasi Tingkat Persaingan</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Distribusi tingkat keketatan persaingan masuk lowongan magang</p>
+                    </div>
+
+                    <div className="flex flex-col gap-4 mt-4 flex-grow justify-center">
+                      {analyticsData.heatClassification.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between gap-4 p-2.5 rounded-lg border border-[#edece9]/50" style={{ backgroundColor: item.bg }}>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[12px] font-bold" style={{ color: item.color }}>{item.label}</span>
+                            <span className="text-[10.5px] text-[#5a5a57]">{item.count} Posisi Loker ({item.percentage}%)</span>
+                          </div>
+                          
+                          <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[11px] border-2 flex-shrink-0" style={{ borderColor: item.color, color: item.color, backgroundColor: 'white' }}>
+                            {item.percentage}%
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card 6: Avg Peluang Lolos Anak Perusahaan */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Avg Peluang Lolos Anak Perusahaan</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Anak perusahaan Pertamina dengan peluang kelulusan magang rata-rata tertinggi</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.avgPassRateByCompany.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between gap-2.5">
+                          <span className="text-[12px] font-bold text-[#37352f] truncate max-w-[240px]">{idx + 1}. {item.name}</span>
+                          <span className="text-[11.5px] font-extrabold text-[#16a34a] bg-[#dcfce7] border border-[#bbf7d0] px-2 py-0.5 rounded flex-shrink-0">
+                            {item.avgRate}% Lolos
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Row 4: Distribusi Lokasi / Kota vs Sebaran Wilayah / Region */}
+                  {/* Card 7: Distribusi Lokasi / Kota */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Distribusi Lokasi / Kota</h3>
+                      <p className="text-[11px] text-[#8a8a86]">6 Kota teratas dengan sebaran penempatan magang terbanyak</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-4 flex-grow justify-center">
+                      {analyticsData.topCities.map((item, idx) => (
+                        <div key={idx} className="bg-[#f7f7f5]/50 border border-[#edece9]/80 rounded-lg p-3 flex justify-between items-center">
+                          <div className="flex flex-col gap-0.5 min-w-0">
+                            <span className="text-[12px] font-bold text-[#37352f] truncate">{item.name}</span>
+                            <span className="text-[10px] text-[#8a8a86]">{item.count} Lowongan</span>
+                          </div>
+                          <span className="text-[12px] font-extrabold text-[#c26100] ml-2 flex-shrink-0">{item.percentage}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card 8: Sebaran Wilayah / Region */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Sebaran Wilayah / Region</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Pembagian penempatan magang berdasarkan kluster wilayah Indonesia</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3 mt-4 flex-grow justify-center">
+                      {analyticsData.regionalDistribution.map((item, idx) => {
+                        const maxCount = analyticsData.regionalDistribution[0]?.count || 1;
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1.5">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/50 h-2 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#c26100] h-full rounded-full" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Row 5: Sebaran Berdasarkan Sektor Kerja vs Analisis Industri Terpopuler */}
+                  {/* Card 9: Sebaran Berdasarkan Sektor Kerja */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Berdasarkan Sektor Kerja</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Pembagian lowongan magang berdasarkan sektor industri terkait</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.sectorBreakdown.map((item, idx) => {
+                        const maxCount = analyticsData.sectorBreakdown[0]?.count || 1;
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#8a8a86] h-full rounded-full" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Card 10: Analisis Industri Terpopuler */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Analisis Industri Terpopuler</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Pembagian lowongan berdasarkan sub-kategori bidang industri</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.industryBreakdown.map((item, idx) => {
+                        const maxCount = analyticsData.industryBreakdown[0]?.count || 1;
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f] truncate max-w-[240px]">{item.name}</span>
+                              <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#c26100] h-full rounded-full" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Row 6: Sebaran Kualifikasi Jenjang Pendidikan vs Kategori Fungsi & Peran Pekerjaan */}
+                  {/* Card 11: Sebaran Kualifikasi Jenjang Pendidikan */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Kualifikasi Jenjang Pendidikan</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Persentase prasyarat tingkat pendidikan minimal bagi calon pelamar</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3 mt-4 flex-grow justify-center">
+                      {analyticsData.eduBreakdown.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between gap-4">
+                          <span className="text-[12px] font-bold text-[#37352f] w-14">{item.name}</span>
+                          <div className="flex-1 bg-[#edece9]/50 h-3.5 rounded overflow-hidden flex">
+                            <div 
+                              className="bg-[#9041a8] h-full transition-all duration-500 rounded-r" 
+                              style={{ width: `${item.percentage}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-[11.5px] text-[#5a5a57] font-semibold w-16 text-right flex-shrink-0">
+                            {item.count} Loker <span className="text-[10px] text-[#8a8a86] font-normal">({item.percentage}%)</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card 12: Kategori Fungsi & Peran Pekerjaan */}
+                  <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col justify-between shadow-3xs h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Kategori Fungsi & Peran Pekerjaan</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Klasifikasi penempatan posisi magang berdasarkan divisi bidang peran</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.rolesBreakdown.map((item, idx) => {
+                        const maxCount = analyticsData.rolesBreakdown[0]?.count || 1;
+                        const pct = (item.count / maxCount) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1.5">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                              <div 
                                   className="bg-[#2563eb] h-full rounded-full" 
                                   style={{ width: `${pct}%` }}
                                 ></div>
@@ -1777,11 +1818,7 @@ export default function App() {
                         })}
                       </div>
                     </div>
-
-                  </div>
-
                 </div>
-
               </div>
             )}
 
