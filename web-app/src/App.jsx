@@ -755,7 +755,7 @@ export default function App() {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.25 outline-none cursor-pointer transition-all"
+                    className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.25 outline-none cursor-pointer transition-all notion-select"
                   >
                     <option value="perusahaan">Nama Perusahaan</option>
                     <option value="judul">Judul Lowongan</option>
@@ -784,7 +784,7 @@ export default function App() {
               <select
                 value={selectedCompany}
                 onChange={(e) => setSelectedCompany(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px] notion-select"
               >
                 <option value="">Semua Perusahaan</option>
                 {filterOptions.companies.map((c) => (
@@ -796,7 +796,7 @@ export default function App() {
               <select
                 value={selectedMajor}
                 onChange={(e) => setSelectedMajor(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px] notion-select"
               >
                 <option value="">Semua Jurusan</option>
                 {filterOptions.majors.map((m) => (
@@ -808,7 +808,7 @@ export default function App() {
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[145px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[145px] notion-select"
               >
                 <option value="">Semua Lokasi</option>
                 {filterOptions.cities.map((ct) => (
@@ -820,7 +820,7 @@ export default function App() {
               <select
                 value={selectedEdu}
                 onChange={(e) => setSelectedEdu(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[130px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[130px] notion-select"
               >
                 <option value="">Semua Jenjang</option>
                 {filterOptions.educations.map((ed) => (
@@ -832,7 +832,7 @@ export default function App() {
               <select
                 value={selectedSector}
                 onChange={(e) => setSelectedSector(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[135px]"
+                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[135px] notion-select"
               >
                 <option value="">Semua Sektor</option>
                 {filterOptions.sectors.map((s) => (
