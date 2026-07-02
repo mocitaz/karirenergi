@@ -1037,11 +1037,16 @@ export default function App() {
                   Non-Official
                 </span>
               </div>
-              <p className="text-[12.5px] text-[#5a5a57] max-w-2xl leading-relaxed mt-0.5">
-                Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
-              </p>
-              <div className="text-[10.5px] text-[#9b9a97] mt-0.5">
-                Terakhir Diupdate: 2 Juli 2026, 22:06 WIB
+              {/* Collapse description & update time when scrolled */}
+              <div className={`transition-all duration-300 ease-in-out origin-top ${
+                isScrolled ? "h-0 opacity-0 overflow-hidden mt-0 pointer-events-none" : "opacity-100 mt-0.5"
+              }`}>
+                <p className="text-[12.5px] text-[#5a5a57] max-w-2xl leading-relaxed">
+                  Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
+                </p>
+                <div className="text-[10.5px] text-[#9b9a97] mt-0.5">
+                  Terakhir Diupdate: 2 Juli 2026, 22:06 WIB
+                </div>
               </div>
 
               {/* Navigation Links inside Header on Mobile */}
@@ -1074,9 +1079,11 @@ export default function App() {
               </div>
             </div>
 
-            {/* Compact Monospace Countdown */}
+            {/* Compact Monospace Countdown - Collapse when scrolled */}
             {!timeLeft.isExpired && (
-              <div className="flex items-center bg-[#fdf2e9] border border-[#f5ebcc] text-[#c26100] px-3.5 py-1.5 rounded-lg text-[12px] w-fit shadow-3xs self-start sm:self-center">
+              <div className={`transition-all duration-300 ease-in-out ${
+                isScrolled ? "h-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none" : "flex items-center bg-[#fdf2e9] border border-[#f5ebcc] text-[#c26100] px-3.5 py-1.5 rounded-lg text-[12px] w-fit shadow-3xs self-start sm:self-center"
+              }`}>
                 <Timer className="w-3.5 h-3.5 mr-2 animate-pulse text-[#c26100] flex-shrink-0" />
                 <div className="flex flex-col">
                   <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-[#c26100]/60 leading-none mb-0.5">Batas Registrasi</span>
@@ -1093,8 +1100,10 @@ export default function App() {
           </div>
         </div>
 
-        {/* Inline Statistics Bar */}
-        <div className="px-6 md:px-10 py-3 flex-shrink-0 border-b border-[#edece9]/40 bg-[#f7f7f5]/30">
+        {/* Inline Statistics Bar - Collapse when scrolled */}
+        <div className={`px-6 md:px-10 flex-shrink-0 border-b border-[#edece9]/40 bg-[#f7f7f5]/30 transition-all duration-300 ease-in-out ${
+          isScrolled ? "h-0 opacity-0 overflow-hidden py-0 border-none pointer-events-none" : "py-3"
+        }`}>
           <div className="max-w-6xl mx-auto flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] text-[#5a5a57] select-none font-medium">
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-[#37352f]">{totalCount}</span>
