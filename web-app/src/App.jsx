@@ -223,6 +223,7 @@ export default function App() {
     setSelectedCity(draftCity);
     setSelectedEdu(draftEdu);
     setSelectedSector(draftSector);
+    setSidebarOpen(false);
   };
 
   // Countdown Timer State (Target: 5 July 2026 at 23:59 WIB)
@@ -809,7 +810,7 @@ export default function App() {
           {sidebarOpen && (
             <button 
               onClick={() => setSidebarOpen(false)}
-              className="md:hidden p-1 rounded hover:bg-[#edece9] text-[#5a5a57] cursor-pointer flex items-center justify-center flex-shrink-0"
+              className="md:hidden p-2 rounded hover:bg-[#edece9] text-[#5a5a57] cursor-pointer flex items-center justify-center flex-shrink-0"
               title="Tutup Menu"
             >
               <X className="w-4 h-4" />
@@ -1025,10 +1026,10 @@ export default function App() {
             {/* Mobile Hamburger toggle button */}
             <button 
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-1 -ml-1 rounded hover:bg-[#edece9] text-[#5a5a57] cursor-pointer flex items-center justify-center flex-shrink-0"
+              className="md:hidden p-2 -ml-2 rounded hover:bg-[#edece9] text-[#5a5a57] cursor-pointer flex items-center justify-center flex-shrink-0"
               title="Buka Menu"
             >
-              <Menu className="w-3.5 h-3.5" />
+              <Menu className="w-4 h-4" />
             </button>
             <span>Arsip</span>
             <span>/</span>
@@ -1179,103 +1180,121 @@ export default function App() {
                 </div>
               </div>
             </div>
-
             {/* Inline Filter Controls on Main Page */}
-            <div className="hidden md:flex flex-wrap items-center gap-2 pt-2.5 border-t border-[#edece9]/60">
-              {/* Inline Search */}
-              <div className="relative flex-1 min-w-[200px] max-w-xs">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
-                <input
-                  type="text"
-                  placeholder="Cari lowongan..."
-                  value={draftSearch}
-                  onChange={(e) => setDraftSearch(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
-                  className="w-full text-[12.5px] border border-[#edece9]/80 bg-[#f7f7f5]/40 focus:bg-white rounded-md pl-8 pr-3 py-1.5 outline-none focus:border-[#dfdfde] transition-all"
-                />
+            <div className="flex flex-col gap-3 pt-2.5 border-t border-[#edece9]/60">
+              
+              {/* Row 1: Search and Mobile Filter Toggle */}
+              <div className="flex items-center gap-2.5 w-full">
+                {/* Inline Search - Always visible */}
+                <div className="relative flex-grow max-w-md">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
+                  <input
+                    type="text"
+                    placeholder="Cari lowongan magang..."
+                    value={draftSearch}
+                    onChange={(e) => setDraftSearch(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
+                    className="w-full text-[12.5px] border border-[#edece9] bg-[#f7f7f5]/40 focus:bg-white rounded-md pl-8 pr-3 py-1.75 outline-none focus:border-[#dfdfde] transition-all"
+                  />
+                </div>
+
+                {/* Mobile Filter Button - only visible on mobile (under md) */}
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="md:hidden flex items-center justify-center gap-1.5 px-3 py-1.75 bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] rounded-md text-[12.5px] font-semibold border border-[#edece9] transition-all cursor-pointer"
+                  title="Buka Panel Filter Lengkap"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>Filter</span>
+                  {(draftCompany || draftMajor || draftCity || draftEdu || draftSector || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
+                    <span className="w-1.5 h-1.5 bg-[#1d7bb8] rounded-full"></span>
+                  )}
+                </button>
+
+                {/* Reset button - Always visible if filters are active */}
+                {(draftSearch || draftCompany || draftMajor || draftCity || draftEdu || draftSector || search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
+                  <button
+                    onClick={handleResetFilters}
+                    className="text-[12.5px] text-[#1d7bb8] hover:bg-[#e8f4fa] px-2.5 py-1.75 rounded transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset</span>
+                  </button>
+                )}
               </div>
 
-              {/* Company dropdown */}
-              <select
-                value={draftCompany}
-                onChange={(e) => setDraftCompany(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px] notion-select"
-              >
-                <option value="">Semua Perusahaan</option>
-                {filterOptions.companies.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-
-              {/* Major dropdown */}
-              <select
-                value={draftMajor}
-                onChange={(e) => setDraftMajor(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[130px] md:max-w-[160px] notion-select"
-              >
-                <option value="">Semua Jurusan</option>
-                {filterOptions.majors.map((m) => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
-
-              {/* City dropdown */}
-              <select
-                value={draftCity}
-                onChange={(e) => setDraftCity(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[145px] notion-select"
-              >
-                <option value="">Semua Lokasi</option>
-                {filterOptions.cities.map((ct) => (
-                  <option key={ct} value={ct}>{ct}</option>
-                ))}
-              </select>
-
-              {/* Education dropdown */}
-              <select
-                value={draftEdu}
-                onChange={(e) => setDraftEdu(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[130px] notion-select"
-              >
-                <option value="">Semua Jenjang</option>
-                {filterOptions.educations.map((ed) => (
-                  <option key={ed} value={ed}>{ed}</option>
-                ))}
-              </select>
-
-              {/* Sektor Kerja dropdown */}
-              <select
-                value={draftSector}
-                onChange={(e) => setDraftSector(e.target.value)}
-                className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-1 min-w-[110px] md:max-w-[135px] notion-select"
-              >
-                <option value="">Semua Sektor</option>
-                {filterOptions.sectors.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-
-              {/* Cari Button */}
-              <button
-                onClick={handleApplyFilters}
-                className="bg-[#1d7bb8] text-white hover:bg-[#155a8a] px-3.5 py-1.5 rounded-md text-[12.5px] font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-              >
-                <Search className="w-3.5 h-3.5" />
-                Cari
-              </button>
-
-              {/* Reset button */}
-              {(draftSearch || draftCompany || draftMajor || draftCity || draftEdu || draftSector || search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
-                <button
-                  onClick={handleResetFilters}
-                  className="text-[12.5px] text-[#1d7bb8] hover:bg-[#e8f4fa] px-2.5 py-1.5 rounded transition-colors flex items-center gap-1 font-semibold cursor-pointer"
+              {/* Advanced Dropdowns Row - Hidden on mobile, shown on desktop (md and larger) */}
+              <div className="hidden md:flex flex-wrap items-center gap-2 w-full mt-0.5">
+                {/* Company dropdown */}
+                <select
+                  value={draftCompany}
+                  onChange={(e) => setDraftCompany(e.target.value)}
+                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[155px] notion-select"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  Reset Filter
-                </button>
-              )}
-            </div>
+                  <option value="">Semua Perusahaan</option>
+                  {filterOptions.companies.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
 
+                {/* Major dropdown */}
+                <select
+                  value={draftMajor}
+                  onChange={(e) => setDraftMajor(e.target.value)}
+                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[155px] notion-select"
+                >
+                  <option value="">Semua Jurusan</option>
+                  {filterOptions.majors.map((m) => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+
+                {/* City dropdown */}
+                <select
+                  value={draftCity}
+                  onChange={(e) => setDraftCity(e.target.value)}
+                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[145px] notion-select"
+                >
+                  <option value="">Semua Lokasi</option>
+                  {filterOptions.cities.map((ct) => (
+                    <option key={ct} value={ct}>{ct}</option>
+                  ))}
+                </select>
+
+                {/* Education dropdown */}
+                <select
+                  value={draftEdu}
+                  onChange={(e) => setDraftEdu(e.target.value)}
+                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[125px] notion-select"
+                >
+                  <option value="">Semua Jenjang</option>
+                  {filterOptions.educations.map((ed) => (
+                    <option key={ed} value={ed}>{ed}</option>
+                  ))}
+                </select>
+
+                {/* Sektor Kerja dropdown */}
+                <select
+                  value={draftSector}
+                  onChange={(e) => setDraftSector(e.target.value)}
+                  className="text-[12.5px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[130px] notion-select"
+                >
+                  <option value="">Semua Sektor</option>
+                  {filterOptions.sectors.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+
+                {/* Cari Button */}
+                <button
+                  onClick={handleApplyFilters}
+                  className="bg-[#1d7bb8] text-white hover:bg-[#155a8a] px-4 py-1.5 rounded-md text-[12.5px] font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer ml-auto"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  Cari
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1839,13 +1858,13 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Elegant Notion Peek Top Bar */}
-            <div className="h-11 px-4 border-b border-[#edece9]/80 flex items-center justify-between bg-[#f7f7f5] flex-shrink-0">
+            <div className="h-12 px-4 border-b border-[#edece9]/80 flex items-center justify-between bg-[#f7f7f5] flex-shrink-0 select-none">
               {/* Previous / Next Navigation */}
               <div className="flex items-center gap-1">
                 <button
                   onClick={handlePrevJob}
                   disabled={currentIdx <= 0}
-                  className="p-1 rounded hover:bg-[#edece9] text-[#5a5a57] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer transition-colors"
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer transition-colors"
                   title="Lowongan Sebelumnya"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -1853,7 +1872,7 @@ export default function App() {
                 <button
                   onClick={handleNextJob}
                   disabled={currentIdx >= filteredListings.length - 1}
-                  className="p-1 rounded hover:bg-[#edece9] text-[#5a5a57] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer transition-colors"
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer transition-colors"
                   title="Lowongan Berikutnya"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -1867,18 +1886,18 @@ export default function App() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={(e) => toggleSaveJob(selectedJob["Link Detail"], e)}
-                  className="p-1 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#b78103] transition-colors cursor-pointer flex items-center gap-1"
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#b78103] transition-colors cursor-pointer flex items-center gap-1"
                   title={savedJobs.includes(selectedJob["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
                 >
                   <Bookmark className={`w-4 h-4 ${savedJobs.includes(selectedJob["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
-                  <span className="text-[11px] font-medium hidden sm:inline">
+                  <span className="text-[11.5px] font-medium hidden sm:inline">
                     {savedJobs.includes(selectedJob["Link Detail"]) ? "Tersimpan" : "Simpan"}
                   </span>
                 </button>
                 <span className="w-px h-4 bg-[#edece9] mx-0.5"></span>
                 <button
                   onClick={() => setSelectedJob(null)}
-                  className="p-1 rounded hover:bg-[#edece9] text-[#5a5a57] transition-colors cursor-pointer"
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] transition-colors cursor-pointer"
                   title="Tutup"
                 >
                   <X className="w-4 h-4" />
@@ -1905,8 +1924,8 @@ export default function App() {
               {/* Notion Table-Style Property Grid */}
               <div className="flex flex-col gap-3.5 border-t border-b border-[#edece9]/80 py-5">
                 {/* Penempatan */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <MapPin className="w-4 h-4 text-[#9b9a97]" />
                     Penempatan
                   </span>
@@ -1914,19 +1933,19 @@ export default function App() {
                 </div>
 
                 {/* Jenjang Studi */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <GraduationCap className="w-4 h-4 text-[#9b9a97]" />
                     Jenjang Studi
                   </span>
-                  <span className="text-[#9041a8] bg-[#f6edf9] px-2 py-0.5 rounded font-bold text-[12px]">
+                  <span className="text-[#9041a8] bg-[#f6edf9] px-2 py-0.5 rounded font-bold text-[12px] w-fit">
                     {selectedJob["Pendidikan"]}
                   </span>
                 </div>
 
                 {/* Sektor & Industri */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <Building className="w-4 h-4 text-[#9b9a97]" />
                     Sektor Kerja
                   </span>
@@ -1944,8 +1963,8 @@ export default function App() {
                 </div>
 
                 {/* Kuota Magang */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <Users className="w-4 h-4 text-[#9b9a97]" />
                     Kuota Magang
                   </span>
@@ -1955,8 +1974,8 @@ export default function App() {
                 </div>
 
                 {/* Total Pelamar */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <UserCheck className="w-4 h-4 text-[#9b9a97]" />
                     Total Pelamar
                   </span>
@@ -1966,27 +1985,27 @@ export default function App() {
                 </div>
 
                 {/* Peluang Lolos */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <TrendingUp className="w-4 h-4 text-[#9b9a97]" />
                     Peluang Lolos
                   </span>
-                  <span className="text-[#c52447] bg-[#fdf2f2] px-2 py-0.5 rounded font-bold text-[12px] flex items-center gap-1.5">
+                  <span className="text-[#c52447] bg-[#fdf2f2] px-2 py-0.5 rounded font-bold text-[12px] flex items-center gap-1.5 w-fit">
                     {selectedJobStats?.passRate}%
                     <span className="text-[10px] text-[#9b9a97] font-normal">(Peluang Kelulusan)</span>
                   </span>
                 </div>
 
                 {/* Tingkat Persaingan */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-1.5 sm:gap-0 py-1.5 sm:py-0.5 border-b border-[#edece9]/10 last:border-none pb-2.5 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <TrendingUp className="w-4 h-4 text-[#9b9a97] rotate-90" />
                     Persaingan
                   </span>
                   {(() => {
                     const comp = getCompetitionLevel(selectedJobStats?.passRate);
                     return (
-                      <span className={`px-2 py-0.5 rounded font-bold text-[11px] ${comp.bg} ${comp.text}`}>
+                      <span className={`px-2 py-0.5 rounded font-bold text-[11px] w-fit ${comp.bg} ${comp.text}`}>
                         {comp.label}
                       </span>
                     );
@@ -1994,8 +2013,8 @@ export default function App() {
                 </div>
 
                 {/* Kualifikasi Jurusan */}
-                <div className="flex items-start text-[13px] py-0.5">
-                  <span className="w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
+                <div className="flex flex-col sm:flex-row sm:items-start text-[13px] gap-2 sm:gap-0 py-1.5 sm:py-0.5 last:border-none pb-2 sm:pb-0.5">
+                  <span className="w-full sm:w-32 text-[#9b9a97] flex items-center gap-1.5 flex-shrink-0 font-medium">
                     <Tags className="w-4 h-4 text-[#9b9a97]" />
                     Kualifikasi
                   </span>
@@ -2088,6 +2107,20 @@ export default function App() {
             </div>
           </div>
         </div>
+      )}
+      {/* Thumb-Friendly Mobile Filter Floating Action Button (FAB) */}
+      {!sidebarOpen && viewTab !== "analytics" && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#37352f] text-white rounded-full px-5 py-3 shadow-xl flex items-center gap-2 text-[12.5px] font-bold z-40 hover:bg-[#4d4b47] active:scale-95 transition-all select-none border border-[#4d4b47] animate-fade-in"
+          title="Filter & Cari Lowongan"
+        >
+          <SlidersHorizontal className="w-4 h-4 text-[#edece9]" />
+          <span>Filter & Cari Loker</span>
+          {(selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector || search) && (
+            <span className="w-2.5 h-2.5 bg-[#43873e] rounded-full animate-pulse flex-shrink-0"></span>
+          )}
+        </button>
       )}
 
     </div>
