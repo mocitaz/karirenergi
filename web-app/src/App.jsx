@@ -771,21 +771,10 @@ export default function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-white text-[#37352f] relative">
-      {/* Mobile Backdrop overlay */}
-      {sidebarOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/10 z-40 backdrop-blur-xs transition-opacity duration-300"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Notion Sidebar */}
+      {/* Notion Sidebar - Desktop Only */}
       <aside
-        className={`flex-shrink-0 bg-[#fbfbfa]/95 backdrop-blur-md flex flex-col fixed md:relative top-0 bottom-0 left-0 transition-all duration-300 ease-in-out z-45 border-r border-[#edece9]/80
-          ${sidebarOpen
-            ? "w-[280px] translate-x-0 shadow-xl md:shadow-none"
-            : "-translate-x-full md:translate-x-0 w-[280px] md:w-[68px] shadow-none"
-          }
+        className={`hidden md:flex flex-col flex-shrink-0 bg-[#fbfbfa]/95 backdrop-blur-md relative top-0 bottom-0 left-0 transition-all duration-300 ease-in-out z-45 border-r border-[#edece9]/80
+          ${sidebarOpen ? "w-[280px]" : "w-[68px]"}
         `}
       >
         {/* Toggle Button Overlapping Right Border */}
@@ -1028,14 +1017,6 @@ export default function App() {
           ${isScrolled ? "md:h-0 md:opacity-0 md:overflow-hidden md:border-none md:pointer-events-none h-10 opacity-100" : "h-10 opacity-100"}
         `}>
           <div className="flex items-center gap-2">
-            {/* Mobile Hamburger toggle button */}
-            <button 
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded hover:bg-[#edece9] text-[#5a5a57] cursor-pointer flex items-center justify-center flex-shrink-0"
-              title="Buka Menu"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
             <span>Arsip</span>
             <span>/</span>
             <span className="text-[#37352f] font-medium truncate max-w-[100px] sm:max-w-none">Database Lowongan</span>
@@ -1045,7 +1026,7 @@ export default function App() {
         {/* Header Title, Description & Countdown */}
         <div className="px-6 md:px-10 pt-4 md:pt-5 pb-3.5 flex-shrink-0 border-b border-[#edece9]/60 bg-white">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 w-full sm:w-auto">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-lg md:text-xl font-extrabold text-[#37352f] tracking-tight">KarirEnergi Database</h1>
                 <span className="text-[10px] font-bold text-[#43873e] bg-[#eaf5ea] border border-[#d2ebd2] px-2 py-0.5 rounded-full select-none flex items-center gap-1">
@@ -1061,6 +1042,35 @@ export default function App() {
               </p>
               <div className="text-[10.5px] text-[#9b9a97] mt-0.5">
                 Terakhir Diupdate: 2 Juli 2026, 22:06 WIB
+              </div>
+
+              {/* Navigation Links inside Header on Mobile */}
+              <div className="flex md:hidden items-center gap-4 text-[12.5px] border-t border-[#edece9]/40 pt-2.5 mt-2.5">
+                <button
+                  onClick={() => setShowSavedOnly(false)}
+                  className={`font-semibold transition-all pb-1 cursor-pointer ${!showSavedOnly ? "text-[#1d7bb8] border-b-2 border-[#1d7bb8]" : "text-[#8a8a86]"}`}
+                >
+                  Semua Lowongan
+                </button>
+                <button
+                  onClick={() => setShowSavedOnly(true)}
+                  className={`font-semibold transition-all pb-1 cursor-pointer flex items-center gap-1.5 ${showSavedOnly ? "text-[#1d7bb8] border-b-2 border-[#1d7bb8]" : "text-[#8a8a86]"}`}
+                >
+                  Tersimpan
+                  {savedJobs.length > 0 && (
+                    <span className="text-[10px] bg-[#edece9] text-[#5a5a57] px-1.5 py-0.25 rounded-full font-bold">
+                      {savedJobs.length}
+                    </span>
+                  )}
+                </button>
+                <a
+                  href="https://recruitment.pertamina.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-[#8a8a86] flex items-center gap-0.5 hover:text-[#37352f] pb-1"
+                >
+                  Portal Resmi <ArrowUpRight className="w-3.5 h-3.5" />
+                </a>
               </div>
             </div>
 
