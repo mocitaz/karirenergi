@@ -916,7 +916,7 @@ export default function App() {
                             <div className="grid grid-cols-4 bg-[#f7f7f5]/60 rounded py-2 px-1 text-center text-[10px] border border-[#edece9]/50 mt-2 divide-x divide-[#edece9]/50">
                               <div className="flex flex-col justify-center px-0.5">
                                 <span className="text-[#9b9a97] text-[7.5px] font-bold uppercase tracking-wider">Kuota</span>
-                                <span className="text-[#37352f] font-bold text-[10.5px] mt-0.5 leading-tight">{stats.kuota} org</span>
+                                <span className="text-[#37352f] font-bold text-[10.5px] mt-0.5 leading-tight">{stats.kuota}</span>
                               </div>
                               <div className="flex flex-col justify-center px-0.5">
                                 <span className="text-[#9b9a97] text-[7.5px] font-bold uppercase tracking-wider">Pelamar</span>
