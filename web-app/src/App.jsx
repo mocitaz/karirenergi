@@ -136,6 +136,7 @@ export default function App() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [visibleLimit, setVisibleLimit] = useState(24);
 
   // Bookmarking / Saved Jobs State
   const [savedJobs, setSavedJobs] = useState(() => {
@@ -186,12 +187,23 @@ export default function App() {
 
 
   const handleScroll = (e) => {
-    if (e.target.scrollTop > 15) {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollTop > 15) {
       setIsScrolled(true);
     } else {
       setIsScrolled(false);
     }
+
+    // Lazy load next batch when close to the bottom (within 150px)
+    if (scrollHeight - scrollTop - clientHeight < 150) {
+      setVisibleLimit((prev) => Math.min(prev + 24, filteredListings.length));
+    }
   };
+
+  // Reset visible limit on filter changes
+  useEffect(() => {
+    setVisibleLimit(24);
+  }, [search, selectedCompany, selectedMajor, selectedCity, selectedEdu, selectedSector, showSavedOnly]);
 
 
 
@@ -338,14 +350,33 @@ export default function App() {
     const sectors = new Set();
     const majors = new Set();
 
+    const companyCounts = {};
+    const cityCounts = {};
+    const educationCounts = {};
+    const sectorCounts = {};
+    const majorCounts = {};
+
     listings.forEach((job) => {
-      if (job["Perusahaan"]) companies.add(job["Perusahaan"]);
-      if (job["Kota"] && job["Kota"] !== "Tidak tertera") cities.add(job["Kota"]);
-      if (job["Pendidikan"] && job["Pendidikan"] !== "Tidak tertera") educations.add(job["Pendidikan"]);
-      if (job["Sektor"] && job["Sektor"] !== "Tidak tertera") sectors.add(job["Sektor"]);
+      if (job["Perusahaan"]) {
+        companies.add(job["Perusahaan"]);
+        companyCounts[job["Perusahaan"]] = (companyCounts[job["Perusahaan"]] || 0) + 1;
+      }
+      if (job["Kota"] && job["Kota"] !== "Tidak tertera") {
+        cities.add(job["Kota"]);
+        cityCounts[job["Kota"]] = (cityCounts[job["Kota"]] || 0) + 1;
+      }
+      if (job["Pendidikan"] && job["Pendidikan"] !== "Tidak tertera") {
+        educations.add(job["Pendidikan"]);
+        educationCounts[job["Pendidikan"]] = (educationCounts[job["Pendidikan"]] || 0) + 1;
+      }
+      if (job["Sektor"] && job["Sektor"] !== "Tidak tertera") {
+        sectors.add(job["Sektor"]);
+        sectorCounts[job["Sektor"]] = (sectorCounts[job["Sektor"]] || 0) + 1;
+      }
 
       if (job["Jurusan"] && job["Jurusan"] !== "Semua Jurusan / Tidak tertera") {
         const parts = job["Jurusan"].split(/,|\bserta\b|dan|;/gi);
+        const seenMajors = new Set();
         parts.forEach((p) => {
           const trimmed = p.replace(/[\s\.\-\(\)]+/g, " ").trim();
           const capitalized = trimmed
@@ -360,8 +391,12 @@ export default function App() {
             !capitalized.toLowerCase().includes("tidak tertera") &&
             !capitalized.toLowerCase().includes("semua jurusan")
           ) {
-            majors.add(capitalized);
+            seenMajors.add(capitalized);
           }
+        });
+        seenMajors.forEach((m) => {
+          majors.add(m);
+          majorCounts[m] = (majorCounts[m] || 0) + 1;
         });
       }
     });
@@ -372,6 +407,11 @@ export default function App() {
       educations: Array.from(educations).sort(),
       sectors: Array.from(sectors).sort(),
       majors: Array.from(majors).sort(),
+      companyCounts,
+      cityCounts,
+      educationCounts,
+      sectorCounts,
+      majorCounts,
     };
   }, [listings]);
 
@@ -908,7 +948,7 @@ export default function App() {
                     >
                       <option value="">Semua Perusahaan</option>
                       {filterOptions.companies.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c} value={c}>{c} ({filterOptions.companyCounts[c] || 0})</option>
                       ))}
                     </select>
                   </div>
@@ -923,7 +963,7 @@ export default function App() {
                     >
                       <option value="">Semua Jurusan</option>
                       {filterOptions.majors.map((m) => (
-                        <option key={m} value={m}>{m}</option>
+                        <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
                       ))}
                     </select>
                   </div>
@@ -938,7 +978,7 @@ export default function App() {
                     >
                       <option value="">Semua Lokasi</option>
                       {filterOptions.cities.map((ct) => (
-                        <option key={ct} value={ct}>{ct}</option>
+                        <option key={ct} value={ct}>{ct} ({filterOptions.cityCounts[ct] || 0})</option>
                       ))}
                     </select>
                   </div>
@@ -953,7 +993,7 @@ export default function App() {
                     >
                       <option value="">Semua Jenjang</option>
                       {filterOptions.educations.map((ed) => (
-                        <option key={ed} value={ed}>{ed}</option>
+                        <option key={ed} value={ed}>{ed} ({filterOptions.educationCounts[ed] || 0})</option>
                       ))}
                     </select>
                   </div>
@@ -968,7 +1008,7 @@ export default function App() {
                     >
                       <option value="">Semua Sektor</option>
                       {filterOptions.sectors.map((s) => (
-                        <option key={s} value={s}>{s}</option>
+                        <option key={s} value={s}>{s} ({filterOptions.sectorCounts[s] || 0})</option>
                       ))}
                     </select>
                   </div>
@@ -1239,7 +1279,7 @@ export default function App() {
               >
                 <option value="">Semua Perusahaan</option>
                 {filterOptions.companies.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>{c} ({filterOptions.companyCounts[c] || 0})</option>
                 ))}
               </select>
 
@@ -1251,7 +1291,7 @@ export default function App() {
               >
                 <option value="">Semua Jurusan</option>
                 {filterOptions.majors.map((m) => (
-                  <option key={m} value={m}>{m}</option>
+                  <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
                 ))}
               </select>
 
@@ -1263,7 +1303,7 @@ export default function App() {
               >
                 <option value="">Semua Lokasi</option>
                 {filterOptions.cities.map((ct) => (
-                  <option key={ct} value={ct}>{ct}</option>
+                  <option key={ct} value={ct}>{ct} ({filterOptions.cityCounts[ct] || 0})</option>
                 ))}
               </select>
 
@@ -1275,7 +1315,7 @@ export default function App() {
               >
                 <option value="">Semua Jenjang</option>
                 {filterOptions.educations.map((ed) => (
-                  <option key={ed} value={ed}>{ed}</option>
+                  <option key={ed} value={ed}>{ed} ({filterOptions.educationCounts[ed] || 0})</option>
                 ))}
               </select>
 
@@ -1287,7 +1327,7 @@ export default function App() {
               >
                 <option value="">Semua Sektor</option>
                 {filterOptions.sectors.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>{s} ({filterOptions.sectorCounts[s] || 0})</option>
                 ))}
               </select>
 
@@ -1331,7 +1371,7 @@ export default function App() {
             {/* Gallery View */}
             {viewTab === "gallery" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in">
-                {filteredListings.map((job) => {
+                {filteredListings.slice(0, visibleLimit).map((job) => {
                   const tagColor = getNotionColor(job["Perusahaan"]);
                   const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"], job["Kuota"], job["Pelamar"]);
                   
@@ -1448,7 +1488,7 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredListings.map((job, idx) => {
+                      {filteredListings.slice(0, visibleLimit).map((job, idx) => {
                         const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"], job["Kuota"], job["Pelamar"]);
                         return (
                           <tr
@@ -2206,7 +2246,7 @@ export default function App() {
                 >
                   <option value="">Semua Perusahaan</option>
                   {filterOptions.companies.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c}>{c} ({filterOptions.companyCounts[c] || 0})</option>
                   ))}
                 </select>
               </div>
@@ -2221,7 +2261,7 @@ export default function App() {
                 >
                   <option value="">Semua Jurusan</option>
                   {filterOptions.majors.map((m) => (
-                    <option key={m} value={m}>{m}</option>
+                    <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
                   ))}
                 </select>
               </div>
@@ -2236,7 +2276,7 @@ export default function App() {
                 >
                   <option value="">Semua Lokasi</option>
                   {filterOptions.cities.map((ct) => (
-                    <option key={ct} value={ct}>{ct}</option>
+                    <option key={ct} value={ct}>{ct} ({filterOptions.cityCounts[ct] || 0})</option>
                   ))}
                 </select>
               </div>
@@ -2251,7 +2291,7 @@ export default function App() {
                 >
                   <option value="">Semua Jenjang</option>
                   {filterOptions.educations.map((ed) => (
-                    <option key={ed} value={ed}>{ed}</option>
+                    <option key={ed} value={ed}>{ed} ({filterOptions.educationCounts[ed] || 0})</option>
                   ))}
                 </select>
               </div>
@@ -2266,7 +2306,7 @@ export default function App() {
                 >
                   <option value="">Semua Sektor</option>
                   {filterOptions.sectors.map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                    <option key={s} value={s}>{s} ({filterOptions.sectorCounts[s] || 0})</option>
                   ))}
                 </select>
               </div>
