@@ -4,7 +4,7 @@ import json
 
 # Define paths
 base_dir = "/Users/Luthfi/Project/PT. Teknalogi Transformasi Digital/PertaminaWebCareer"
-excel_path = os.path.join(base_dir, "Folder Pertamina Fukk", "loker_magang_pertamina_page_1-40.xlsx")
+excel_path = os.path.join(base_dir, "Folder Pertamina New", "loker_magang_pertamina_page_1-40.xlsx")
 json_output_path = os.path.join(base_dir, "web", "loker_data.json")
 
 print(f"Reading Excel from: {excel_path}")

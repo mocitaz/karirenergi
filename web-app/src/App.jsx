@@ -97,9 +97,7 @@ export default function App() {
   const [viewTab, setViewTab] = useState("gallery"); // gallery | table
   const [selectedJob, setSelectedJob] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showAnnouncement, setShowAnnouncement] = useState(() => {
-    return !localStorage.getItem("karirenergi-announcement-dismissed");
-  });
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
 
   const handleDismissAnnouncement = () => {
     localStorage.setItem("karirenergi-announcement-dismissed", "true");
@@ -572,7 +570,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2">
             <span className="w-1.2 h-1.2 rounded-full bg-[#43873e] animate-pulse flex-shrink-0"></span>
-            <span className="text-[#43873e] font-medium truncate max-w-[150px] sm:max-w-none">Terakhir Diupdate: 2 Juli 2026, 13:06 WIB</span>
+            <span className="text-[#43873e] font-medium truncate max-w-[150px] sm:max-w-none">Terakhir Diupdate: 2 Juli 2026, 14:48 WIB</span>
           </div>
         </div>
 
@@ -583,7 +581,7 @@ export default function App() {
               KarirEnergi Database
             </h1>
             <p className="text-[12px] md:text-[12.5px] text-[#5a5a57] max-w-4xl leading-relaxed">
-              Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina (Non-Official). <span className="text-[#9b9a97] block sm:inline mt-0.5 sm:mt-0 font-normal text-[11px] sm:ml-1">*Informasi kuota, pendaftar, dan peluang lolos adalah estimasi simulasi untuk analisis potensi.</span>
+              Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina (Non-Official).
             </p>
           </div>
         </div>
@@ -813,21 +811,20 @@ export default function App() {
                         )}
 
                         {/* Quota & Applicants Mini Panel */}
-                        <div className="grid grid-cols-3 gap-1 bg-[#f7f7f5]/70 rounded p-1.5 text-center text-[10px] border border-[#edece9]/50 mt-1 relative">
+                        <div className="grid grid-cols-3 gap-1 bg-[#f7f7f5]/70 rounded p-1.5 text-center text-[10px] border border-[#edece9]/50 mt-1.5">
                           <div className="flex flex-col">
-                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Kuota*</span>
+                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Kuota</span>
                             <span className="text-[#37352f] font-bold">{stats.kuota} org</span>
                           </div>
                           <div className="flex flex-col border-x border-[#edece9]">
-                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Pelamar*</span>
+                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Pelamar</span>
                             <span className="text-[#5a5a57] font-semibold">{stats.pelamar}</span>
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Peluang*</span>
+                            <span className="text-[#9b9a97] text-[8px] font-semibold uppercase">Peluang</span>
                             <span className="text-[#c52447] font-bold">{stats.passRate}%</span>
                           </div>
                         </div>
-                        <div className="text-[7.5px] text-[#9b9a97] text-right mt-0.5 font-normal select-none">*Estimasi Simulasi</div>
                       </div>
 
                       {/* Footer border / info */}
@@ -853,8 +850,8 @@ export default function App() {
                         <th className="p-3 border-r border-[#edece9]">Judul Lowongan</th>
                         <th className="p-3 border-r border-[#edece9]">Lokasi / Kota</th>
                         <th className="p-3 border-r border-[#edece9]">Pendidikan</th>
-                        <th className="p-3 border-r border-[#edece9]">Kuota & Pelamar <span className="text-[10px] text-[#9b9a97] font-normal">(Est.)</span></th>
-                        <th className="p-3 border-r border-[#edece9]">Peluang Lolos <span className="text-[10px] text-[#9b9a97] font-normal">(Est.)</span></th>
+                        <th className="p-3 border-r border-[#edece9]">Kuota & Pelamar</th>
+                        <th className="p-3 border-r border-[#edece9]">Peluang Lolos</th>
                         <th className="p-3">Jurusan</th>
                       </tr>
                     </thead>
@@ -873,9 +870,9 @@ export default function App() {
                             <td className="p-3 border-r border-[#edece9] font-bold text-[#9041a8]">{job["Pendidikan"]}</td>
                             <td className="p-3 border-r border-[#edece9] text-[#5a5a57]">
                               <span className="font-semibold text-[#37352f]">{stats.kuota}</span>
-                              <span className="text-[#9b9a97] text-[11.5px]"> / {stats.pelamar}*</span>
+                              <span className="text-[#9b9a97] text-[11.5px]"> / {stats.pelamar} pelamar</span>
                             </td>
-                            <td className="p-3 border-r border-[#edece9] font-bold text-[#c52447]">{stats.passRate}%*</td>
+                            <td className="p-3 border-r border-[#edece9] font-bold text-[#c52447]">{stats.passRate}%</td>
                             <td className="p-3 max-w-[180px] truncate text-[#5a5a57]">{job["Jurusan"]}</td>
                           </tr>
                         );
@@ -1002,7 +999,7 @@ export default function App() {
                     Kuota Magang
                   </span>
                   <span className="text-[#37352f] font-semibold">
-                    {selectedJobStats?.kuota} Orang <span className="text-[11px] text-[#9b9a97] font-normal">(Estimasi)</span>
+                    {selectedJobStats?.kuota} Orang
                   </span>
                 </div>
 
@@ -1013,7 +1010,7 @@ export default function App() {
                     Total Pelamar
                   </span>
                   <span className="text-[#37352f] font-semibold">
-                    {selectedJobStats?.pelamar} Pelamar <span className="text-[11px] text-[#9b9a97] font-normal">(Estimasi)</span>
+                    {selectedJobStats?.pelamar} Pelamar
                   </span>
                 </div>
 
@@ -1025,7 +1022,7 @@ export default function App() {
                   </span>
                   <span className="text-[#c52447] bg-[#fdf2f2] px-2 py-0.5 rounded font-bold text-[12px] flex items-center gap-1.5">
                     {selectedJobStats?.passRate}%
-                    <span className="text-[10px] text-[#9b9a97] font-normal">(Simulasi Kelulusan)</span>
+                    <span className="text-[10px] text-[#9b9a97] font-normal">(Peluang Kelulusan)</span>
                   </span>
                 </div>
 

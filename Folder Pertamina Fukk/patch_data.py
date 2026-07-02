@@ -3,7 +3,7 @@ import pandas as pd
 
 # Paths
 base_dir = "/Users/Luthfi/Project/PT. Teknalogi Transformasi Digital/PertaminaWebCareer"
-excel_path = os.path.join(base_dir, "Folder Pertamina Fukk", "loker_magang_pertamina_page_1-40.xlsx")
+excel_path = os.path.join(base_dir, "Folder Pertamina New", "loker_magang_pertamina_page_1-40.xlsx")
 
 if not os.path.exists(excel_path):
     print("Excel file not found!")

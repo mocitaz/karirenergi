@@ -16,18 +16,26 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 
 # Directory containing the CSVs
-dir_path = "/Users/Luthfi/Project/PT. Teknalogi Transformasi Digital/PertaminaWebCareer/Folder Pertamina Fukk"
-csv_files = glob.glob(os.path.join(dir_path, "loker_magang_pertamina_semua_*.csv"))
+dir_path = "/Users/Luthfi/Project/PT. Teknalogi Transformasi Digital/PertaminaWebCareer/Folder Pertamina New"
+csv_files = glob.glob(os.path.join(dir_path, "loker_magang_pertamina_semua*.csv"))
+
+def get_page_number(x):
+    name = os.path.basename(x)
+    name_no_ext = name.split('.')[0]
+    parts = name_no_ext.split('_')
+    if parts[-1].isdigit():
+        return int(parts[-1])
+    return 1 # Fallback for loker_magang_pertamina_semua.csv (page 1)
 
 # Sort files by page number
-csv_files.sort(key=lambda x: int(os.path.basename(x).split('_')[-1].split('.')[0]))
+csv_files.sort(key=get_page_number)
 
 dfs = []
 for file in csv_files:
     try:
         df = pd.read_csv(file, encoding='utf-8-sig')
         # Add a column for source page to help in auditing
-        df['Source_Page'] = int(os.path.basename(file).split('_')[-1].split('.')[0])
+        df['Source_Page'] = get_page_number(file)
         dfs.append(df)
     except Exception as e:
         print(f"Error reading {file}: {e}")
