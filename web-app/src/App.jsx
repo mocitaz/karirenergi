@@ -151,19 +151,36 @@ export default function App() {
   }, [savedJobs]);
 
   const [showSavedOnly, setShowSavedOnly] = useState(false);
+  const [pendingBookmark, setPendingBookmark] = useState(null);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const toggleSaveJob = (linkDetail, e) => {
     if (e) {
       e.stopPropagation();
       e.preventDefault();
     }
-    setSavedJobs((prev) => {
-      if (prev.includes(linkDetail)) {
-        return prev.filter((link) => link !== linkDetail);
+    const isSaved = savedJobs.includes(linkDetail);
+    if (isSaved) {
+      setSavedJobs((prev) => prev.filter((link) => link !== linkDetail));
+    } else {
+      const skipConfirm = localStorage.getItem("karirenergi-skip-bookmark-confirm") === "true";
+      if (skipConfirm) {
+        setSavedJobs((prev) => [...prev, linkDetail]);
       } else {
-        return [...prev, linkDetail];
+        setPendingBookmark(linkDetail);
+        setDontShowAgain(false);
       }
-    });
+    }
+  };
+
+  const handleConfirmBookmark = () => {
+    if (pendingBookmark) {
+      setSavedJobs((prev) => [...prev, pendingBookmark]);
+      if (dontShowAgain) {
+        localStorage.setItem("karirenergi-skip-bookmark-confirm", "true");
+      }
+      setPendingBookmark(null);
+    }
   };
 
 
@@ -1362,6 +1379,49 @@ export default function App() {
                 Daftar Melalui Portal Resmi
                 <ArrowUpRight className="w-4 h-4" />
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bookmark Confirmation Modal */}
+      {pendingBookmark && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-[1px] p-4 animate-fade-in">
+          <div className="bg-white rounded-lg max-w-sm w-full border border-[#edece9] shadow-lg p-5 flex flex-col gap-4 animate-scale-in">
+            <div className="flex items-center gap-2.5 text-[#b78103]">
+              <span className="w-8 h-8 rounded-full bg-[#fdf2e9] flex items-center justify-center">
+                <Bookmark className="w-4 h-4 fill-[#b78103]" />
+              </span>
+              <h3 className="font-bold text-[15px] text-[#37352f]">Simpan Lowongan</h3>
+            </div>
+            
+            <p className="text-[12.5px] text-[#5a5a57] leading-relaxed">
+              Lowongan ini akan disimpan ke dalam <strong>Local Storage</strong> browser Anda. Ini berarti data tersimpan secara lokal di perangkat Anda dan akan hilang jika Anda menghapus riwayat atau cache browser. Apakah Anda yakin ingin menyimpan?
+            </p>
+            
+            <label className="flex items-center gap-2 text-[11.5px] text-[#5a5a57] select-none cursor-pointer">
+              <input
+                type="checkbox"
+                checked={dontShowAgain}
+                onChange={(e) => setDontShowAgain(e.target.checked)}
+                className="w-3.5 h-3.5 accent-[#b78103] rounded border-[#edece9]"
+              />
+              <span>Jangan tanyakan lagi</span>
+            </label>
+            
+            <div className="flex items-center justify-end gap-2.5 mt-1">
+              <button
+                onClick={() => setPendingBookmark(null)}
+                className="px-3.5 py-2 text-[12px] font-semibold text-[#5a5a57] bg-white border border-[#edece9] hover:bg-[#f7f7f5] rounded-md transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleConfirmBookmark}
+                className="px-3.5 py-2 text-[12px] font-semibold text-white bg-[#b78103] hover:bg-[#9d6c00] rounded-md transition-colors cursor-pointer"
+              >
+                Ya, Simpan
+              </button>
             </div>
           </div>
         </div>
