@@ -315,7 +315,7 @@ export default function App() {
         className={`flex-shrink-0 bg-[#f7f7f5] flex flex-col fixed md:relative top-0 bottom-0 left-0 transition-all duration-300 ease-in-out z-45 border-[#edece9]
           ${sidebarOpen
             ? "w-[280px] translate-x-0 shadow-2xl border-r md:shadow-none"
-            : "w-0 -translate-x-full border-none md:w-[72px] md:translate-x-0 md:border-r"
+            : "w-0 -translate-x-full border-none md:w-[72px] md:translate-x-0 md:border-r max-md:pointer-events-none max-md:invisible"
           }
         `}
       >
@@ -509,7 +509,7 @@ export default function App() {
         {/* Footer */}
         <div className={`p-4 border-t border-[#edece9] text-[10px] text-[#9b9a97] text-center flex-shrink-0 bg-[#f7f7f5] ${sidebarOpen ? "block" : "hidden"
           }`}>
-          &copy; 2026 PT Teknalogi Transformasi Digital
+          &copy; 2026 KarirEnergi
         </div>
       </aside>
 
@@ -628,7 +628,7 @@ export default function App() {
             </div>
 
             {/* Inline Filter Controls on Main Page */}
-            <div className="flex flex-wrap items-center gap-2 pt-1.5 border-t border-[#edece9]/50">
+            <div className="hidden md:flex flex-wrap items-center gap-2 pt-1.5 border-t border-[#edece9]/50">
               {/* Inline Search */}
               <div className="relative flex-1 min-w-[200px] max-w-xs">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
