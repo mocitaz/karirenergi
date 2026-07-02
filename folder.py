@@ -102,12 +102,22 @@
                     perusahaan = cardLines[1];
                 }
 
+                let kuota = 1;
+                let pelamar = 0;
+                const cardText = card.innerText || "";
+                const matchPosisi = cardText.match(/(\d+)\s+posisi/i);
+                const matchPelamar = cardText.match(/(\d+)\s+pelamar/i);
+                if (matchPosisi) kuota = parseInt(matchPosisi[1], 10);
+                if (matchPelamar) pelamar = parseInt(matchPelamar[1], 10);
+
                 if (!uniqueJobs.some(job => job.id === vacancyId)) {
                     uniqueJobs.push({
                         id: vacancyId,
                         judul: judul,
                         perusahaan: perusahaan,
-                        detailUrl: `https://recruitment.pertamina.com/object/widget/${widgetDetailUUID}/?id=${vacancyId}`
+                        detailUrl: `https://recruitment.pertamina.com/object/widget/${widgetDetailUUID}/?id=${vacancyId}`,
+                        kuota: kuota,
+                        pelamar: pelamar
                     });
                     count++;
                 }
@@ -255,7 +265,9 @@
                         "Sektor": sektor,
                         "Pendidikan": pendidikan,
                         "Jurusan": jurusan,
-                        "Link Detail": job.detailUrl
+                        "Link Detail": job.detailUrl,
+                        "Kuota": job.kuota,
+                        "Pelamar": job.pelamar
                     });
 
                 } catch (err) {
@@ -278,9 +290,9 @@
         document.getElementById("scrape-status").style.color = "#81c784";
         document.getElementById("scrape-progress").style.backgroundColor = "#81c784";
 
-        let csvContent = "\uFEFFJudul Lowongan,Perusahaan,Kota,Industri,Sektor,Pendidikan,Jurusan,Link Detail\n";
+        let csvContent = "\uFEFFJudul Lowongan,Perusahaan,Kota,Industri,Sektor,Pendidikan,Jurusan,Link Detail,Kuota,Pelamar\n";
         hasilScraping.forEach(row => {
-            csvContent += `"${row["Judul Lowongan"].replace(/"/g, '""')}","${row["Perusahaan"].replace(/"/g, '""')}","${row["Kota"].replace(/"/g, '""')}","${row["Industri"].replace(/"/g, '""')}","${row["Sektor"].replace(/"/g, '""')}","${row["Pendidikan"].replace(/"/g, '""')}","${row["Jurusan"].replace(/"/g, '""')}","${row["Link Detail"].replace(/"/g, '""')}"\n`;
+            csvContent += `"${row["Judul Lowongan"].replace(/"/g, '""')}","${row["Perusahaan"].replace(/"/g, '""')}","${row["Kota"].replace(/"/g, '""')}","${row["Industri"].replace(/"/g, '""')}","${row["Sektor"].replace(/"/g, '""')}","${row["Pendidikan"].replace(/"/g, '""')}","${row["Jurusan"].replace(/"/g, '""')}","${row["Link Detail"].replace(/"/g, '""')}","${row["Kuota"]}","${row["Pelamar"]}"\n`;
         });
 
         // Modifikasi tombol stop menjadi tombol download besar

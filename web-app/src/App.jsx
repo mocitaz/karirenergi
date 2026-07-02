@@ -40,7 +40,15 @@ function getNotionColor(text) {
 }
 
 // Generate realistic deterministic stats based on unique listing fields
-export function getDeterministicStats(title, company, link) {
+export function getDeterministicStats(title, company, link, dbKuota, dbPelamar) {
+  // If database already contains real scraped Kuota and Pelamar details, use them
+  if (dbKuota !== undefined && dbKuota !== null) {
+    const kuota = parseInt(dbKuota, 10);
+    const pelamar = dbPelamar !== undefined && dbPelamar !== null ? parseInt(dbPelamar, 10) : 0;
+    const passRate = pelamar > 0 ? ((kuota / pelamar) * 100).toFixed(2) : "100.00";
+    return { kuota, pelamar, passRate };
+  }
+
   let hash = 0;
   const str = link || title || "";
   for (let i = 0; i < str.length; i++) {
@@ -244,14 +252,14 @@ export default function App() {
       result.sort((a, b) => a["Judul Lowongan"].localeCompare(b["Judul Lowongan"]));
     } else if (sortBy === "peluang-desc") {
       result.sort((a, b) => {
-        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"]);
-        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"]);
+        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"], a["Kuota"], a["Pelamar"]);
+        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"], b["Kuota"], b["Pelamar"]);
         return parseFloat(statsB.passRate) - parseFloat(statsA.passRate);
       });
     } else if (sortBy === "peluang-asc") {
       result.sort((a, b) => {
-        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"]);
-        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"]);
+        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"], a["Kuota"], a["Pelamar"]);
+        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"], b["Kuota"], b["Pelamar"]);
         return parseFloat(statsA.passRate) - parseFloat(statsB.passRate);
       });
     }
@@ -264,6 +272,17 @@ export default function App() {
     if (!selectedJob) return -1;
     return filteredListings.findIndex((j) => j["Link Detail"] === selectedJob["Link Detail"]);
   }, [selectedJob, filteredListings]);
+
+  const selectedJobStats = useMemo(() => {
+    if (!selectedJob) return null;
+    return getDeterministicStats(
+      selectedJob["Judul Lowongan"],
+      selectedJob["Perusahaan"],
+      selectedJob["Link Detail"],
+      selectedJob["Kuota"],
+      selectedJob["Pelamar"]
+    );
+  }, [selectedJob]);
 
   const handlePrevJob = () => {
     if (currentIdx > 0) {
@@ -292,7 +311,7 @@ export default function App() {
     let kuota = 0;
     let pelamar = 0;
     listings.forEach((job) => {
-      const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"]);
+      const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"], job["Kuota"], job["Pelamar"]);
       kuota += stats.kuota;
       pelamar += parseInt(stats.pelamar);
     });
@@ -734,7 +753,7 @@ export default function App() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-fade-in">
                 {filteredListings.map((job) => {
                   const tagColor = getNotionColor(job["Perusahaan"]);
-                  const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"]);
+                  const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"], job["Kuota"], job["Pelamar"]);
                   
                   // Extract first two majors for inline tags
                   const majorTags = job["Jurusan"]
@@ -832,7 +851,7 @@ export default function App() {
                     </thead>
                     <tbody>
                       {filteredListings.map((job, idx) => {
-                        const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"]);
+                        const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"], job["Kuota"], job["Pelamar"]);
                         return (
                           <tr
                             key={idx}
@@ -974,7 +993,7 @@ export default function App() {
                     Kuota Magang
                   </span>
                   <span className="text-[#37352f] font-semibold">
-                    {getDeterministicStats(selectedJob["Judul Lowongan"], selectedJob["Perusahaan"], selectedJob["Link Detail"]).kuota} Orang <span className="text-[11px] text-[#9b9a97] font-normal">(Estimasi)</span>
+                    {selectedJobStats?.kuota} Orang <span className="text-[11px] text-[#9b9a97] font-normal">(Estimasi)</span>
                   </span>
                 </div>
 
@@ -985,7 +1004,7 @@ export default function App() {
                     Total Pelamar
                   </span>
                   <span className="text-[#37352f] font-semibold">
-                    {getDeterministicStats(selectedJob["Judul Lowongan"], selectedJob["Perusahaan"], selectedJob["Link Detail"]).pelamar} Pelamar <span className="text-[11px] text-[#9b9a97] font-normal">(Estimasi)</span>
+                    {selectedJobStats?.pelamar} Pelamar <span className="text-[11px] text-[#9b9a97] font-normal">(Estimasi)</span>
                   </span>
                 </div>
 
@@ -996,7 +1015,7 @@ export default function App() {
                     Peluang Lolos
                   </span>
                   <span className="text-[#c52447] bg-[#fdf2f2] px-2 py-0.5 rounded font-bold text-[12px] flex items-center gap-1.5">
-                    {getDeterministicStats(selectedJob["Judul Lowongan"], selectedJob["Perusahaan"], selectedJob["Link Detail"]).passRate}%
+                    {selectedJobStats?.passRate}%
                     <span className="text-[10px] text-[#9b9a97] font-normal">(Simulasi Kelulusan)</span>
                   </span>
                 </div>

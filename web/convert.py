@@ -29,6 +29,23 @@ for _, row in df_excel.iterrows():
         candidate = parts[1].strip()
         perusahaan = candidate
         
+    kuota = row.get("Kuota")
+    pelamar = row.get("Pelamar")
+    
+    kuota_val = None
+    if kuota is not None and not pd.isna(kuota) and str(kuota).strip() != "Tidak tertera":
+        try:
+            kuota_val = int(float(str(kuota).strip()))
+        except ValueError:
+            pass
+            
+    pelamar_val = None
+    if pelamar is not None and not pd.isna(pelamar) and str(pelamar).strip() != "Tidak tertera":
+        try:
+            pelamar_val = int(float(str(pelamar).strip()))
+        except ValueError:
+            pass
+
     records.append({
         "Judul Lowongan": title,
         "Perusahaan": perusahaan,
@@ -37,7 +54,9 @@ for _, row in df_excel.iterrows():
         "Sektor": str(row.get("Sektor", "Tidak tertera")).strip(),
         "Pendidikan": str(row.get("Pendidikan", "Tidak tertera")).strip(),
         "Jurusan": str(row.get("Jurusan", "Semua Jurusan / Tidak tertera")).strip(),
-        "Link Detail": str(row.get("Link Detail", "")).strip()
+        "Link Detail": str(row.get("Link Detail", "")).strip(),
+        "Kuota": kuota_val,
+        "Pelamar": pelamar_val
     })
 
 # Ensure output directory exists
