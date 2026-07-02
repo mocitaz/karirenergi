@@ -1082,18 +1082,34 @@ export default function App() {
             {/* Compact Monospace Countdown - Collapse when scrolled */}
             {!timeLeft.isExpired && (
               <div className={`transition-all duration-300 ease-in-out ${
-                isScrolled ? "h-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none" : "flex items-center bg-[#fdf2e9] border border-[#f5ebcc] text-[#c26100] px-3.5 py-1.5 rounded-lg text-[12px] w-fit shadow-3xs self-start sm:self-center"
+                isScrolled 
+                  ? "h-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none" 
+                  : "flex items-center bg-[#fdf2e9] border border-[#f5ebcc]/80 text-[#c26100] px-3.5 py-2 rounded-xl text-[12px] w-fit shadow-3xs self-start sm:self-center"
               }`}>
-                <Timer className="w-3.5 h-3.5 mr-2 animate-pulse text-[#c26100] flex-shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-[#c26100]/60 leading-none mb-0.5">Batas Registrasi</span>
-                  <span className="font-mono font-bold leading-none select-none flex items-center gap-0.5">
-                    <span>{timeLeft.days}<span className="text-[8px] font-sans font-semibold text-[#c26100]/70">d</span></span>
-                    <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
-                    <span>{String(timeLeft.hours).padStart(2, "0")}<span className="text-[8px] font-sans font-semibold text-[#c26100]/70">h</span></span>
-                    <span className="text-[#c26100]/30 font-sans mx-0.5">:</span>
-                    <span>{String(timeLeft.minutes).padStart(2, "0")}<span className="text-[8px] font-sans font-semibold text-[#c26100]/70">m</span></span>
-                  </span>
+                <Timer className="w-4 h-4 mr-2.5 animate-pulse text-[#c26100] flex-shrink-0" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[8.5px] font-extrabold uppercase tracking-wider text-[#c26100]/60 leading-none">Batas Registrasi</span>
+                  <div className="flex items-center gap-1 font-mono text-[13px] font-bold text-[#c26100] select-none">
+                    <div className="bg-[#f5e9dc]/70 px-1.5 py-1 rounded-md border border-[#eedcc8]/40 flex flex-col items-center min-w-[26px]">
+                      <span className="leading-none">{timeLeft.days}</span>
+                      <span className="text-[7px] font-sans font-extrabold uppercase tracking-wider text-[#c26100]/60 mt-0.5">hari</span>
+                    </div>
+                    <span className="text-[#c26100]/40 font-sans font-medium animate-pulse">:</span>
+                    <div className="bg-[#f5e9dc]/70 px-1.5 py-1 rounded-md border border-[#eedcc8]/40 flex flex-col items-center min-w-[26px]">
+                      <span className="leading-none">{String(timeLeft.hours).padStart(2, "0")}</span>
+                      <span className="text-[7px] font-sans font-extrabold uppercase tracking-wider text-[#c26100]/60 mt-0.5">jam</span>
+                    </div>
+                    <span className="text-[#c26100]/40 font-sans font-medium animate-pulse">:</span>
+                    <div className="bg-[#f5e9dc]/70 px-1.5 py-1 rounded-md border border-[#eedcc8]/40 flex flex-col items-center min-w-[26px]">
+                      <span className="leading-none">{String(timeLeft.minutes).padStart(2, "0")}</span>
+                      <span className="text-[7px] font-sans font-extrabold uppercase tracking-wider text-[#c26100]/60 mt-0.5">mnt</span>
+                    </div>
+                    <span className="text-[#c26100]/40 font-sans font-medium animate-pulse">:</span>
+                    <div className="bg-[#f5e9dc]/70 px-1.5 py-1 rounded-md border border-[#eedcc8]/40 flex flex-col items-center min-w-[26px]">
+                      <span className="leading-none">{String(timeLeft.seconds).padStart(2, "0")}</span>
+                      <span className="text-[7px] font-sans font-extrabold uppercase tracking-wider text-[#c26100]/60 mt-0.5">dtk</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
