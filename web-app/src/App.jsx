@@ -445,6 +445,157 @@ export default function App() {
     }
   };
 
+  // Memoized calculations for the Analytics Dashboard
+  const analyticsData = useMemo(() => {
+    const totalJobs = filteredListings.length;
+    const totalQuota = filteredListings.reduce((sum, item) => sum + (item.Kuota || 0), 0);
+    const totalApplicants = filteredListings.reduce((sum, item) => sum + (item.Pelamar || 0), 0);
+    const avgApplicantsPerJob = totalJobs > 0 ? Math.round(totalApplicants / totalJobs) : 0;
+    
+    // Average pass rate (only for jobs with stats)
+    const jobsWithStats = filteredListings.filter(j => j.Kuota > 0 && j.Pelamar > 0);
+    const avgPassRate = jobsWithStats.length > 0
+      ? (jobsWithStats.reduce((sum, j) => sum + ((j.Kuota / j.Pelamar) * 100), 0) / jobsWithStats.length).toFixed(2)
+      : "0";
+
+    // Company breakdown
+    const companyCounts = {};
+    const companyApplicants = {};
+    filteredListings.forEach(j => {
+      const c = j.Perusahaan || "Tidak tertera";
+      companyCounts[c] = (companyCounts[c] || 0) + 1;
+      companyApplicants[c] = (companyApplicants[c] || 0) + (j.Pelamar || 0);
+    });
+    
+    const companyLeaderboard = Object.keys(companyCounts).map(name => ({
+      name,
+      vacancies: companyCounts[name],
+      applicants: companyApplicants[name]
+    })).sort((a, b) => b.vacancies - a.vacancies).slice(0, 7);
+
+    // Most Competitive Specific Jobs (Ratio Pelamar/Kuota)
+    const competitiveJobs = filteredListings
+      .filter(j => j.Kuota > 0 && j.Pelamar > 0)
+      .map(j => {
+        const ratio = j.Pelamar / j.Kuota;
+        return {
+          ...j,
+          ratio: Math.round(ratio),
+          passRate: ((j.Kuota / j.Pelamar) * 100).toFixed(2)
+        };
+      })
+      .sort((a, b) => b.ratio - a.ratio)
+      .slice(0, 5);
+
+    // Education Level Breakdown
+    const eduCounts = {};
+    filteredListings.forEach(j => {
+      const edu = j.Pendidikan || "Tidak tertera";
+      eduCounts[edu] = (eduCounts[edu] || 0) + 1;
+    });
+    const eduBreakdown = Object.keys(eduCounts).map(name => ({
+      name,
+      count: eduCounts[name],
+      percentage: totalJobs > 0 ? Math.round((eduCounts[name] / totalJobs) * 100) : 0
+    })).sort((a, b) => b.count - a.count);
+
+    // Geographic Breakdown
+    const cityCounts = {};
+    filteredListings.forEach(j => {
+      const city = j.Kota || "Tidak tertera";
+      cityCounts[city] = (cityCounts[city] || 0) + 1;
+    });
+    const topCities = Object.keys(cityCounts).map(name => ({
+      name,
+      count: cityCounts[name],
+      percentage: totalJobs > 0 ? Math.round((cityCounts[name] / totalJobs) * 100) : 0
+    })).sort((a, b) => b.count - a.count).slice(0, 6);
+
+    // Competition Heat Classification
+    let superKetat = 0; 
+    let tinggi = 0;      
+    let sedang = 0;      
+    let terbuka = 0;     
+
+    filteredListings.forEach(j => {
+      if (j.Kuota > 0 && j.Pelamar > 0) {
+        const ratio = j.Pelamar / j.Kuota;
+        if (ratio > 200) superKetat++;
+        else if (ratio >= 50) tinggi++;
+        else if (ratio >= 20) sedang++;
+        else terbuka++;
+      }
+    });
+
+    const heatClassification = [
+      { label: "Sangat Ketat (Rasio > 1:200)", count: superKetat, percentage: totalJobs > 0 ? Math.round((superKetat / totalJobs) * 100) : 0, color: "#c52447", bg: "#fdf0f2" },
+      { label: "Tinggi (Rasio 1:50 - 1:200)", count: tinggi, percentage: totalJobs > 0 ? Math.round((tinggi / totalJobs) * 100) : 0, color: "#d97706", bg: "#fef3c7" },
+      { label: "Sedang (Rasio 1:20 - 1:50)", count: sedang, percentage: totalJobs > 0 ? Math.round((sedang / totalJobs) * 100) : 0, color: "#2563eb", bg: "#dbeafe" },
+      { label: "Terbuka (Rasio < 1:20)", count: terbuka, percentage: totalJobs > 0 ? Math.round((terbuka / totalJobs) * 100) : 0, color: "#16a34a", bg: "#dcfce7" }
+    ];
+
+    // Group Majors Category
+    const majorCategories = {
+      "Teknik / STEM": 0,
+      "Manajemen / Bisnis": 0,
+      "Ekonomi & Akuntansi": 0,
+      "Teknologi Informasi & Komputer": 0,
+      "Psikologi / Human Resources": 0,
+      "Hukum & Legal": 0,
+      "Statistika / Matematika": 0,
+      "Semua Jurusan": 0
+    };
+
+    filteredListings.forEach(j => {
+      const jur = (j.Jurusan || "").toLowerCase();
+      if (jur.includes("semua jurusan")) {
+        majorCategories["Semua Jurusan"]++;
+      } else {
+        if (jur.includes("teknik") || jur.includes("sains") || jur.includes("kimia") || jur.includes("fisika") || jur.includes("lingkungan") || jur.includes("sipil") || jur.includes("mesin") || jur.includes("elektro") || jur.includes("industri") || jur.includes("perminyakan") || jur.includes("geologi")) {
+          majorCategories["Teknik / STEM"]++;
+        }
+        if (jur.includes("manajemen") || jur.includes("bisnis") || jur.includes("administrasi") || jur.includes("marketing") || jur.includes("pemasaran")) {
+          majorCategories["Manajemen / Bisnis"]++;
+        }
+        if (jur.includes("akuntansi") || jur.includes("ekonomi") || jur.includes("keuangan")) {
+          majorCategories["Ekonomi & Akuntansi"]++;
+        }
+        if (jur.includes("informatika") || jur.includes("komputer") || jur.includes("sistem informasi") || jur.includes("it") || jur.includes("software") || jur.includes("teknologi informasi")) {
+          majorCategories["Teknologi Informasi & Komputer"]++;
+        }
+        if (jur.includes("psikologi") || jur.includes("human resource") || jur.includes("hc")) {
+          majorCategories["Psikologi / Human Resources"]++;
+        }
+        if (jur.includes("hukum") || jur.includes("legal")) {
+          majorCategories["Hukum & Legal"]++;
+        }
+        if (jur.includes("statistika") || jur.includes("matematika") || jur.includes("statistik")) {
+          majorCategories["Statistika / Matematika"]++;
+        }
+      }
+    });
+
+    const sortedMajors = Object.keys(majorCategories).map(name => ({
+      name,
+      count: majorCategories[name],
+      percentage: totalJobs > 0 ? Math.round((majorCategories[name] / totalJobs) * 100) : 0
+    })).sort((a, b) => b.count - a.count);
+
+    return {
+      totalJobs,
+      totalQuota,
+      totalApplicants,
+      avgApplicantsPerJob,
+      avgPassRate,
+      companyLeaderboard,
+      competitiveJobs,
+      eduBreakdown,
+      topCities,
+      heatClassification,
+      sortedMajors
+    };
+  }, [filteredListings]);
+
 
 
   // Stats
@@ -864,6 +1015,17 @@ export default function App() {
                   <TableIcon className="w-3.5 h-3.5" />
                   Table
                 </button>
+                <button
+                  onClick={() => setViewTab("analytics")}
+                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12.5px] transition-all cursor-pointer ${
+                    viewTab === "analytics"
+                      ? "bg-white text-[#37352f] font-bold shadow-xs"
+                      : "text-[#5a5a57] hover:text-[#37352f]"
+                  }`}
+                >
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  Analisis
+                </button>
               </div>
 
               <div className="flex items-center gap-4">
@@ -1156,6 +1318,213 @@ export default function App() {
                   </table>
                 </div>
                 {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} />}
+              </div>
+            )}
+
+            {/* Analytics Dashboard View */}
+            {viewTab === "analytics" && (
+              <div className="flex flex-col gap-6 animate-fade-in pb-10 select-none">
+                
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-[#f7f7f5]/60 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs">
+                    <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Total Posisi Loker</span>
+                    <span className="text-2xl font-extrabold text-[#37352f] tracking-tight">{analyticsData.totalJobs}</span>
+                    <span className="text-[10px] text-[#8a8a86] mt-0.5">Aktif di database</span>
+                  </div>
+                  
+                  <div className="bg-[#f7f7f5]/60 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs">
+                    <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Total Kuota Penerimaan</span>
+                    <span className="text-2xl font-extrabold text-[#c26100] tracking-tight">{analyticsData.totalQuota}</span>
+                    <span className="text-[10px] text-[#8a8a86] mt-0.5">Orang mahasiswa magang</span>
+                  </div>
+
+                  <div className="bg-[#f7f7f5]/60 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs">
+                    <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Total Pendaftar Aktif</span>
+                    <span className="text-2xl font-extrabold text-[#37352f] tracking-tight">{analyticsData.totalApplicants.toLocaleString()}</span>
+                    <span className="text-[10px] text-[#8a8a86] mt-0.5">Pelamar terdaftar</span>
+                  </div>
+
+                  <div className="bg-[#f7f7f5]/60 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs">
+                    <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Rata-Rata Keketatan</span>
+                    <span className="text-2xl font-extrabold text-[#c52447] tracking-tight">{analyticsData.avgPassRate}%</span>
+                    <span className="text-[10px] text-[#8a8a86] mt-0.5">Peluang kelulusan rata-rata</span>
+                  </div>
+                </div>
+
+                {/* 2-Column Dashboard Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  
+                  {/* Left Column */}
+                  <div className="flex flex-col gap-6">
+                    
+                    {/* Subsidiary Leaderboard */}
+                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Leaderboard Anak Perusahaan</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Anak perusahaan/subsidiari Pertamina dengan jumlah loker magang terbanyak</p>
+                      </div>
+                      
+                      <div className="flex flex-col gap-3.5">
+                        {analyticsData.companyLeaderboard.map((item, idx) => {
+                          const maxVacancies = analyticsData.companyLeaderboard[0]?.vacancies || 1;
+                          const pct = (item.vacancies / maxVacancies) * 100;
+                          return (
+                            <div key={idx} className="flex flex-col gap-1.5">
+                              <div className="flex justify-between items-center text-[12px]">
+                                <span className="font-bold text-[#37352f] truncate max-w-[260px]">{idx + 1}. {item.name}</span>
+                                <span className="text-[#5a5a57] font-semibold text-[11px]">
+                                  {item.vacancies} Posisi <span className="text-[#8a8a86] font-normal">• {item.applicants.toLocaleString()} pelamar</span>
+                                </span>
+                              </div>
+                              <div className="w-full bg-[#edece9]/50 h-2.5 rounded-full overflow-hidden">
+                                <div 
+                                  className="bg-gradient-to-r from-[#b78103] to-[#c26100] h-full rounded-full transition-all duration-500" 
+                                  style={{ width: `${pct}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Top 5 Most Competitive Internships */}
+                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Posisi Paling Kompetitif</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio jumlah pelamar per kuota kursi tertinggi (Klik untuk buka detail)</p>
+                      </div>
+
+                      <div className="flex flex-col divide-y divide-[#edece9]/60">
+                        {analyticsData.competitiveJobs.map((job, idx) => (
+                          <div 
+                            key={idx} 
+                            onClick={() => setSelectedJob(job)}
+                            className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3 cursor-pointer group hover:bg-[#f7f7f5]/30 rounded-md transition-colors px-1"
+                          >
+                            <div className="flex flex-col gap-0.5 min-w-0">
+                              <span className="text-[12.5px] font-bold text-[#1d7bb8] group-hover:underline truncate">{job["Judul Lowongan"]}</span>
+                              <span className="text-[10px] text-[#8a8a86]">{job["Perusahaan"]}</span>
+                            </div>
+                            <div className="flex flex-col items-end flex-shrink-0 text-right">
+                              <span className="text-[11.5px] font-extrabold text-[#c52447]">1 : {job.ratio}</span>
+                              <span className="text-[9.5px] text-[#8a8a86] font-medium">({job["Kuota"]} kuota / {job["Pelamar"]} pelamar)</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Geographic Location breakdown */}
+                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Distribusi Lokasi / Kota</h3>
+                        <p className="text-[11px] text-[#8a8a86]">6 Kota teratas dengan sebaran penempatan magang terbanyak</p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {analyticsData.topCities.map((item, idx) => (
+                          <div key={idx} className="bg-[#f7f7f5]/50 border border-[#edece9]/80 rounded-lg p-3 flex justify-between items-center">
+                            <div className="flex flex-col gap-0.5 min-w-0">
+                              <span className="text-[12px] font-bold text-[#37352f] truncate">{item.name}</span>
+                              <span className="text-[10px] text-[#8a8a86]">{item.count} Lowongan</span>
+                            </div>
+                            <span className="text-[12px] font-extrabold text-[#c26100] ml-2">{item.percentage}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="flex flex-col gap-6">
+                    
+                    {/* Competition Heat Zone classification */}
+                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Klasifikasi Tingkat Persaingan</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Distribusi tingkat keketatan persaingan masuk lowongan magang</p>
+                      </div>
+
+                      <div className="flex flex-col gap-4">
+                        {analyticsData.heatClassification.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between gap-4 p-2.5 rounded-lg border border-[#edece9]/50" style={{ backgroundColor: item.bg }}>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-[12px] font-bold" style={{ color: item.color }}>{item.label}</span>
+                              <span className="text-[10.5px] text-[#5a5a57]">{item.count} Posisi Loker ({item.percentage}%)</span>
+                            </div>
+                            
+                            {/* Simple Mini Ring Indicator */}
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[11px] border-2" style={{ borderColor: item.color, color: item.color, backgroundColor: 'white' }}>
+                              {item.percentage}%
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Popular Majors In-Demand Categories */}
+                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Kebutuhan Rumpun Jurusan Terbanyak</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Kategori program studi yang paling sering dicari pada prasyarat pendaftaran</p>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        {analyticsData.sortedMajors.map((item, idx) => {
+                          const maxCount = analyticsData.sortedMajors[0]?.count || 1;
+                          const pct = (item.count / maxCount) * 100;
+                          return (
+                            <div key={idx} className="flex flex-col gap-1">
+                              <div className="flex justify-between items-center text-[12px]">
+                                <span className="font-semibold text-[#37352f]">{item.name}</span>
+                                <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                  {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
+                                </span>
+                              </div>
+                              <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
+                                <div 
+                                  className="bg-[#b78103] h-full rounded-full transition-all duration-500" 
+                                  style={{ width: `${pct}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Education Level breakdown */}
+                    <div className="border border-[#edece9] rounded-lg p-5 bg-white flex flex-col gap-4 shadow-3xs">
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Kualifikasi Jenjang Pendidikan</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Persentase prasyarat tingkat pendidikan minimal bagi calon pelamar</p>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        {analyticsData.eduBreakdown.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between gap-4">
+                            <span className="text-[12px] font-bold text-[#37352f] w-14">{item.name}</span>
+                            <div className="flex-1 bg-[#edece9]/50 h-3.5 rounded overflow-hidden flex">
+                              <div 
+                                className="bg-[#9041a8] h-full transition-all duration-500 rounded-r" 
+                                style={{ width: `${item.percentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-[11.5px] text-[#5a5a57] font-semibold w-16 text-right">
+                              {item.count} Loker <span className="text-[10px] text-[#8a8a86] font-normal">({item.percentage}%)</span>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
               </div>
             )}
 
