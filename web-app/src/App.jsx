@@ -200,13 +200,6 @@ export default function App() {
     }
   };
 
-  // Reset visible limit on filter changes
-  useEffect(() => {
-    setVisibleLimit(24);
-  }, [search, selectedCompany, selectedMajor, selectedCity, selectedEdu, selectedSector, showSavedOnly]);
-
-
-
   // Lock sidebar state to localStorage
   useEffect(() => {
     localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
@@ -220,6 +213,11 @@ export default function App() {
   const [selectedEdu, setSelectedEdu] = useState("");
   const [selectedSector, setSelectedSector] = useState("");
   const [sortBy, setSortBy] = useState("perusahaan"); // perusahaan | judul
+
+  // Reset visible limit on filter changes
+  useEffect(() => {
+    setVisibleLimit(24);
+  }, [search, selectedCompany, selectedMajor, selectedCity, selectedEdu, selectedSector, showSavedOnly]);
 
   // Draft Filters State (applied on clicking 'Cari' or pressing Enter)
   const [draftSearch, setDraftSearch] = useState("");
