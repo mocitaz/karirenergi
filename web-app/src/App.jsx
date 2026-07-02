@@ -1042,7 +1042,7 @@ export default function App() {
                 isScrolled ? "h-0 opacity-0 overflow-hidden mt-0 pointer-events-none" : "opacity-100 mt-0.5"
               }`}>
                 <p className="text-[12.5px] text-[#5a5a57] max-w-2xl leading-relaxed">
-                  Asisten pelacak independen untuk membantu Anda memantau dan mencari program magang aktif dari portal rekrutmen resmi Pertamina.
+                  Pelacak independen program magang resmi Pertamina.
                 </p>
                 <div className="text-[10.5px] text-[#9b9a97] mt-0.5">
                   Terakhir Diupdate: 2 Juli 2026, 22:06 WIB
