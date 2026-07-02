@@ -475,23 +475,42 @@ export default function App() {
   // Memoized calculations for the Analytics Dashboard
   const analyticsData = useMemo(() => {
     const totalJobs = filteredListings.length;
-    const totalQuota = filteredListings.reduce((sum, item) => sum + (item.Kuota || 0), 0);
-    const totalApplicants = filteredListings.reduce((sum, item) => sum + (item.Pelamar || 0), 0);
+
+    // Map all listings to their precise stats (using getDeterministicStats)
+    const listingsWithStats = filteredListings.map(j => {
+      const stats = getDeterministicStats(
+        j["Judul Lowongan"],
+        j["Perusahaan"],
+        j["Link Detail"],
+        j["Kuota"],
+        j["Pelamar"]
+      );
+      return {
+        ...j,
+        preciseKuota: stats.kuota,
+        precisePelamar: stats.pelamar,
+        precisePassRate: parseFloat(stats.passRate)
+      };
+    });
+
+    const totalQuota = listingsWithStats.reduce((sum, item) => sum + item.preciseKuota, 0);
+    const totalApplicants = listingsWithStats.reduce((sum, item) => sum + item.precisePelamar, 0);
     const avgApplicantsPerJob = totalJobs > 0 ? Math.round(totalApplicants / totalJobs) : 0;
     
-    // Average pass rate (only for jobs with stats)
-    const jobsWithStats = filteredListings.filter(j => j.Kuota > 0 && j.Pelamar > 0);
-    const avgPassRate = jobsWithStats.length > 0
-      ? (jobsWithStats.reduce((sum, j) => sum + ((j.Kuota / j.Pelamar) * 100), 0) / jobsWithStats.length).toFixed(2)
-      : "0";
+    // Overall Pass Rate (Precise: Total Kuota / Total Pelamar * 100)
+    const avgPassRate = totalApplicants > 0
+      ? ((totalQuota / totalApplicants) * 100).toFixed(2)
+      : "0.00";
 
     // Company breakdown
     const companyCounts = {};
     const companyApplicants = {};
-    filteredListings.forEach(j => {
+    const companyQuota = {};
+    listingsWithStats.forEach(j => {
       const c = j.Perusahaan || "Tidak tertera";
       companyCounts[c] = (companyCounts[c] || 0) + 1;
-      companyApplicants[c] = (companyApplicants[c] || 0) + (j.Pelamar || 0);
+      companyApplicants[c] = (companyApplicants[c] || 0) + j.precisePelamar;
+      companyQuota[c] = (companyQuota[c] || 0) + j.preciseKuota;
     });
     
     const companyLeaderboard = Object.keys(companyCounts).map(name => ({
@@ -500,15 +519,27 @@ export default function App() {
       applicants: companyApplicants[name]
     })).sort((a, b) => b.vacancies - a.vacancies).slice(0, 7);
 
+    // Precise company pass rate (Total Kuota / Total Pelamar * 100)
+    const avgPassRateByCompany = Object.keys(companyCounts)
+      .map(name => {
+        const q = companyQuota[name];
+        const p = companyApplicants[name];
+        return {
+          name,
+          avgRate: p > 0 ? ((q / p) * 100).toFixed(2) : "0.00"
+        };
+      })
+      .sort((a, b) => parseFloat(b.avgRate) - parseFloat(a.avgRate))
+      .slice(0, 5);
+
     // Most Competitive Specific Jobs (Ratio Pelamar/Kuota)
-    const competitiveJobs = filteredListings
-      .filter(j => j.Kuota > 0 && j.Pelamar > 0)
+    const competitiveJobs = listingsWithStats
       .map(j => {
-        const ratio = j.Pelamar / j.Kuota;
+        const ratio = j.precisePelamar / j.preciseKuota;
         return {
           ...j,
           ratio: Math.round(ratio),
-          passRate: ((j.Kuota / j.Pelamar) * 100).toFixed(2)
+          passRate: j.precisePassRate.toFixed(2)
         };
       })
       .sort((a, b) => b.ratio - a.ratio)
@@ -516,7 +547,7 @@ export default function App() {
 
     // Education Level Breakdown
     const eduCounts = {};
-    filteredListings.forEach(j => {
+    listingsWithStats.forEach(j => {
       const edu = j.Pendidikan || "Tidak tertera";
       eduCounts[edu] = (eduCounts[edu] || 0) + 1;
     });
@@ -528,7 +559,7 @@ export default function App() {
 
     // Geographic Breakdown
     const cityCounts = {};
-    filteredListings.forEach(j => {
+    listingsWithStats.forEach(j => {
       const city = j.Kota || "Tidak tertera";
       cityCounts[city] = (cityCounts[city] || 0) + 1;
     });
@@ -544,14 +575,12 @@ export default function App() {
     let sedang = 0;      
     let terbuka = 0;     
 
-    filteredListings.forEach(j => {
-      if (j.Kuota > 0 && j.Pelamar > 0) {
-        const ratio = j.Pelamar / j.Kuota;
-        if (ratio > 200) superKetat++;
-        else if (ratio >= 50) tinggi++;
-        else if (ratio >= 20) sedang++;
-        else terbuka++;
-      }
+    listingsWithStats.forEach(j => {
+      const ratio = j.precisePelamar / j.preciseKuota;
+      if (ratio > 200) superKetat++;
+      else if (ratio >= 50) tinggi++;
+      else if (ratio >= 20) sedang++;
+      else terbuka++;
     });
 
     const heatClassification = [
@@ -573,7 +602,7 @@ export default function App() {
       "Semua Jurusan": 0
     };
 
-    filteredListings.forEach(j => {
+    listingsWithStats.forEach(j => {
       const jur = (j.Jurusan || "").toLowerCase();
       if (jur.includes("semua jurusan")) {
         majorCategories["Semua Jurusan"]++;
@@ -609,14 +638,13 @@ export default function App() {
     })).sort((a, b) => b.count - a.count);
 
     // A. Top 5 Most User-Friendly Jobs (Competition Ratio Terendah)
-    const userFriendlyJobs = filteredListings
-      .filter(j => j.Kuota > 0 && j.Pelamar > 0)
+    const userFriendlyJobs = listingsWithStats
       .map(j => {
-        const ratio = j.Pelamar / j.Kuota;
+        const ratio = j.precisePelamar / j.preciseKuota;
         return {
           ...j,
           ratio: Math.round(ratio),
-          passRate: ((j.Kuota / j.Pelamar) * 100).toFixed(2)
+          passRate: j.precisePassRate.toFixed(2)
         };
       })
       .sort((a, b) => a.ratio - b.ratio)
@@ -631,7 +659,7 @@ export default function App() {
       "HSSE & Safety": 0,
       "Lainnya": 0
     };
-    filteredListings.forEach(j => {
+    listingsWithStats.forEach(j => {
       const t = (j["Judul Lowongan"] || "").toLowerCase();
       if (t.includes("hsse") || t.includes("safety") || t.includes("k3") || t.includes("environment") || t.includes("lingkungan")) {
         rolesCount["HSSE & Safety"]++;
@@ -661,7 +689,7 @@ export default function App() {
       "Kalimantan & Sulawesi": 0,
       "Indonesia Timur & Lainnya": 0
     };
-    filteredListings.forEach(j => {
+    listingsWithStats.forEach(j => {
       const city = (j.Kota || "").toLowerCase();
       if (city.includes("jakarta") || city.includes("bekasi") || city.includes("tangerang") || city.includes("depok") || city.includes("bogor")) {
         regionalCount["Jabodetabek"]++;
@@ -681,25 +709,9 @@ export default function App() {
       percentage: totalJobs > 0 ? Math.round((regionalCount[name] / totalJobs) * 100) : 0
     })).sort((a, b) => b.count - a.count);
 
-    // D. Avg Pass Rate by Company
-    const companyPassRates = {};
-    const companyTotalPass = {};
-    filteredListings.forEach(j => {
-      if (j.Kuota > 0 && j.Pelamar > 0) {
-        const c = j.Perusahaan || "Tidak tertera";
-        const rate = (j.Kuota / j.Pelamar) * 100;
-        companyPassRates[c] = (companyPassRates[c] || 0) + rate;
-        companyTotalPass[c] = (companyTotalPass[c] || 0) + 1;
-      }
-    });
-    const avgPassRateByCompany = Object.keys(companyTotalPass).map(name => ({
-      name,
-      avgRate: (companyPassRates[name] / companyTotalPass[name]).toFixed(2)
-    })).sort((a, b) => b.avgRate - a.avgRate).slice(0, 5);
-
     // E. Sector Breakdown
     const sectorCounts = {};
-    filteredListings.forEach(j => {
+    listingsWithStats.forEach(j => {
       const s = j.Sektor || "Tidak tertera";
       sectorCounts[s] = (sectorCounts[s] || 0) + 1;
     });
