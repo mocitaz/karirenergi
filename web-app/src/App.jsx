@@ -772,37 +772,40 @@ export default function App() {
       {/* Mobile Backdrop overlay */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 bg-black/20 z-40 backdrop-blur-xs transition-opacity"
+          className="md:hidden fixed inset-0 bg-black/10 z-40 backdrop-blur-xs transition-opacity duration-300"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Notion Sidebar */}
       <aside
-        className={`flex-shrink-0 bg-[#f7f7f5] flex flex-col fixed md:relative top-0 bottom-0 left-0 transition-all duration-300 ease-in-out z-45 border-r border-[#edece9]/80
+        className={`flex-shrink-0 bg-[#fbfbfa]/95 backdrop-blur-md flex flex-col fixed md:relative top-0 bottom-0 left-0 transition-all duration-300 ease-in-out z-45 border-r border-[#edece9]/80
           ${sidebarOpen
-            ? "w-[280px] translate-x-0 shadow-2xl md:shadow-none"
-            : "-translate-x-full md:translate-x-0 w-[280px] md:w-[72px] shadow-none"
+            ? "w-[280px] translate-x-0 shadow-xl md:shadow-none"
+            : "-translate-x-full md:translate-x-0 w-[280px] md:w-[68px] shadow-none"
           }
         `}
       >
         {/* Toggle Button Overlapping Right Border */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute top-[68px] -right-3 w-6 h-6 bg-white border border-[#edece9] rounded-full shadow-md flex items-center justify-center text-[#5a5a57] hover:text-[#37352f] hover:scale-105 transition-all z-50 cursor-pointer"
+          className="absolute top-[68px] -right-3 w-5 h-5 bg-white border border-[#edece9] rounded-full shadow-xs flex items-center justify-center text-[#5a5a57] hover:text-[#37352f] hover:scale-105 hover:bg-[#edece9]/30 transition-all z-50 cursor-pointer"
           title={sidebarOpen ? "Tutup Sidebar" : "Buka Sidebar"}
         >
-          {sidebarOpen ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+          {sidebarOpen ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
         </button>
 
         {/* Top Header Logo */}
-        <div className="p-5 flex items-center justify-between border-b border-[#edece9]/60 flex-shrink-0">
+        <div className="p-5 flex items-center justify-between border-b border-[#edece9]/50 flex-shrink-0">
           <div className={`flex items-center gap-2.5 ${sidebarOpen ? "" : "mx-auto"}`}>
             <img src="/logo.png" alt="Logo" className="h-6 w-auto object-contain flex-shrink-0" />
             {sidebarOpen && (
               <div className="flex flex-col animate-fade-in">
-                <span className="font-bold text-[14.5px] leading-none text-[#37352f] tracking-tight">KarirEnergi</span>
-                <span className="text-[10px] text-[#9b9a97] mt-0.5 font-normal">Non-Official</span>
+                <span className="font-extrabold text-[14.5px] leading-none text-[#37352f] tracking-tight">KarirEnergi</span>
+                <span className="text-[9.5px] text-[#9b9a97] mt-0.5 font-semibold flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-full bg-[#1d7bb8]"></span>
+                  Independen
+                </span>
               </div>
             )}
           </div>
@@ -810,7 +813,7 @@ export default function App() {
           {sidebarOpen && (
             <button 
               onClick={() => setSidebarOpen(false)}
-              className="md:hidden p-2 rounded hover:bg-[#edece9] text-[#5a5a57] cursor-pointer flex items-center justify-center flex-shrink-0"
+              className="md:hidden p-1.5 rounded-lg hover:bg-[#edece9] text-[#5a5a57] cursor-pointer flex items-center justify-center flex-shrink-0 transition-colors"
               title="Tutup Menu"
             >
               <X className="w-4 h-4" />
@@ -819,39 +822,39 @@ export default function App() {
         </div>
 
         {/* Scrollable Navigation & Filters */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6 scrollbar-thin">
           {/* Navigation */}
           <div className="flex flex-col gap-2">
-            {sidebarOpen && <div className="text-[11px] font-bold text-[#9b9a97] uppercase tracking-wider px-2">Navigasi</div>}
-            <nav className="flex flex-col gap-1">
+            {sidebarOpen && <div className="text-[10px] font-extrabold text-[#9b9a97] uppercase tracking-wider px-2.5">Menu Utama</div>}
+            <nav className="flex flex-col gap-0.5">
               <button
                 onClick={() => setShowSavedOnly(false)}
-                className={`flex items-center w-full px-2.5 py-2 rounded-md text-[13px] hover:bg-[#edece9] transition-colors cursor-pointer ${
+                className={`flex items-center w-full px-2.5 py-2 rounded-lg text-[13px] hover:bg-[#edece9]/50 hover:text-[#37352f] transition-all cursor-pointer group ${
                   !showSavedOnly 
-                    ? "bg-[#edece9]/50 text-[#37352f] font-semibold" 
+                    ? "bg-[#edece9]/70 text-[#37352f] font-bold" 
                     : "text-[#5a5a57]"
                 } ${sidebarOpen ? "justify-start" : "justify-center"}`}
                 title="Semua Lowongan"
               >
                 <Briefcase className="w-4 h-4 flex-shrink-0" />
-                {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in">Semua Lowongan</span>}
+                {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in group-hover:translate-x-0.5 transition-transform">Semua Lowongan</span>}
               </button>
 
               <button
                 onClick={() => setShowSavedOnly(true)}
-                className={`flex items-center w-full px-2.5 py-2 rounded-md text-[13px] hover:bg-[#edece9] transition-colors cursor-pointer justify-between ${
+                className={`flex items-center w-full px-2.5 py-2 rounded-lg text-[13px] hover:bg-[#edece9]/50 hover:text-[#37352f] transition-all cursor-pointer justify-between group ${
                   showSavedOnly 
-                    ? "bg-[#edece9]/50 text-[#37352f] font-semibold" 
+                    ? "bg-[#edece9]/70 text-[#37352f] font-bold" 
                     : "text-[#5a5a57]"
                 } ${sidebarOpen ? "px-2.5" : "justify-center"}`}
                 title="Tersimpan"
               >
                 <div className="flex items-center">
                   <Bookmark className={`w-4 h-4 flex-shrink-0 ${showSavedOnly || savedJobs.length > 0 ? "fill-[#b78103] text-[#b78103]" : ""}`} />
-                  {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in">Tersimpan</span>}
+                  {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in group-hover:translate-x-0.5 transition-transform">Tersimpan</span>}
                 </div>
                 {sidebarOpen && savedJobs.length > 0 && (
-                  <span className="text-[10px] bg-[#edece9] text-[#5a5a57] px-1.5 py-0.5 rounded font-bold animate-fade-in">
+                  <span className="text-[10px] bg-[#edece9] text-[#5a5a57] px-1.5 py-0.25 rounded font-bold animate-fade-in">
                     {savedJobs.length}
                   </span>
                 )}
@@ -861,12 +864,12 @@ export default function App() {
                 href="https://recruitment.pertamina.com"
                 target="_blank"
                 rel="noreferrer"
-                className={`flex items-center px-2.5 py-2 rounded-md text-[13px] hover:bg-[#edece9] text-[#5a5a57] transition-colors ${sidebarOpen ? "justify-start" : "justify-center"
+                className={`flex items-center px-2.5 py-2 rounded-lg text-[13px] hover:bg-[#edece9]/50 text-[#5a5a57] hover:text-[#37352f] transition-all group ${sidebarOpen ? "justify-start" : "justify-center"
                   }`}
                 title="Portal Resmi"
               >
                 <ArrowUpRight className="w-4 h-4 flex-shrink-0" />
-                {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in">Portal Resmi</span>}
+                {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in group-hover:translate-x-0.5 transition-transform">Portal Resmi</span>}
               </a>
             </nav>
           </div>
@@ -875,22 +878,22 @@ export default function App() {
           <div className="flex flex-col gap-2">
             {sidebarOpen ? (
               <div className="flex flex-col gap-4 animate-fade-in">
-                <div className="text-[11px] font-bold text-[#9b9a97] uppercase tracking-wider flex items-center justify-between border-b border-[#edece9]/60 pb-1.5 px-2">
-                  <span>Filter Lowongan</span>
+                <div className="text-[10px] font-extrabold text-[#9b9a97] uppercase tracking-wider flex items-center justify-between border-b border-[#edece9]/60 pb-1.5 px-2.5">
+                  <span>Filter</span>
                   {(draftSearch || draftCompany || draftMajor || draftCity || draftEdu || draftSector || search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
                     <button
                       onClick={handleResetFilters}
-                      className="text-[11px] text-[#1d7bb8] hover:underline flex items-center gap-0.5 font-semibold"
+                      className="text-[10px] text-[#1d7bb8] hover:underline flex items-center gap-0.5 font-bold cursor-pointer"
                     >
                       Reset
                     </button>
                   )}
                 </div>
 
-                <div className="flex flex-col gap-3.5 px-2">
+                <div className="flex flex-col gap-3.5 px-1">
                   {/* Search */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-semibold text-[#5a5a57]">Cari Kata Kunci</label>
+                    <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider px-1">Cari Kata Kunci</label>
                     <div className="relative">
                       <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
                       <input
@@ -899,18 +902,18 @@ export default function App() {
                         value={draftSearch}
                         onChange={(e) => setDraftSearch(e.target.value)}
                         onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
-                        className="w-full text-[12.5px] border border-[#edece9] rounded-md pl-8 pr-2.5 py-1.5 bg-white outline-none focus:border-[#5a5a57] shadow-sm transition-all"
+                        className="w-full text-[12px] border border-[#edece9] rounded-lg pl-8 pr-2.5 py-1.5 bg-white outline-none focus:border-[#c4c4c2] focus:shadow-xs transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Company dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-semibold text-[#5a5a57]">Perusahaan</label>
+                    <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider px-1">Perusahaan</label>
                     <select
                       value={draftCompany}
                       onChange={(e) => setDraftCompany(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
+                      className="w-full text-[12px] border border-[#edece9] rounded-lg px-2.5 py-1.5 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                     >
                       <option value="">Semua Perusahaan</option>
                       {filterOptions.companies.map((c) => (
@@ -921,11 +924,11 @@ export default function App() {
 
                   {/* Major dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-semibold text-[#5a5a57]">Jurusan</label>
+                    <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider px-1">Jurusan</label>
                     <select
                       value={draftMajor}
                       onChange={(e) => setDraftMajor(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
+                      className="w-full text-[12px] border border-[#edece9] rounded-lg px-2.5 py-1.5 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                     >
                       <option value="">Semua Jurusan</option>
                       {filterOptions.majors.map((m) => (
@@ -936,11 +939,11 @@ export default function App() {
 
                   {/* City dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-semibold text-[#5a5a57]">Lokasi / Kota</label>
+                    <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider px-1">Lokasi / Kota</label>
                     <select
                       value={draftCity}
                       onChange={(e) => setDraftCity(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
+                      className="w-full text-[12px] border border-[#edece9] rounded-lg px-2.5 py-1.5 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                     >
                       <option value="">Semua Lokasi</option>
                       {filterOptions.cities.map((ct) => (
@@ -951,11 +954,11 @@ export default function App() {
 
                   {/* Education dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-semibold text-[#5a5a57]">Pendidikan</label>
+                    <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider px-1">Pendidikan</label>
                     <select
                       value={draftEdu}
                       onChange={(e) => setDraftEdu(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
+                      className="w-full text-[12px] border border-[#edece9] rounded-lg px-2.5 py-1.5 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                     >
                       <option value="">Semua Jenjang</option>
                       {filterOptions.educations.map((ed) => (
@@ -966,11 +969,11 @@ export default function App() {
 
                   {/* Sektor Kerja dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[11px] font-semibold text-[#5a5a57]">Sektor Kerja</label>
+                    <label className="text-[10.5px] font-bold text-[#8a8a86] uppercase tracking-wider px-1">Sektor Kerja</label>
                     <select
                       value={draftSector}
                       onChange={(e) => setDraftSector(e.target.value)}
-                      className="w-full text-[12.5px] border border-[#edece9] rounded-md px-2 py-1.5 bg-white outline-none cursor-pointer focus:border-[#5a5a57] shadow-sm transition-all notion-select"
+                      className="w-full text-[12px] border border-[#edece9] rounded-lg px-2.5 py-1.5 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                     >
                       <option value="">Semua Sektor</option>
                       {filterOptions.sectors.map((s) => (
@@ -982,7 +985,7 @@ export default function App() {
                   {/* Apply Filters Button */}
                   <button
                     onClick={handleApplyFilters}
-                    className="w-full bg-[#1d7bb8] text-white hover:bg-[#155a8a] py-2 rounded-md text-[12.5px] font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer mt-1"
+                    className="w-full bg-[#1d7bb8] text-white hover:bg-[#155a8a] py-2 rounded-lg text-[12.5px] font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer mt-1 hover:shadow-md"
                   >
                     <Search className="w-3.5 h-3.5" />
                     Cari Lowongan
@@ -994,13 +997,13 @@ export default function App() {
                 {/* Collapsed Filter Trigger */}
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className={`p-2.5 rounded-md hover:bg-[#edece9] text-[#5a5a57] relative transition-colors ${(search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) ? "text-[#1d7bb8] bg-[#e8f4fa]" : ""
+                  className={`p-2.5 rounded-lg hover:bg-[#edece9]/50 text-[#5a5a57] relative transition-all hover:scale-105 cursor-pointer ${(search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) ? "text-[#1d7bb8] bg-[#e8f4fa]" : ""
                     }`}
                   title="Buka Filter & Cari"
                 >
                   <Search className="w-4 h-4" />
                   {(search || selectedCompany || selectedMajor || selectedCity || selectedEdu || selectedSector) && (
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#1d7bb8] rounded-full"></span>
+                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#1d7bb8] rounded-full"></span>
                   )}
                 </button>
               </div>
@@ -1009,7 +1012,7 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <div className={`p-4 border-t border-[#edece9] text-[10px] text-[#9b9a97] text-center flex-shrink-0 bg-[#f7f7f5] ${sidebarOpen ? "block" : "hidden"
+        <div className={`p-4 border-t border-[#edece9]/50 text-[10px] text-[#9b9a97] text-center flex-shrink-0 bg-[#f7f7f5]/20 ${sidebarOpen ? "block" : "hidden"
           }`}>
           &copy; 2026 KarirEnergi
         </div>
