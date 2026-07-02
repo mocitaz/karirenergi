@@ -1067,10 +1067,6 @@ export default function App() {
             <div className="flex flex-col gap-1 w-full sm:w-auto">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-lg md:text-xl font-extrabold text-[#37352f] tracking-tight">KarirEnergi Database</h1>
-                <span className="text-[10px] font-bold text-[#43873e] bg-[#eaf5ea] border border-[#d2ebd2] px-2 py-0.5 rounded-full select-none flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#43873e] animate-pulse"></span>
-                  Live Tracker
-                </span>
                 <span className="text-[10px] font-semibold text-[#8a8a86] bg-[#edece9]/50 border border-[#edece9] px-2 py-0.5 rounded-full select-none">
                   Non-Official
                 </span>
