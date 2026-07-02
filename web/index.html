@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertamina Internship Tracker</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Filters -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+                    <h2>P-Interns</h2>
+                </div>
+                <p class="subtitle">Tracker Lowongan Magang</p>
+            </div>
+            
+            <div class="filter-section">
+                <h3><i class="fa-solid fa-sliders"></i> Filter Lowongan</h3>
+                
+                <!-- Search -->
+                <div class="filter-group">
+                    <label for="search-input">Cari Lowongan</label>
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="Ketik kata kunci...">
+                    </div>
+                </div>
+
+                <!-- Company Filter -->
+                <div class="filter-group">
+                    <label for="filter-company">Perusahaan</label>
+                    <select id="filter-company">
+                        <option value="">Semua Perusahaan</option>
+                    </select>
+                </div>
+
+                <!-- Jurusan Filter -->
+                <div class="filter-group">
+                    <label for="filter-major">Jurusan</label>
+                    <select id="filter-major">
+                        <option value="">Semua Jurusan</option>
+                    </select>
+                </div>
+
+                <!-- City Filter -->
+                <div class="filter-group">
+                    <label for="filter-city">Kota / Lokasi</label>
+                    <select id="filter-city">
+                        <option value="">Semua Kota</option>
+                    </select>
+                </div>
+
+                <!-- Education Filter -->
+                <div class="filter-group">
+                    <label for="filter-edu">Pendidikan</label>
+                    <select id="filter-edu">
+                        <option value="">Semua Pendidikan</option>
+                    </select>
+                </div>
+
+                <button id="btn-reset" class="btn-secondary"><i class="fa-solid fa-rotate-left"></i> Reset Filter</button>
+            </div>
+            
+            <div class="sidebar-footer">
+                <p>&copy; 2026 PT Teknalogi Transformasi Digital</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h1>Dashboard Lowongan Magang</h1>
+                    <p>Temukan program magang terbaik di Pertamina Group</p>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue"><i class="fa-solid fa-briefcase"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Lowongan</span>
+                        <h2 id="stat-total">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-green"><i class="fa-solid fa-building"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Perusahaan</span>
+                        <h2 id="stat-companies">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-orange"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Kota Terjangkau</span>
+                        <h2 id="stat-cities">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon icon-purple"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Khusus S1</span>
+                        <h2 id="stat-s1">0</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Job List Section Header -->
+            <section class="job-list-section">
+                <div class="list-header">
+                    <h2>Daftar Lowongan (<span id="results-count">0</span>)</h2>
+                    <div class="sort-wrapper">
+                        <label for="sort-select">Urutkan:</label>
+                        <select id="sort-select">
+                            <option value="perusahaan">Nama Perusahaan</option>
+                            <option value="judul">Judul Lowongan</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="job-grid" id="job-grid">
+                    <div class="loading-state">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <p>Memuat data lowongan...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Job Detail Modal -->
+    <div class="modal-overlay" id="detail-modal" style="display: none;">
+        <div class="modal-card">
+            <button class="btn-close-modal" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <span class="modal-company-badge" id="modal-company">PT Pertamina</span>
+                <h2 id="modal-title">INTERNSHIP 2026 - Fungsi Finance</h2>
+                <div class="modal-meta">
+                    <span><i class="fa-solid fa-location-dot"></i> <span id="modal-location">Jakarta Selatan</span></span>
+                    <span><i class="fa-solid fa-graduation-cap"></i> <span id="modal-education">S1</span></span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Bidang Industri & Sektor</h3>
+                    <div class="industry-box">
+                        <span class="badge"><i class="fa-solid fa-layer-group"></i> <span id="modal-industry">Oil & Energy</span></span>
+                        <span class="badge"><i class="fa-solid fa-tag"></i> <span id="modal-sector">Energy</span></span>
+                    </div>
+                </div>
+                <div class="modal-section">
+                    <h3>Syarat Jurusan</h3>
+                    <p id="modal-majors" class="majors-list">Akuntansi, Manajemen, Teknik Industri</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="modal-apply-link" target="_blank" class="btn-primary btn-apply">
+                    Daftar Sekarang <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>

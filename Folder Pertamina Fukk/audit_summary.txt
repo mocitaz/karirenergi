@@ -1,0 +1,30 @@
+====================================================
+            AUDIT REPORT - LOKER PERTAMINA 1-40
+====================================================
+Total Lowongan Sebelum Deduplikasi : 353
+Total Lowongan Unik                : 353
+Total Duplikat yang Dihapus        : 0
+====================================================
+
+Breakdown Lowongan Berdasarkan Perusahaan (Top 10):
+ - PT Pertamina                                  : 353 lowongan
+
+Breakdown Lowongan Berdasarkan Kota (Top 10):
+ - Kota Administrasi Jakarta Selatan             : 139 lowongan
+ - Kota Administrasi Jakarta Pusat               : 121 lowongan
+ - Kota Administrasi Jakarta Barat               : 27 lowongan
+ - Tidak tertera                                 : 16 lowongan
+ - Kota Surabaya                                 : 7 lowongan
+ - Kota Administrasi Jakarta Utara               : 7 lowongan
+ - Kota Palembang                                : 6 lowongan
+ - Kota Semarang                                 : 5 lowongan
+ - Kota Medan                                    : 5 lowongan
+ - Kota Balikpapan                               : 4 lowongan
+
+Breakdown Lowongan Berdasarkan Pendidikan:
+ - S1                                            : 313 lowongan
+ - Tidak tertera                                 : 20 lowongan
+ - D4/S1                                         : 13 lowongan
+ - Minimal D3                                    : 4 lowongan
+ - D3                                            : 2 lowongan
+ - D4                                            : 1 lowongan
