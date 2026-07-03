@@ -36,6 +36,21 @@ print(f"\nScanning for JSON files in: {json_folder}")
 json_files = glob.glob(os.path.join(json_folder, "loker_data*.json"))
 print(f"Found {len(json_files)} JSON files.")
 
+import datetime
+existing_dates = {}
+today_str = datetime.date.today().strftime("%Y-%m-%d")
+if os.path.exists(react_json_path):
+    try:
+        with open(react_json_path, "r", encoding="utf-8") as f:
+            existing_data = json.load(f)
+            for item in existing_data:
+                link = item.get("Link Detail", "").strip()
+                date_found = item.get("tanggal_ditemukan")
+                if link and date_found:
+                    existing_dates[link] = date_found
+    except Exception as e:
+        print(f"Warning: could not load existing dates database: {e}")
+
 all_records = []
 seen_links = set()
 records_by_link = {}
@@ -45,6 +60,7 @@ patched_industri_count = 0
 
 # Helper function to clean Jurusan field from script injection and requirement texts
 import re
+import difflib
 
 REQUIREMENT_KEYWORDS = [
     "menguasai", "mampu", "memiliki", "detail", "big data", "advanced", "problem", 
@@ -65,6 +81,48 @@ REQUIREMENT_KEYWORDS = [
     "passion", "adaptability", "resilience", "adaptive", "writing", "listening", 
     "thinking", "solving", "oriented", "project management", "stakeholder management", 
     "data management", "waste management", "emergency response"
+]
+
+STANDARDIZED_MAJORS = [
+    "Teknik Informatika",
+    "Sistem Informasi",
+    "Ilmu Komputer",
+    "Teknologi Informasi",
+    "Rekayasa Perangkat Lunak",
+    "Informatika",
+    "Ilmu Komunikasi",
+    "Hubungan Internasional",
+    "Desain Komunikasi Visual",
+    "Desain Grafis",
+    "Akuntansi",
+    "Manajemen",
+    "Administrasi Bisnis",
+    "Administrasi Publik",
+    "Psikologi",
+    "Hukum",
+    "Statistika",
+    "Matematika",
+    "Fisika",
+    "Kimia",
+    "Biologi",
+    "Bioteknologi",
+    "Sastra Inggris",
+    "Hubungan Masyarakat",
+    "Kesehatan & Keselamatan Kerja (K3)",
+    "Teknik Industri",
+    "Teknik Elektro",
+    "Teknik Mesin",
+    "Teknik Kimia",
+    "Teknik Sipil",
+    "Teknik Perminyakan",
+    "Teknik Pertambangan",
+    "Teknik Geologi",
+    "Teknik Geofisika",
+    "Teknik Kelautan",
+    "Teknik Lingkungan",
+    "Teknik Fisika",
+    "Teknik Metalurgi",
+    "Teknik Perkapalan"
 ]
 
 def clean_jurusan(jurusan_str):
@@ -196,6 +254,18 @@ def clean_jurusan(jurusan_str):
                 token = re.sub(pattern, correction, token, flags=re.IGNORECASE)
                 token_lower = token.lower()
                 
+        # SequenceMatcher fuzzy check for standard majors
+        best_match = None
+        best_ratio = 0.0
+        for std_major in STANDARDIZED_MAJORS:
+            ratio = difflib.SequenceMatcher(None, token_lower.strip(), std_major.lower()).ratio()
+            if ratio > 0.80 and ratio > best_ratio:
+                best_ratio = ratio
+                best_match = std_major
+        if best_match:
+            token = best_match
+            token_lower = token.lower()
+
         token = re.sub(r'\s+', ' ', token).strip()
         token = capitalize_major(token)
         valid_majors.append(token)
@@ -361,7 +431,8 @@ for json_file in json_files:
                     "Kuota": kuota,
                     "Pelamar": pelamar,
                     "Deskripsi Pekerjaan": desc_val,
-                    "Persyaratan": req_val
+                    "Persyaratan": req_val,
+                    "tanggal_ditemukan": existing_dates.get(link, today_str)
                 }
                 all_records.append(record)
                 records_by_link[link] = record

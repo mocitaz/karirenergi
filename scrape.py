@@ -4,6 +4,7 @@ import os
 import json
 import time
 import re
+import difflib
 
 # Premium ASCII art header
 print("=" * 60)
@@ -45,6 +46,48 @@ REQUIREMENT_KEYWORDS = [
     "passion", "adaptability", "resilience", "adaptive", "writing", "listening", 
     "thinking", "solving", "oriented", "project management", "stakeholder management", 
     "data management", "waste management", "emergency response"
+]
+
+STANDARDIZED_MAJORS = [
+    "Teknik Informatika",
+    "Sistem Informasi",
+    "Ilmu Komputer",
+    "Teknologi Informasi",
+    "Rekayasa Perangkat Lunak",
+    "Informatika",
+    "Ilmu Komunikasi",
+    "Hubungan Internasional",
+    "Desain Komunikasi Visual",
+    "Desain Grafis",
+    "Akuntansi",
+    "Manajemen",
+    "Administrasi Bisnis",
+    "Administrasi Publik",
+    "Psikologi",
+    "Hukum",
+    "Statistika",
+    "Matematika",
+    "Fisika",
+    "Kimia",
+    "Biologi",
+    "Bioteknologi",
+    "Sastra Inggris",
+    "Hubungan Masyarakat",
+    "Kesehatan & Keselamatan Kerja (K3)",
+    "Teknik Industri",
+    "Teknik Elektro",
+    "Teknik Mesin",
+    "Teknik Kimia",
+    "Teknik Sipil",
+    "Teknik Perminyakan",
+    "Teknik Pertambangan",
+    "Teknik Geologi",
+    "Teknik Geofisika",
+    "Teknik Kelautan",
+    "Teknik Lingkungan",
+    "Teknik Fisika",
+    "Teknik Metalurgi",
+    "Teknik Perkapalan"
 ]
 
 def clean_jurusan(jurusan_str):
@@ -172,6 +215,18 @@ def clean_jurusan(jurusan_str):
                 token = re.sub(pattern, correction, token, flags=re.IGNORECASE)
                 token_lower = token.lower()
                 
+        # SequenceMatcher fuzzy check for standard majors
+        best_match = None
+        best_ratio = 0.0
+        for std_major in STANDARDIZED_MAJORS:
+            ratio = difflib.SequenceMatcher(None, token_lower.strip(), std_major.lower()).ratio()
+            if ratio > 0.80 and ratio > best_ratio:
+                best_ratio = ratio
+                best_match = std_major
+        if best_match:
+            token = best_match
+            token_lower = token.lower()
+
         token = re.sub(r'\s+', ' ', token).strip()
         token = capitalize_major(token)
         valid_majors.append(token)

@@ -68,3 +68,176 @@ body {
 .animate-slide-up {
   animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ==========================================
+   NOTION DARK THEME (DARK MODE) OVERRIDES
+   ========================================== */
+
+/* Base Canvas & Text */
+html.dark, html.dark body {
+  background-color: #191919 !important;
+  color: #e3e3e2 !important;
+}
+
+/* Sidebar and Main container */
+html.dark aside,
+html.dark .bg-\[\#fbfbfa\] {
+  background-color: #202020 !important;
+  border-color: #2e2e2e !important;
+}
+
+/* General white backgrounds to dark card colors */
+html.dark .bg-white,
+html.dark .bg-white\/80 {
+  background-color: #202020 !important;
+  border-color: #2e2e2e !important;
+}
+
+/* Card layout backgrounds */
+html.dark .bg-white\/90 {
+  background-color: #202020 !important;
+  border-color: #2e2e2e !important;
+}
+
+/* Borders */
+html.dark .border-\[\#edece9\],
+html.dark .border-\[\#edece9\]\/50,
+html.dark .border-\[\#edece9\]\/60,
+html.dark .border-\[\#edece9\]\/70,
+html.dark .border-t,
+html.dark .border-b,
+html.dark .border-r,
+html.dark .border-l {
+  border-color: #2e2e2e !important;
+}
+
+/* Primary text color */
+html.dark .text-\[\#37352f\] {
+  color: #e3e3e2 !important;
+}
+
+/* Secondary text color */
+html.dark .text-\[\#5a5a57\],
+html.dark .text-gray-600 {
+  color: #9b9a97 !important;
+}
+
+/* Muted/Footer text color */
+html.dark .text-\[\#8a8a86\],
+html.dark .text-\[\#9b9a97\],
+html.dark .text-gray-400 {
+  color: #7c7b77 !important;
+}
+
+/* Hover bg overrides */
+html.dark .hover\:bg-\[\#fbfbfa\]:hover,
+html.dark .hover\:bg-gray-50:hover {
+  background-color: #2a2a2a !important;
+}
+
+html.dark .bg-gray-100 {
+  background-color: #2a2a2a !important;
+  color: #e3e3e2 !important;
+}
+
+/* Inputs and Select fields */
+html.dark input, 
+html.dark select,
+html.dark textarea {
+  background-color: #252525 !important;
+  border-color: #2e2e2e !important;
+  color: #e3e3e2 !important;
+}
+
+html.dark input::placeholder {
+  color: #555552 !important;
+}
+
+html.dark select option {
+  background-color: #202020 !important;
+  color: #e3e3e2 !important;
+}
+
+/* Custom Notion select dropdown arrow for dark mode */
+html.dark .notion-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239b9a97' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+/* Modal overlay & specific cards inside details modal */
+html.dark .bg-black\/30 {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+html.dark .bg-\[\#f7f7f5\]\/40,
+html.dark .bg-\[\#f2f1ee\]\/50,
+html.dark .bg-\[\#f9f9f8\] {
+  background-color: #252525 !important;
+  border-color: #2e2e2e !important;
+}
+
+/* Specific yellow & blue badges/banners inside modal */
+html.dark .bg-amber-50\/40 {
+  background-color: rgba(229, 195, 163, 0.1) !important;
+  border-color: rgba(229, 195, 163, 0.2) !important;
+}
+html.dark .text-amber-800 {
+  color: #e5c3a3 !important;
+}
+
+html.dark .bg-blue-50\/40 {
+  background-color: rgba(147, 197, 253, 0.1) !important;
+  border-color: rgba(147, 197, 253, 0.2) !important;
+}
+html.dark .text-blue-800 {
+  color: #93c5fd !important;
+}
+
+/* Custom scrollbars in Dark Mode */
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+}
+
+/* Bookmark tag list tags */
+html.dark .bg-gray-100\/80 {
+  background-color: #2d2d2d !important;
+  color: #d3d3d3 !important;
+}
+
+/* Adjust stats cards */
+html.dark .bg-amber-50 {
+  background-color: rgba(217, 119, 6, 0.1) !important;
+  border-color: rgba(217, 119, 6, 0.2) !important;
+  color: #fbbf24 !important;
+}
+html.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+}
+html.dark .bg-indigo-50 {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+  color: #818cf8 !important;
+}
+html.dark .bg-purple-50 {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+  border-color: rgba(168, 85, 247, 0.2) !important;
+  color: #c084fc !important;
+}
+html.dark .text-emerald-800, html.dark .text-emerald-700 {
+  color: #34d399 !important;
+}
+html.dark .text-indigo-800, html.dark .text-indigo-700 {
+  color: #818cf8 !important;
+}
+html.dark .text-purple-800, html.dark .text-purple-700 {
+  color: #c084fc !important;
+}
+html.dark .text-amber-900, html.dark .text-amber-800 {
+  color: #fbbf24 !important;
+}
+

@@ -46,6 +46,19 @@ server {
     root $(pwd)/dist;
     index index.html;
 
+    # Gzip Compression Config
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml application/json image/svg+xml;
+    gzip_disable "MSIE [1-6]\.";
+
+    # Brotli Compression Config (if Nginx brotli module is enabled)
+    # brotli on;
+    # brotli_comp_level 6;
+    # brotli_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml application/json image/svg+xml;
+
     location / {
         try_files \$uri \$uri/ /index.html;
     }

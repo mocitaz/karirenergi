@@ -20,9 +20,13 @@ import {
   TrendingUp,
   Bookmark,
   SlidersHorizontal,
-  Timer
+  Timer,
+  Sun,
+  Moon,
+  Share2
 } from "lucide-react";
 import lokerData from "./data/loker_data.json";
+import Fuse from "fuse.js";
 
 // Helper for Notion Tag colors
 const NOTION_COLORS = [
@@ -187,6 +191,19 @@ export function formatTitle(rawTitle) {
   return title.replace(/^INTERNSHIP\s*\d*\s*[-–]?\s*/i, "").trim();
 }
 
+function isJobNew(tanggalDitemukan) {
+  if (!tanggalDitemukan) return false;
+  try {
+    const today = new Date();
+    const foundDate = new Date(tanggalDitemukan);
+    const diffTime = Math.abs(today - foundDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 3;
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function App() {
   // Navigation & View States
   const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -216,6 +233,118 @@ export default function App() {
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [pendingBookmark, setPendingBookmark] = useState(null);
   const [dontShowAgain, setDontShowAgain] = useState(false);
+
+  // Dark Mode State
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem("karirenergi-dark-mode");
+      return saved ? JSON.parse(saved) : false;
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("karirenergi-dark-mode", JSON.stringify(darkMode));
+      if (darkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } catch (e) {}
+  }, [darkMode]);
+
+  // Handle Deep Linking URL updates based on selectedJob
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (selectedJob) {
+        urlParams.set("job", selectedJob["Link Detail"]);
+        window.history.pushState(null, "", "?" + urlParams.toString());
+      } else {
+        urlParams.delete("job");
+        const newSearch = urlParams.toString();
+        window.history.pushState(
+          null,
+          "",
+          newSearch ? "?" + newSearch : window.location.pathname
+        );
+      }
+    } catch (e) {}
+  }, [selectedJob]);
+
+  // Handle parsing initial URL deep link on mount
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const jobLink = urlParams.get("job");
+      if (jobLink && lokerData && lokerData.length > 0) {
+        const matched = lokerData.find((job) => job["Link Detail"] === jobLink);
+        if (matched) {
+          setSelectedJob(matched);
+        }
+      }
+    } catch (e) {}
+  }, []);
+  // Toast Message State
+  const [toastMessage, setToastMessage] = useState("");
+  const showToast = (message) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage("");
+    }, 3000);
+  };
+  // Simulated Live Visitor State
+  const [liveVisitors, setLiveVisitors] = useState(() => {
+    const hour = new Date().getHours();
+    let base = 180;
+    if (hour >= 1 && hour <= 6) base = 40;
+    else if (hour >= 7 && hour <= 11) base = 160;
+    else if (hour >= 12 && hour <= 14) base = 220;
+    else if (hour >= 15 && hour <= 17) base = 190;
+    else if (hour >= 18 && hour <= 23) base = 310;
+    return base + Math.floor(Math.random() * 15) - 7;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveVisitors((prev) => {
+        const change = Math.floor(Math.random() * 5) - 2;
+        const nextVal = prev + change;
+        return Math.max(20, Math.min(450, nextVal));
+      });
+    }, 4500);
+    return () => clearInterval(interval);
+  }, []);
+
+
+  // Share Job listing handler
+  const handleShareJob = (e) => {
+    if (e) e.stopPropagation();
+    if (!selectedJob) return;
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?job=${encodeURIComponent(selectedJob["Link Detail"])}`;
+    const shareText = `Lowongan Magang Pertamina: ${selectedJob["Judul Lowongan"]} - ${selectedJob["Perusahaan"]}.\nCek info kualifikasi & jurusan lengkapnya di: ${shareUrl}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareText)
+        .then(() => showToast("Tautan lowongan berhasil disalin ke papan klip!"))
+        .catch(() => showToast("Gagal menyalin tautan."));
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = shareText;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        showToast("Tautan lowongan berhasil disalin ke papan klip!");
+      } catch (err) {
+        showToast("Gagal menyalin tautan.");
+      }
+      document.body.removeChild(textarea);
+    }
+  };
 
   const toggleSaveJob = (linkDetail, e) => {
     if (e) {
@@ -470,25 +599,34 @@ export default function App() {
 
   // Apply filters and sorting
   const filteredListings = useMemo(() => {
+    // 1. Initial base filtering (all filters except search query)
     let result = listings.filter((job) => {
-      const q = search.toLowerCase().trim();
-      const matchSearch =
-        !q ||
-        job["Judul Lowongan"].toLowerCase().includes(q) ||
-        job["Perusahaan"].toLowerCase().includes(q) ||
-        job["Jurusan"].toLowerCase().includes(q) ||
-        job["Kota"].toLowerCase().includes(q);
-
       const matchCompany = !selectedCompany || job["Perusahaan"] === selectedCompany;
       const matchMajor = !selectedMajor || job["Jurusan"].toLowerCase().includes(selectedMajor.toLowerCase());
       const matchCity = !selectedCity || job["Kota"] === selectedCity;
       const matchEdu = !selectedEdu || job["Pendidikan"] === selectedEdu;
       const matchSector = !selectedSector || job["Sektor"] === selectedSector;
-
       const matchSaved = !showSavedOnly || savedJobs.includes(job["Link Detail"]);
 
-      return matchSearch && matchCompany && matchMajor && matchCity && matchEdu && matchSector && matchSaved;
+      return matchCompany && matchMajor && matchCity && matchEdu && matchSector && matchSaved;
     });
+
+    // 2. Apply Fuse.js fuzzy search if search query is active
+    const q = search.trim();
+    if (q) {
+      const fuse = new Fuse(result, {
+        keys: [
+          { name: "Judul Lowongan", weight: 0.4 },
+          { name: "Perusahaan", weight: 0.2 },
+          { name: "Jurusan", weight: 0.3 },
+          { name: "Kota", weight: 0.1 }
+        ],
+        threshold: 0.35,
+        distance: 100,
+        ignoreLocation: true
+      });
+      result = fuse.search(q).map((res) => res.item);
+    }
 
     // Apply sorting
     if (sortBy === "perusahaan") {
@@ -1109,6 +1247,14 @@ export default function App() {
               Katalog independen. Semua data diperoleh dari rekrutmen resmi Pertamina. Karya ini bersifat gratis & tidak boleh diperjualbelikan.
             </p>
 
+            <div className="flex items-center gap-2 text-[10.5px] text-[#43873e] bg-[#edf6ec]/50 border border-[#43873e]/10 py-1 px-2.5 rounded-lg font-bold select-none w-fit">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#43873e] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#43873e]"></span>
+              </span>
+              <span>{liveVisitors} orang sedang memantau</span>
+            </div>
+
             <a
               href="https://www.threads.net/@mocitaz"
               target="_blank"
@@ -1134,6 +1280,17 @@ export default function App() {
             <span>/</span>
             <span className="text-[#37352f] font-medium truncate max-w-[100px] sm:max-w-none">Database Lowongan</span>
           </div>
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="flex items-center justify-center p-1.5 rounded-lg hover:bg-[#edece9]/40 border border-[#edece9]/20 transition-all cursor-pointer text-[#5a5a57] hover:text-[#37352f] select-none"
+            title={darkMode ? "Aktifkan Mode Terang" : "Aktifkan Mode Gelap"}
+          >
+            {darkMode ? (
+              <Sun className="w-3.5 h-3.5 text-amber-500 animate-[spin_4s_linear_infinite]" />
+            ) : (
+              <Moon className="w-3.5 h-3.5 text-[#5a5a57]" />
+            )}
+          </button>
         </div>
 
         {/* Header Title, Description & Countdown */}
@@ -1461,10 +1618,17 @@ export default function App() {
                     >
                       {/* Top Part */}
                       <div className="flex flex-col gap-2 flex-grow">
-                        {/* Title */}
-                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5">
-                          {job["Judul Lowongan"]}
-                        </h3>
+                        {/* Title and Baru Badge */}
+                        <div className="flex items-start gap-1.5 justify-between">
+                          <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5 flex-1">
+                            {job["Judul Lowongan"]}
+                          </h3>
+                          {isJobNew(job["tanggal_ditemukan"]) && (
+                            <span className="text-[9px] font-extrabold bg-[#edf6ec] text-[#43873e] px-1.5 py-0.5 rounded border border-[#43873e]/10 tracking-wide uppercase select-none flex-shrink-0 animate-pulse mt-0.5">
+                              Baru
+                            </span>
+                          )}
+                        </div>
 
                         {/* Company Name (underneath title) */}
                         <div className="text-[11px] text-[#8a8a86] font-semibold leading-normal -mt-0.5">
@@ -1575,7 +1739,16 @@ export default function App() {
                               </button>
                             </td>
                             <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate">{job["Perusahaan"]}</td>
-                            <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate">{job["Judul Lowongan"]}</td>
+                            <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate">
+                              <div className="flex items-center gap-1.5 justify-between">
+                                <span className="truncate flex-1" title={job["Judul Lowongan"]}>{job["Judul Lowongan"]}</span>
+                                {isJobNew(job["tanggal_ditemukan"]) && (
+                                  <span className="text-[8px] font-extrabold bg-[#edf6ec] text-[#43873e] px-1 py-0.25 rounded border border-[#43873e]/10 tracking-wide uppercase select-none flex-shrink-0">
+                                    Baru
+                                  </span>
+                                )}
+                              </div>
+                            </td>
                             <td className="p-3 border-r border-[#edece9] max-w-[140px] truncate">{job["Kota"]}</td>
                             <td className="p-3 border-r border-[#edece9] font-bold text-[#9041a8] text-center">{job["Pendidikan"]}</td>
                             <td className="p-3 border-r border-[#edece9] text-[#5a5a57]">
@@ -2021,13 +2194,21 @@ export default function App() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={(e) => toggleSaveJob(selectedJob["Link Detail"], e)}
-                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#b78103] transition-colors cursor-pointer flex items-center gap-1"
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#b78103] transition-colors cursor-pointer flex items-center gap-1 select-none"
                   title={savedJobs.includes(selectedJob["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
                 >
                   <Bookmark className={`w-4 h-4 ${savedJobs.includes(selectedJob["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
                   <span className="text-[11.5px] font-medium hidden sm:inline">
                     {savedJobs.includes(selectedJob["Link Detail"]) ? "Tersimpan" : "Simpan"}
                   </span>
+                </button>
+                <button
+                  onClick={handleShareJob}
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#1d7bb8] transition-colors cursor-pointer flex items-center gap-1 select-none"
+                  title="Bagikan Lowongan"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span className="text-[11.5px] font-medium hidden sm:inline">Bagikan</span>
                 </button>
                 <span className="w-px h-4 bg-[#edece9] mx-0.5"></span>
                 <button
@@ -2426,6 +2607,13 @@ export default function App() {
             </div>
           </div>
         </>
+      )}
+
+
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#121212] text-white px-4 py-2.5 rounded-xl text-[12.5px] font-bold shadow-lg z-[9999] flex items-center gap-2 border border-white/10 animate-fade-in select-none">
+          <span>{toastMessage}</span>
+        </div>
       )}
 
     </div>
