@@ -347,12 +347,21 @@
                             "data management", "waste management", "emergency response"
                         ];
                         
+                        const majorCorrections = {
+                            "akturia": "Aktuaria",
+                            "akutansi": "Akuntansi",
+                            "psiklogi": "Psikologi",
+                            "admitrasi": "Administrasi",
+                            "keskatriatan": "Kesekretariatan",
+                            "hukum pi": "Hukum Pidana"
+                        };
+
                         const validMajors = [];
                         for (let token of tokens) {
-                            token = token.strip ? token.strip() : token.trim();
-                            if (!token) continue;
+                            token = token.replace(/^[^a-zA-Z0-9(]+|[^a-zA-Z0-9)]+$/g, '').trim();
+                            if (!token || token.length <= 1) continue;
                             
-                            const tokenLower = token.toLowerCase();
+                            let tokenLower = token.toLowerCase();
                             let hasKeyword = false;
                             for (let kw of requirementKeywords) {
                                 if (tokenLower.includes(kw)) {
@@ -364,6 +373,17 @@
                             if (hasKeyword) {
                                 break;
                             }
+
+                            // Apply corrections with word boundary match
+                            for (let [typo, correction] of Object.entries(majorCorrections)) {
+                                const pattern = new RegExp('\\b' + typo + '\\b', 'gi');
+                                if (pattern.test(tokenLower)) {
+                                    token = token.replace(pattern, correction);
+                                    tokenLower = token.toLowerCase();
+                                }
+                            }
+
+                            token = token.replace(/\s+/g, ' ').trim();
                             validMajors.push(token);
                         }
                         

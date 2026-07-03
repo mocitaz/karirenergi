@@ -60,12 +60,23 @@ def clean_jurusan(jurusan_str):
     cleaned = re.sub(r'([a-z])([A-Z])', r'\1, \2', jurusan_str)
     
     # Split by separators
-    tokens = re.split(r',|;|dan|\bserta\b', cleaned, flags=re.IGNORECASE)
+    tokens = re.split(r',|;|\bdan\b|\bserta\b', cleaned, flags=re.IGNORECASE)
+    
+    MAJOR_CORRECTIONS = {
+        "akturia": "Aktuaria",
+        "akutansi": "Akuntansi",
+        "psiklogi": "Psikologi",
+        "admitrasi": "Administrasi",
+        "keskatriatan": "Kesekretariatan",
+        "hukum pi": "Hukum Pidana",
+    }
     
     valid_majors = []
     for token in tokens:
         token = token.strip()
-        if not token:
+        # Clean leading/trailing non-alphanumeric chars except parenthesis
+        token = re.sub(r'^[^a-zA-Z0-9\(]+|[^a-zA-Z0-9\)]+$', '', token).strip()
+        if not token or len(token) <= 1:
             continue
         
         token_lower = token.lower()
@@ -78,6 +89,14 @@ def clean_jurusan(jurusan_str):
         if has_keyword:
             break
             
+        # Apply corrections with word boundary match
+        for typo, correction in MAJOR_CORRECTIONS.items():
+            pattern = r'\b' + re.escape(typo) + r'\b'
+            if re.search(pattern, token_lower):
+                token = re.sub(pattern, correction, token, flags=re.IGNORECASE)
+                token_lower = token.lower()
+                
+        token = re.sub(r'\s+', ' ', token).strip()
         valid_majors.append(token)
         
     if not valid_majors:
