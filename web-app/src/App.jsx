@@ -1079,7 +1079,7 @@ export default function App() {
                   Pelacak independen program magang resmi Pertamina.
                 </p>
                 <div className="text-[10.5px] text-[#9b9a97] mt-0.5">
-                  Terakhir Diupdate: 2 Juli 2026, 22:06 WIB
+                  Terakhir Diupdate: 3 Juli 2026, 08:55 WIB
                 </div>
               </div>
 
