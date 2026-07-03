@@ -102,6 +102,61 @@ export function getCompetitionLevel(passRateStr) {
   }
 }
 
+export function renderPersyaratan(text) {
+  if (!text) return null;
+  return text.split('\n').map((line, idx) => {
+    const trimmed = line.trim();
+    if (!trimmed) return null;
+    
+    const lower = trimmed.toLowerCase();
+    if (lower.startsWith("tingkat pendidikan") || lower.startsWith("jurusan")) {
+      const parts = trimmed.split(":");
+      const label = parts[0] ? parts[0].trim() : "";
+      const value = parts.slice(1).join(":").trim();
+      return (
+        <div key={idx} className="mb-2 text-[12.5px] text-[#37352f]">
+          <strong>{label} : </strong>
+          <span className="font-bold text-[#2b2a26] bg-[#f2f1ee]/90 px-2 py-0.5 rounded text-[11.5px] border border-[#edece9]">{value}</span>
+        </div>
+      );
+    }
+    
+    const isListItem = /^[0-9]+[\.\)]|^\-|^\•/.test(trimmed);
+    let cleanLine = trimmed;
+    if (isListItem) {
+      cleanLine = trimmed.replace(/^[0-9]+[\.\)]\s*|^\-\s*|^\•\s*/, '').trim();
+    }
+    
+    return (
+      <div key={idx} className="flex items-start gap-2 pl-1.5 py-0.5 text-[12.5px] text-[#4d4b47] leading-relaxed">
+        <span className="text-[#8a8a86] mt-1.5 text-[7px] select-none">•</span>
+        <span className="font-medium">{cleanLine}</span>
+      </div>
+    );
+  });
+}
+
+export function renderDeskripsiPekerjaan(text) {
+  if (!text) return null;
+  return text.split('\n').map((line, idx) => {
+    const trimmed = line.trim();
+    if (!trimmed) return null;
+    
+    const isListItem = /^[0-9]+[\.\)]|^\-|^\•/.test(trimmed);
+    let cleanLine = trimmed;
+    if (isListItem) {
+      cleanLine = trimmed.replace(/^[0-9]+[\.\)]\s*|^\-\s*|^\•\s*/, '').trim();
+    }
+    
+    return (
+      <div key={idx} className="flex items-start gap-2 pl-1.5 py-0.5 text-[12.5px] text-[#4d4b47] leading-relaxed">
+        <span className="text-[#8a8a86] mt-1.5 text-[7px] select-none">•</span>
+        <span className="font-medium">{cleanLine}</span>
+      </div>
+    );
+  });
+}
+
 // Clean and swap title parts: "INTERNSHIP 2026 - PT Company - Position" -> "Position - PT Company"
 export function formatTitle(rawTitle) {
   if (!rawTitle) return "";
@@ -2099,23 +2154,23 @@ export default function App() {
 
               {/* Job Description & Requirements from Database */}
               {selectedJob["Deskripsi Pekerjaan"] && selectedJob["Deskripsi Pekerjaan"] !== "Tidak tertera" && (
-                <div className="flex flex-col gap-2 p-4 bg-white rounded-xl border border-[#edece9] text-[13px] text-[#37352f] leading-relaxed shadow-sm">
-                  <h4 className="font-extrabold text-[#37352f] text-[13px] border-b border-[#edece9] pb-2 mb-1.5 flex items-center gap-1.5">
-                    <span>📋</span> Deskripsi Pekerjaan
+                <div className="flex flex-col gap-2.5 p-4 bg-white rounded-xl border border-[#edece9] text-[13px] text-[#37352f] leading-relaxed shadow-sm">
+                  <h4 className="font-extrabold text-[#37352f] text-[11px] uppercase tracking-wider border-b border-[#edece9] pb-1.5 mb-0.5 select-none">
+                    Deskripsi Pekerjaan
                   </h4>
-                  <div className="whitespace-pre-line pl-1.5 text-[#5a5a57]">
-                    {selectedJob["Deskripsi Pekerjaan"]}
+                  <div className="flex flex-col gap-1 pl-0.5">
+                    {renderDeskripsiPekerjaan(selectedJob["Deskripsi Pekerjaan"])}
                   </div>
                 </div>
               )}
 
               {selectedJob["Persyaratan"] && selectedJob["Persyaratan"] !== "Tidak tertera" && (
-                <div className="flex flex-col gap-2 p-4 bg-white rounded-xl border border-[#edece9] text-[13px] text-[#37352f] leading-relaxed shadow-sm">
-                  <h4 className="font-extrabold text-[#37352f] text-[13px] border-b border-[#edece9] pb-2 mb-1.5 flex items-center gap-1.5">
-                    <span>⚡</span> Persyaratan & Keahlian
+                <div className="flex flex-col gap-2.5 p-4 bg-white rounded-xl border border-[#edece9] text-[13px] text-[#37352f] leading-relaxed shadow-sm">
+                  <h4 className="font-extrabold text-[#37352f] text-[11px] uppercase tracking-wider border-b border-[#edece9] pb-1.5 mb-0.5 select-none">
+                    Persyaratan & Keahlian
                   </h4>
-                  <div className="whitespace-pre-line pl-1.5 text-[#5a5a57]">
-                    {selectedJob["Persyaratan"]}
+                  <div className="flex flex-col gap-1 pl-0.5">
+                    {renderPersyaratan(selectedJob["Persyaratan"])}
                   </div>
                 </div>
               )}
