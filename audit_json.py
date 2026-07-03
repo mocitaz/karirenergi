@@ -5,7 +5,7 @@ import json
 
 base_dir = "/Users/Luthfi/Project/PT. Teknalogi Transformasi Digital/PertaminaWebCareer"
 csv_folder = os.path.join(base_dir, "Folder Pertamina New BGT")
-json_folder = os.path.join(base_dir, "JSON BARU")
+json_folder = os.path.join(base_dir, "JSON NEW")
 react_json_path = os.path.join(base_dir, "web-app", "src", "data", "loker_data.json")
 web_json_path = os.path.join(base_dir, "web", "loker_data.json")
 
