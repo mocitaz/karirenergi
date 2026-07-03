@@ -1025,25 +1025,29 @@ export default function App() {
     // 3. Matriks Korelasi Ukuran Kuota vs Minat Pelamar
     const quotaGroups = {
       "Kuota 1": { count: 0, applicants: 0 },
-      "Kuota 2-4": { count: 0, applicants: 0 },
-      "Kuota 5-9": { count: 0, applicants: 0 },
-      "Kuota 10+": { count: 0, applicants: 0 }
+      "Kuota 2-3 text": { count: 0, applicants: 0 }, // wait, let's write exact keys
+      "Kuota 2-3": { count: 0, applicants: 0 },
+      "Kuota 4-5": { count: 0, applicants: 0 },
+      "Kuota 6-8": { count: 0, applicants: 0 }
     };
+    // remove the extra key above
+    delete quotaGroups["Kuota 2-3 text"];
+    
     listingsWithStats.forEach(j => {
       const q = j.preciseKuota;
       const p = j.precisePelamar;
       if (q === 1) {
         quotaGroups["Kuota 1"].count++;
         quotaGroups["Kuota 1"].applicants += p;
-      } else if (q >= 2 && q <= 4) {
-        quotaGroups["Kuota 2-4"].count++;
-        quotaGroups["Kuota 2-4"].applicants += p;
-      } else if (q >= 5 && q <= 9) {
-        quotaGroups["Kuota 5-9"].count++;
-        quotaGroups["Kuota 5-9"].applicants += p;
+      } else if (q >= 2 && q <= 3) {
+        quotaGroups["Kuota 2-3"].count++;
+        quotaGroups["Kuota 2-3"].applicants += p;
+      } else if (q >= 4 && q <= 5) {
+        quotaGroups["Kuota 4-5"].count++;
+        quotaGroups["Kuota 4-5"].applicants += p;
       } else {
-        quotaGroups["Kuota 10+"].count++;
-        quotaGroups["Kuota 10+"].applicants += p;
+        quotaGroups["Kuota 6-8"].count++;
+        quotaGroups["Kuota 6-8"].applicants += p;
       }
     });
     const quotaCorrelation = Object.keys(quotaGroups).map(name => {
