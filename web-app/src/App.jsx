@@ -1096,31 +1096,28 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <div className={`p-3.5 border-t border-[#edece9]/50 flex-shrink-0 bg-[#f7f7f5]/30 ${sidebarOpen ? "block" : "hidden"}`}>
-          <div className="flex flex-col gap-2 text-left">
-            <div className="flex items-center justify-between text-[11px] font-bold text-[#37352f] select-none">
-              <span>&copy; 2026 KarirEnergi</span>
-              <span className="text-[9px] font-extrabold bg-[#edf6ec] text-[#43873e] px-1.5 py-0.5 rounded-md border border-[#43873e]/10 tracking-wide uppercase">
-                100% GRATIS
+        <div className={`p-4 border-t border-[#edece9]/50 bg-[#fbfbfa] flex-shrink-0 ${sidebarOpen ? "block" : "hidden"}`}>
+          <div className="flex flex-col gap-2.5 bg-[#f2f1ee]/50 border border-[#edece9]/70 rounded-xl p-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+            <div className="flex items-center justify-between text-[11px] font-extrabold text-[#37352f] select-none">
+              <span>KarirEnergi &copy; 2026</span>
+              <span className="text-[9px] font-bold bg-[#1d7bb8]/8 text-[#1d7bb8] px-1.5 py-0.5 rounded border border-[#1d7bb8]/15 tracking-wide uppercase">
+                Non-Official
               </span>
             </div>
-            
-            <p className="text-[10px] text-[#8a8a86] leading-relaxed">
-              Situs independen non-resmi (Non-Official). Konten database bersumber dari portal resmi PT Pertamina (Persero) dan tidak diperjualbelikan.
+
+            <p className="text-[10.5px] text-[#5a5a57] leading-relaxed">
+              Katalog independen. Semua data diperoleh dari rekrutmen resmi Pertamina. Karya ini bersifat gratis & tidak diperjualbelikan.
             </p>
-            
-            <div className="flex items-center justify-between pt-2 border-t border-[#edece9]/60 text-[10px]">
-              <span className="text-[#9b9a97] font-medium select-none">Source & Update:</span>
-              <a
-                href="https://www.threads.net/@mocitaz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 font-bold text-[#1d7bb8] hover:text-[#145d8f] bg-[#1d7bb8]/5 hover:bg-[#1d7bb8]/10 px-2 py-0.75 rounded-md border border-[#1d7bb8]/10 transition-all select-none"
-              >
-                <span>threads/@mocitaz</span>
-                <ArrowUpRight className="w-2.5 h-2.5" />
-              </a>
-            </div>
+
+            <a
+              href="https://www.threads.net/@mocitaz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 w-full flex items-center justify-center gap-1.5 py-2 text-[10.5px] font-extrabold text-white bg-[#121212] hover:bg-[#2c2c2c] active:scale-[0.98] rounded-lg transition-all shadow-sm select-none cursor-pointer"
+            >
+              <span>Follow Threads @mocitaz</span>
+              <ArrowUpRight className="w-3 h-3 text-[#edece9]" />
+            </a>
           </div>
         </div>
       </aside>
