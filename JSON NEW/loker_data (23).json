@@ -23,23 +23,9 @@
     "Jurusan": "Teknik Lingkungan",
     "Link Detail": "https://recruitment.pertamina.com/object/widget/845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2/?id=9dc66621-99f0-4e25-9e62-8389bbd8b25b",
     "Kuota": 1,
-    "Pelamar": 65,
+    "Pelamar": 68,
     "Deskripsi Pekerjaan": "Membantu penyusunan dan pembaruan dokumen standar, serta prosedur terkait aspek Lingkungan\nMembantu pelaksanaan program kerja aspek Lingkungan\nMembuat laporan progres pelaksanaan program kerja aspek Lingkungan",
     "Persyaratan": "Tingkat Pendidikan : S1\nJurusan : Teknik Lingkungan\nBig Data Management\nDetail Oriented\nProblem Solving\nData Analysis\nData Visualization\nAdaptive\nCritical Thinking\nTeam Work\nKemampuan Bahasa Inggris"
-  },
-  {
-    "Judul Lowongan": "INTERNSHIP 2026 - PT Pertamina (Persero) - Fungsi Transformasi Keberlanjutan Bisnis (Transformation Program Intern)",
-    "Perusahaan": "PT Pertamina",
-    "Kota": "Kota Administrasi Jakarta Pusat",
-    "Industri": "Oil & Energy",
-    "Sektor": "Energy",
-    "Pendidikan": "D4/S1",
-    "Jurusan": "Teknik Informatika, Teknologi Informasi, Matematika, Bisnis Digital, Sistem Informasi",
-    "Link Detail": "https://recruitment.pertamina.com/object/widget/845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2/?id=af7999dc-7864-4d05-add4-8133b0c6baaa",
-    "Kuota": 1,
-    "Pelamar": 38,
-    "Deskripsi Pekerjaan": "Membantu pemetaan proses bisnis, identifikasi pain points, dan peluang digitalisasi dalam program transformasi TDU.\nMendukung penyusunan user requirement, alur proses, issue log, dan dokumentasi implementasi tools/platform digital.\nMembantu pengembangan dashboard, visualisasi data, dan digital monitoring tools untuk pemantauan program transformasi.\nMendukung monitoring progress, pengumpulan feedback pengguna, serta penyusunan insight/rekomendasi perbaikan implementasi digitalisasi",
-    "Persyaratan": "Tingkat Pendidikan : D4/S1\nJurusan : Teknik Informatika, Teknologi Informasi, Matematika, Bisnis Digital, Sistem Informasi\nData Analyst\nData Scientist\nUI/UX desainer\nBig Data Analysis\nArtificial Intelligent\nDetail Orientend\nMenguasai Microsoft Excel, PowerBI, atau tools digital monitoring lainnya\nMampu bekerja dalam tim dan berkoordinasi dengan berbagai fungsi"
   },
   {
     "Judul Lowongan": "INTERNSHIP 2026 - PT Pertamina (Persero) - Fungsi Keuangan (Financial Planning & Performance Gas)",
@@ -56,6 +42,20 @@
     "Persyaratan": "Tingkat Pendidikan : S1\nJurusan : Manajemen Keuangan, Akuntansi, Teknik Industri, Statistika\nMicrosoft Excel dan PowerPoint\nKemampuan analisis data dasar.\nDetail oriented.\nKemampuan komunikasi dan kerja sama tim.\nMampu mengelola dan menyajikan data dengan baik"
   },
   {
+    "Judul Lowongan": "INTERNSHIP 2026 - PT Pertamina (Persero) - Fungsi Transformasi Keberlanjutan Bisnis (Transformation Program Intern)",
+    "Perusahaan": "PT Pertamina",
+    "Kota": "Kota Administrasi Jakarta Pusat",
+    "Industri": "Oil & Energy",
+    "Sektor": "Energy",
+    "Pendidikan": "D4/S1",
+    "Jurusan": "Teknik Informatika, Teknologi Informasi, Matematika, Bisnis Digital, Sistem Informasi",
+    "Link Detail": "https://recruitment.pertamina.com/object/widget/845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2/?id=af7999dc-7864-4d05-add4-8133b0c6baaa",
+    "Kuota": 1,
+    "Pelamar": 39,
+    "Deskripsi Pekerjaan": "Membantu pemetaan proses bisnis, identifikasi pain points, dan peluang digitalisasi dalam program transformasi TDU.\nMendukung penyusunan user requirement, alur proses, issue log, dan dokumentasi implementasi tools/platform digital.\nMembantu pengembangan dashboard, visualisasi data, dan digital monitoring tools untuk pemantauan program transformasi.\nMendukung monitoring progress, pengumpulan feedback pengguna, serta penyusunan insight/rekomendasi perbaikan implementasi digitalisasi",
+    "Persyaratan": "Tingkat Pendidikan : D4/S1\nJurusan : Teknik Informatika, Teknologi Informasi, Matematika, Bisnis Digital, Sistem Informasi\nData Analyst\nData Scientist\nUI/UX desainer\nBig Data Analysis\nArtificial Intelligent\nDetail Orientend\nMenguasai Microsoft Excel, PowerBI, atau tools digital monitoring lainnya\nMampu bekerja dalam tim dan berkoordinasi dengan berbagai fungsi"
+  },
+  {
     "Judul Lowongan": "INTERNSHIP 2026 - PT Pertamina (Persero) - Fungsi Technology Innovation and Implementation (DNRE TCI)",
     "Perusahaan": "PT Pertamina",
     "Kota": "Kota Administrasi Jakarta Barat",
@@ -65,7 +65,7 @@
     "Jurusan": "Teknik Kimia, Teknik Bioenergi, Kemurgi",
     "Link Detail": "https://recruitment.pertamina.com/object/widget/845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2/?id=b5bb6fdb-859b-4106-9b19-7e50fa30a4dc",
     "Kuota": 1,
-    "Pelamar": 12,
+    "Pelamar": 15,
     "Deskripsi Pekerjaan": "Kajian Teknis dan Analisis Keekonomian.\nPelaksanaan Inkubasi dan Uji Pasar\nAdministrasi Proyek dan Manajemen Kemitraan.\nRiset Pasar dan Analisis Kompetitor.\nPengawasan Kepatuhan Regulasi HSSE",
     "Persyaratan": "Tingkat Pendidikan : S1\nJurusan : Teknik Kimia, Teknik Bioenergi dan Kemurgi\nPenguasaan AI tools\nMS Office Advanced"
   },
@@ -79,7 +79,7 @@
     "Jurusan": "Teknik Industri, Aktuaria, Statistik, Data Analyst",
     "Link Detail": "https://recruitment.pertamina.com/object/widget/845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2/?id=4ab1c979-051c-413f-b703-7951dfc3dea6",
     "Kuota": 1,
-    "Pelamar": 33,
+    "Pelamar": 35,
     "Deskripsi Pekerjaan": "Digitalisasi Proses Monev Optimasi Hilir",
     "Persyaratan": "Tingkat Pendidikan : S1\nJurusan : Teknik Industri, Akturia, Statistik, Data Analyst\nData Analyst\nData management\nProgramming\nSupply Chain Management"
   },
@@ -93,7 +93,7 @@
     "Jurusan": "Teknik Industri, Desain Grafis, Desain Komunikasi Visual, Akuntansi",
     "Link Detail": "https://recruitment.pertamina.com/object/widget/845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2/?id=5cfddc2f-bc56-474c-a3f2-7a008284a285",
     "Kuota": 3,
-    "Pelamar": 47,
+    "Pelamar": 48,
     "Deskripsi Pekerjaan": "Membantu administrasi terkait kegiatan dalam fungsi\nMelakukan Analisa Data\nMembantu kegiatan terkait pemagangan (daily task, report)\nMembantu kegiatan terkait digital learning (daily task, report)\nMengoptimalkan sistem pembelajaran digital perusahaan guna mendukung peningkatan kompetensi karyawan melalui platform\nMenyusun dan mengimplementasikan strategi digital learning sesuai kebutuhan organisasi\nMembuat desain souvenir untuk kebutuhan Fungsi\nMembantu membuat desain untuk presentasi Fungsi\nMembuat desain serta mengelola Sosial Media (IG)\nMengedit video terkait kebutuhan fungsi\nMengerti dengan penyusunan anggaran serta pemonitoran\nMelakukan kontrol anggaran\nMengerti terkait dengan peraturan pajak dan perhitungannya\nMemastikan seluruh transaksi sesuai dengan SOP dan kebijakan perusahaan\nMenyediakan data finansial untuk evaluasi efektivitas program",
     "Persyaratan": "Tingkat Pendidikan : D4/S1\nJurusan : Teknik Industri, Desain Grafis, Desain Komunikasi Visual, Akuntansi\nDetail Oriented\nKreatif\nQuick Response\nGood Presentation\nGood Coordination & Communication\nAdvanced Excel & Powerpoint\nBisa desain (Canva/Adobe Photoshop) nilai plus\nMampu mengoperasikan komputer & aplikasinya\nEditing\nWork ethic\nTime management\nAdvanced Photoshop / canva\nAdaptif\nAdministrasi & kearsipan\nKreatif\nMandiri & Proaktif"
   },
