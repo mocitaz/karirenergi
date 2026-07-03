@@ -1382,37 +1382,39 @@ export default function App() {
                     <div
                       key={job["Link Detail"]}
                       onClick={() => setSelectedJob(job)}
-                      className="group border border-[#edece9] rounded-lg p-4.5 flex flex-col justify-between gap-3.5 cursor-pointer hover:border-[#dfdfde] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all bg-white"
+                      className="group border border-[#edece9] rounded-lg p-4 flex flex-col justify-between gap-3.5 cursor-pointer hover:border-[#dfdfde] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all bg-white"
                     >
                       <div className="flex flex-col gap-2">
                         {/* Tags Row */}
                         <div className="flex items-center justify-between">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded w-fit truncate max-w-[170px] ${tagColor.bg} ${tagColor.text}`}>
-                            {job["Perusahaan"]}
-                          </span>
-                          <span className="text-[10.5px] font-bold text-[#9041a8] bg-[#f6edf9] px-1.5 py-0.5 rounded flex-shrink-0">
+                          <span className="text-[10px] font-semibold text-[#5a5a57] bg-[#edece9]/40 border border-[#edece9]/70 px-2 py-0.5 rounded-full select-none">
                             {job["Pendidikan"]}
                           </span>
                         </div>
 
                         {/* Title */}
-                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-1">
+                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5">
                           {job["Judul Lowongan"]}
                         </h3>
 
+                        {/* Company Name (underneath title) */}
+                        <div className="text-[11px] text-[#8a8a86] font-semibold leading-normal -mt-0.5">
+                          {job["Perusahaan"]}
+                        </div>
+
                         {/* Majors list */}
                         {majorTags.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            {majorTags.map((tag, idx) => (
-                              <span key={idx} className="text-[10px] bg-[#f7f7f5] text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm truncate max-w-[105px]">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
+                           <div className="flex flex-wrap gap-1.5 mt-1">
+                             {majorTags.map((tag, idx) => (
+                               <span key={idx} className="text-[10px] bg-[#f7f7f5] text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm truncate max-w-[105px]">
+                                 {tag}
+                               </span>
+                             ))}
+                           </div>
                         )}
 
                         {/* Location */}
-                        <div className="flex items-center gap-1.5 text-[11.5px] text-[#5a5a57] mt-0.5">
+                        <div className="flex items-center gap-1.5 text-[11px] text-[#5a5a57] mt-0.5">
                           <MapPin className="w-3.5 h-3.5 text-[#9b9a97] flex-shrink-0" />
                           <span className="truncate">{job["Kota"]}</span>
                         </div>
