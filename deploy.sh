@@ -61,6 +61,9 @@ server {
 
     location / {
         try_files \$uri \$uri/ /index.html;
+        
+        # Prevent caching of index.html so updates are immediately loaded
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
     }
 
     # Proxy API real-time visitors backend
