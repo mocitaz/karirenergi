@@ -337,14 +337,22 @@
                     if (jobDescMatch) {
                         let text = jobDescMatch[1].trim();
                         if (text.startsWith(":")) text = text.substring(1).trim();
-                        jobDesc = text;
+                        const footerIdx = text.search(/cookies consent|copyright/i);
+                        if (footerIdx !== -1) {
+                            text = text.substring(0, footerIdx).trim();
+                        }
+                        jobDesc = text.replace(/[\s\-•\.,]+$/, '').trim();
                     }
                     
                     const reqMatch = fullText.match(/Requirements([\s\S]*?)(?=\$\(document\)\.ready|Apply|$)/i);
                     if (reqMatch) {
                         let text = reqMatch[1].trim();
                         if (text.startsWith(":")) text = text.substring(1).trim();
-                        requirements = text;
+                        const footerIdx = text.search(/cookies consent|copyright/i);
+                        if (footerIdx !== -1) {
+                            text = text.substring(0, footerIdx).trim();
+                        }
+                        requirements = text.replace(/[\s\-•\.,]+$/, '').trim();
                     }
 
                     // Clean Jurusan from script injection & requirements text

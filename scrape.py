@@ -427,14 +427,20 @@ def run():
                     text = job_desc_match.group(1).strip()
                     if text.startswith(":"):
                         text = text[1:].strip()
-                    job_desc = text
+                    footer_match = re.search(r'cookies consent|copyright', text, re.IGNORECASE)
+                    if footer_match:
+                        text = text[:footer_match.start()].strip()
+                    job_desc = re.sub(r'[\s\-•\.,]+$', '', text).strip()
                     
                 req_match = re.search(r'Requirements([\s\S]*?)(?=\$\(document\)\.ready|Apply|$)', full_text, re.IGNORECASE)
                 if req_match:
                     text = req_match.group(1).strip()
                     if text.startswith(":"):
                         text = text[1:].strip()
-                    requirements = text
+                    footer_match = re.search(r'cookies consent|copyright', text, re.IGNORECASE)
+                    if footer_match:
+                        text = text[:footer_match.start()].strip()
+                    requirements = re.sub(r'[\s\-•\.,]+$', '', text).strip()
 
                 hasil_scraping.append({
                     "Judul Lowongan": job["judul"],

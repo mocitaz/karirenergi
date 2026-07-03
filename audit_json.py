@@ -38,6 +38,7 @@ print(f"Found {len(json_files)} JSON files.")
 
 all_records = []
 seen_links = set()
+records_by_link = {}
 dirty_jurusan_count = 0
 patched_kota_count = 0
 patched_industri_count = 0
@@ -258,10 +259,7 @@ for json_file in json_files:
                 if not link:
                     continue
                 
-                # Deduplicate by detail link
-                if link in seen_links:
-                    continue
-                seen_links.add(link)
+                # Deduplicate check is deferred to the end of the loop to merge description and requirements.
                 
                 title = item.get("Judul Lowongan", "").strip()
                 
@@ -318,7 +316,37 @@ for json_file in json_files:
                 except:
                     pelamar = 0
                 
-                all_records.append({
+                req_val = item.get("Persyaratan", "Tidak tertera")
+                if req_val and req_val != "Tidak tertera":
+                    footer_match = re.search(r'cookies consent|copyright', req_val, re.IGNORECASE)
+                    if footer_match:
+                        req_val = req_val[:footer_match.start()].strip()
+                    req_val = re.sub(r'[\s\-•\.,]+$', '', req_val).strip()
+                
+                desc_val = item.get("Deskripsi Pekerjaan", "Tidak tertera")
+                if desc_val and desc_val != "Tidak tertera":
+                    footer_match = re.search(r'cookies consent|copyright', desc_val, re.IGNORECASE)
+                    if footer_match:
+                        desc_val = desc_val[:footer_match.start()].strip()
+                    desc_val = re.sub(r'[\s\-•\.,]+$', '', desc_val).strip()
+
+                if link in seen_links:
+                    existing = records_by_link.get(link)
+                    if existing:
+                        if (existing.get("Deskripsi Pekerjaan") == "Tidak tertera" or not existing.get("Deskripsi Pekerjaan")) and desc_val and desc_val != "Tidak tertera":
+                            existing["Deskripsi Pekerjaan"] = desc_val
+                        if (existing.get("Persyaratan") == "Tidak tertera" or not existing.get("Persyaratan")) and req_val and req_val != "Tidak tertera":
+                            existing["Persyaratan"] = req_val
+                        # Keep the latest applicant / quota numbers if they are non-default
+                        if kuota > 1 and existing["Kuota"] == 1:
+                            existing["Kuota"] = kuota
+                        if pelamar > 0 and existing["Pelamar"] == 0:
+                            existing["Pelamar"] = pelamar
+                    continue
+                
+                seen_links.add(link)
+                
+                record = {
                     "Judul Lowongan": title,
                     "Perusahaan": company,
                     "Kota": kota,
@@ -329,9 +357,11 @@ for json_file in json_files:
                     "Link Detail": link,
                     "Kuota": kuota,
                     "Pelamar": pelamar,
-                    "Deskripsi Pekerjaan": item.get("Deskripsi Pekerjaan", "Tidak tertera"),
-                    "Persyaratan": item.get("Persyaratan", "Tidak tertera")
-                })
+                    "Deskripsi Pekerjaan": desc_val,
+                    "Persyaratan": req_val
+                }
+                all_records.append(record)
+                records_by_link[link] = record
     except Exception as e:
         print(f"Error reading {filename}: {e}")
 
