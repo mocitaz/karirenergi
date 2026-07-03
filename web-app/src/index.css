@@ -81,22 +81,36 @@ html.dark, html.dark body {
 
 /* Sidebar and Main container */
 html.dark aside,
-html.dark .bg-\[\#fbfbfa\] {
+html.dark .bg-\[\#fbfbfa\],
+html.dark .bg-white {
   background-color: #202020 !important;
   border-color: #2e2e2e !important;
 }
 
-/* General white backgrounds to dark card colors */
-html.dark .bg-white,
-html.dark .bg-white\/80 {
+/* Card layout backgrounds & components */
+html.dark .bg-white\/80,
+html.dark .bg-white\/90,
+html.dark .bg-white\/95 {
   background-color: #202020 !important;
   border-color: #2e2e2e !important;
 }
 
-/* Card layout backgrounds */
-html.dark .bg-white\/90 {
-  background-color: #202020 !important;
+/* Specific panels and cards inside layouts */
+html.dark .bg-\[\#f7f7f5\]\/60,
+html.dark .bg-\[\#f7f7f5\]\/55,
+html.dark .bg-\[\#f7f7f5\]\/40,
+html.dark .bg-\[\#f7f7f5\]\/30,
+html.dark .bg-\[\#f2f1ee\]\/50,
+html.dark .bg-\[\#f9f9f8\],
+html.dark .bg-\[\#f7f7f5\] {
+  background-color: #252525 !important;
   border-color: #2e2e2e !important;
+  color: #e3e3e2 !important;
+}
+
+/* Table header tr background */
+html.dark tr.bg-\[\#f7f7f5\] {
+  background-color: #252525 !important;
 }
 
 /* Borders */
@@ -107,12 +121,24 @@ html.dark .border-\[\#edece9\]\/70,
 html.dark .border-t,
 html.dark .border-b,
 html.dark .border-r,
-html.dark .border-l {
+html.dark .border-l,
+html.dark th,
+html.dark td {
   border-color: #2e2e2e !important;
 }
 
-/* Primary text color */
+/* Divider lines inside card stats */
+html.dark .divide-\[\#edece9\]\/50 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #2e2e2e !important;
+}
+
+/* Primary text colors */
 html.dark .text-\[\#37352f\] {
+  color: #e3e3e2 !important;
+}
+
+/* Detail descriptions & requirements list item text color */
+html.dark .text-\[\#4d4b47\] {
   color: #e3e3e2 !important;
 }
 
@@ -120,6 +146,15 @@ html.dark .text-\[\#37352f\] {
 html.dark .text-\[\#5a5a57\],
 html.dark .text-gray-600 {
   color: #9b9a97 !important;
+}
+
+/* Key requirement values inside detail cards */
+html.dark .text-\[\#2b2a26\] {
+  color: #fbbf24 !important; /* Premium amber highlight for key info */
+}
+html.dark .bg-\[\#f2f1ee\]\/90 {
+  background-color: #2d2d2d !important;
+  border-color: #3b3b3b !important;
 }
 
 /* Muted/Footer text color */
@@ -131,7 +166,8 @@ html.dark .text-gray-400 {
 
 /* Hover bg overrides */
 html.dark .hover\:bg-\[\#fbfbfa\]:hover,
-html.dark .hover\:bg-gray-50:hover {
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-\[\#f7f7f5\]\/40:hover {
   background-color: #2a2a2a !important;
 }
 
@@ -163,16 +199,48 @@ html.dark .notion-select {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239b9a97' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
 }
 
-/* Modal overlay & specific cards inside details modal */
+/* Modal overlay */
 html.dark .bg-black\/30 {
   background-color: rgba(0, 0, 0, 0.7) !important;
 }
 
-html.dark .bg-\[\#f7f7f5\]\/40,
-html.dark .bg-\[\#f2f1ee\]\/50,
-html.dark .bg-\[\#f9f9f8\] {
-  background-color: #252525 !important;
-  border-color: #2e2e2e !important;
+/* Competition level status badge overrides inside cards & modals */
+html.dark .bg-\[\#fde8e8\],
+html.dark .bg-\[\#fdf2f2\] {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+html.dark .text-\[\#c52447\] {
+  color: #f87171 !important;
+}
+
+html.dark .bg-\[\#fef3c7\] {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+html.dark .text-\[\#b78103\] {
+  color: #fbbf24 !important;
+}
+
+html.dark .bg-\[\#edf6ec\] {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+html.dark .text-\[\#43873e\] {
+  color: #34d399 !important;
+}
+
+/* Orange text inside analysis cards */
+html.dark .text-\[\#c26100\] {
+  color: #f59e0b !important;
+}
+
+/* Analytics progress bars background track */
+html.dark .bg-\[\#edece9\]\/50 {
+  background-color: #2e2e2e !important;
 }
 
 /* Specific yellow & blue badges/banners inside modal */
@@ -241,3 +309,54 @@ html.dark .text-amber-900, html.dark .text-amber-800 {
   color: #fbbf24 !important;
 }
 
+/* ==========================================
+   NOTION COLOR TAG OVERRIDES IN DARK MODE
+   ========================================== */
+html.dark .bg-\[\#edf6ec\], 
+html.dark .bg-\[\#edf6ec\]\/50 { /* Green */
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+html.dark .text-\[\#43873e\] {
+  color: #52d681 !important;
+}
+
+html.dark .bg-\[\#e8f4fa\] { /* Blue */
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+html.dark .text-\[\#1d7bb8\] {
+  color: #60a5fa !important;
+}
+
+html.dark .bg-\[\#f6edf9\] { /* Purple */
+  background-color: rgba(168, 85, 247, 0.12) !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+html.dark .text-\[\#9041a8\] {
+  color: #c084fc !important;
+}
+
+html.dark .bg-\[\#fdf2e9\] { /* Orange */
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+html.dark .text-\[\#c26100\] {
+  color: #fbbf24 !important;
+}
+
+html.dark .bg-\[\#f5ebee\] { /* Pink */
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+html.dark .text-\[\#c52447\] {
+  color: #f87171 !important;
+}
+
+html.dark .bg-\[\#edf3ec\] { /* Gray */
+  background-color: #2b2b2b !important;
+  border-color: #3b3b3b !important;
+}
+html.dark .text-\[\#37352f\] {
+  color: #e3e3e2 !important;
+}
