@@ -63,6 +63,10 @@ def clean_jurusan(jurusan_str):
     tokens = re.split(r',|;|\bdan\b|\bserta\b', cleaned, flags=re.IGNORECASE)
     
     MAJOR_CORRECTIONS = {
+        "design komunikasi visual (dkv)": "Desain Komunikasi Visual (DKV)",
+        "design komunikasi visual": "Desain Komunikasi Visual (DKV)",
+        "design grafis": "Desain Grafis",
+        "dkv": "Desain Komunikasi Visual (DKV)",
         "akturia": "Aktuaria",
         "akutansi": "Akuntansi",
         "psiklogi": "Psikologi",
@@ -89,9 +93,13 @@ def clean_jurusan(jurusan_str):
         if has_keyword:
             break
             
-        # Apply corrections with word boundary match
+        # Apply corrections with word boundary match where appropriate
         for typo, correction in MAJOR_CORRECTIONS.items():
-            pattern = r'\b' + re.escape(typo) + r'\b'
+            if correction.lower() in token.lower():
+                continue
+            left_boundary = r'\b' if typo[0].isalnum() else ''
+            right_boundary = r'\b' if typo[-1].isalnum() else ''
+            pattern = left_boundary + re.escape(typo) + right_boundary
             if re.search(pattern, token_lower):
                 token = re.sub(pattern, correction, token, flags=re.IGNORECASE)
                 token_lower = token.lower()

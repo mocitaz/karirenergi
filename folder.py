@@ -348,6 +348,10 @@
                         ];
                         
                         const majorCorrections = {
+                            "design komunikasi visual (dkv)": "Desain Komunikasi Visual (DKV)",
+                            "design komunikasi visual": "Desain Komunikasi Visual (DKV)",
+                            "design grafis": "Desain Grafis",
+                            "dkv": "Desain Komunikasi Visual (DKV)",
                             "akturia": "Aktuaria",
                             "akutansi": "Akuntansi",
                             "psiklogi": "Psikologi",
@@ -373,10 +377,16 @@
                             if (hasKeyword) {
                                 break;
                             }
-
-                            // Apply corrections with word boundary match
+                            
+                            // Apply corrections with word boundary match where appropriate
                             for (let [typo, correction] of Object.entries(majorCorrections)) {
-                                const pattern = new RegExp('\\b' + typo + '\\b', 'gi');
+                                if (tokenLower.includes(correction.toLowerCase())) {
+                                    continue;
+                                }
+                                const leftBoundary = /^[a-zA-Z0-9]/.test(typo) ? '\\b' : '';
+                                const rightBoundary = /[a-zA-Z0-9]$/.test(typo) ? '\\b' : '';
+                                const escapedTypo = typo.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                                const pattern = new RegExp(leftBoundary + escapedTypo + rightBoundary, 'gi');
                                 if (pattern.test(tokenLower)) {
                                     token = token.replace(pattern, correction);
                                     tokenLower = token.toLowerCase();
