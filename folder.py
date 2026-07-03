@@ -225,8 +225,28 @@
                         iframe.onload = resolve;
                     });
                     
-                    // Tunggu 1500ms agar JS internal widget merender ikon & data di DOM
-                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    // Tunggu hingga konten detail ter-render (polling maksimal 2500ms)
+                    await new Promise((resolve) => {
+                        const startTime = Date.now();
+                        const checkInterval = setInterval(() => {
+                            try {
+                                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                                const hasText = iframeDoc && iframeDoc.body && (
+                                    iframeDoc.body.innerText.includes("Jurusan") || 
+                                    iframeDoc.body.innerText.includes("Pendidikan")
+                                );
+                                if (hasText || Date.now() - startTime > 2500) {
+                                    clearInterval(checkInterval);
+                                    resolve();
+                                }
+                            } catch (e) {
+                                if (Date.now() - startTime > 2500) {
+                                    clearInterval(checkInterval);
+                                    resolve();
+                                }
+                            }
+                        }, 100);
+                    });
                     
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     if (!iframeDoc) throw new Error("Iframe document not accessible");
@@ -355,6 +375,11 @@
                             "design komunikasi visual (dkv)": "Desain Komunikasi Visual",
                             "design komunikasi visual": "Desain Komunikasi Visual",
                             "design grafis": "Desain Grafis",
+                            "desian komunikasi visual": "Desain Komunikasi Visual",
+                            "desian grafis": "Desain Grafis",
+                            "desain gravis": "Desain Grafis",
+                            "desain komunikasi fisual": "Desain Komunikasi Visual",
+                            "dvk": "Desain Komunikasi Visual",
                             "dkv": "Desain Komunikasi Visual",
                             "akturia": "Aktuaria",
                             "akutansi": "Akuntansi",
