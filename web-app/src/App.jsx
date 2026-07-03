@@ -46,6 +46,38 @@ function getNotionColor(text) {
   return NOTION_COLORS[Math.abs(hash) % NOTION_COLORS.length];
 }
 
+export function getDeadlineText() {
+  const targetDate = new Date("2026-07-05T23:59:00+07:00").getTime();
+  const now = new Date().getTime();
+  const diff = targetDate - now;
+  
+  if (diff <= 0) {
+    return {
+      text: "Tutup",
+      color: "bg-red-50 text-red-700 border-red-200 html.dark:bg-red-950/20 html.dark:text-red-400 html.dark:border-red-900/40"
+    };
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) {
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    return {
+      text: `Tutup Hari Ini (${hours}j lagi)`,
+      color: "bg-red-50 text-red-600 border-red-200 animate-pulse-warning html.dark:bg-red-950/30 html.dark:text-red-400 html.dark:border-red-900/60"
+    };
+  }
+  if (days === 1) {
+    return {
+      text: "Tutup Besok",
+      color: "bg-orange-50 text-orange-600 border-orange-200 animate-pulse-warning html.dark:bg-orange-950/30 html.dark:text-orange-400 html.dark:border-orange-900/60"
+    };
+  }
+  return {
+    text: `Tutup 5 Jul (${days} hari lagi)`,
+    color: "bg-amber-50 text-amber-700 border-amber-200 html.dark:bg-amber-950/20 html.dark:text-amber-400 html.dark:border-amber-900/40"
+  };
+}
+
 // Generate realistic deterministic stats based on unique listing fields
 export function getDeterministicStats(title, company, link, dbKuota, dbPelamar) {
   // If database already contains real scraped Kuota and Pelamar details, use them
@@ -1016,6 +1048,36 @@ export default function App() {
     setShowSavedOnly(false);
   };
 
+  const handleCompanyChartClick = (companyName) => {
+    setSelectedCompany(companyName);
+    setDraftCompany(companyName);
+    setViewTab("gallery");
+  };
+
+  const handleMajorChartClick = (majorRumpunName) => {
+    let query = "";
+    if (majorRumpunName === "Teknik / STEM") query = "Teknik";
+    else if (majorRumpunName === "Manajemen / Bisnis") query = "Manajemen";
+    else if (majorRumpunName === "Ekonomi & Akuntansi") query = "Akuntansi";
+    else if (majorRumpunName === "Teknologi Informasi & Komputer") query = "Informatika";
+    else if (majorRumpunName === "Psikologi / Human Resources") query = "Psikologi";
+    else if (majorRumpunName === "Hukum & Legal") query = "Hukum";
+    else if (majorRumpunName === "Statistika / Matematika") query = "Statistika";
+    else if (majorRumpunName === "Semua Jurusan") query = "Semua Jurusan";
+    
+    if (query) {
+      setSearch(query);
+      setDraftSearch(query);
+      setViewTab("gallery");
+    }
+  };
+
+  const handleCityChartClick = (cityName) => {
+    setSelectedCity(cityName);
+    setDraftCity(cityName);
+    setViewTab("gallery");
+  };
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-white text-[#37352f] relative">
       {/* Notion Sidebar - Desktop Only */}
@@ -1642,7 +1704,20 @@ export default function App() {
                     >
                       {/* Top Part */}
                       <div className="flex flex-col gap-2 flex-grow">
-
+                        {/* Company Badge & Deadline Warning */}
+                        <div className="flex items-center justify-between gap-2 select-none">
+                          <span className={`text-[8.5px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wider ${tagColor.bg} ${tagColor.text}`}>
+                            {job["Perusahaan"].replace("PT ", "")}
+                          </span>
+                          {(() => {
+                            const deadline = getDeadlineText();
+                            return (
+                              <span className={`text-[8.5px] px-1.5 py-0.5 rounded-sm font-bold border ${deadline.color}`}>
+                                {deadline.text}
+                              </span>
+                            );
+                          })()}
+                        </div>
 
                         {/* Title */}
                         <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5">
@@ -1718,7 +1793,7 @@ export default function App() {
                     </div>
                   );
                 })}
-                {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} />}
+                {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} onReset={handleResetFilters} />}
               </div>
             )}
 
@@ -1758,8 +1833,18 @@ export default function App() {
                               </button>
                             </td>
                             <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate" title={job["Perusahaan"]}>{job["Perusahaan"]}</td>
-                            <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate" title={job["Judul Lowongan"]}>
-                              {job["Judul Lowongan"]}
+                            <td className="p-3 border-r border-[#edece9] max-w-[240px] select-none" title={job["Judul Lowongan"]}>
+                              <div className="flex flex-col gap-1">
+                                <span className="font-semibold text-[#1d7bb8] truncate">{job["Judul Lowongan"]}</span>
+                                {(() => {
+                                  const deadline = getDeadlineText();
+                                  return (
+                                    <span className={`text-[8.5px] px-1.5 py-0.25 rounded-sm font-bold border w-fit ${deadline.color}`}>
+                                      {deadline.text}
+                                    </span>
+                                  );
+                                })()}
+                              </div>
                             </td>
 
                             <td className="p-3 border-r border-[#edece9] max-w-[140px] truncate">{job["Kota"]}</td>
@@ -1788,7 +1873,7 @@ export default function App() {
                     </tbody>
                   </table>
                 </div>
-                {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} />}
+                 {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} onReset={handleResetFilters} />}
               </div>
             )}
 
@@ -1839,16 +1924,21 @@ export default function App() {
                         const maxVacancies = analyticsData.companyLeaderboard[0]?.vacancies || 1;
                         const pct = (item.vacancies / maxVacancies) * 100;
                         return (
-                          <div key={idx} className="flex flex-col gap-1.5">
+                          <div 
+                            key={idx} 
+                            onClick={() => handleCompanyChartClick(item.name)}
+                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
+                            title={`Klik untuk filter: ${item.name}`}
+                          >
                             <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-bold text-[#37352f] truncate max-w-[240px]">{idx + 1}. {item.name}</span>
+                              <span className="font-bold text-[#37352f] truncate max-w-[240px] group-hover/bar:text-[#1d7bb8] transition-colors">{idx + 1}. {item.name}</span>
                               <span className="text-[#5a5a57] font-semibold text-[11px] flex-shrink-0">
                                 {item.vacancies} Posisi <span className="text-[#8a8a86] font-normal">• {item.applicants.toLocaleString()} pelamar</span>
                               </span>
                             </div>
                             <div className="w-full bg-[#edece9]/50 h-2.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-[#b78103] to-[#c26100] h-full rounded-full transition-all duration-500" 
+                                className="bg-gradient-to-r from-[#b78103] to-[#c26100] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -1870,16 +1960,21 @@ export default function App() {
                         const maxCount = analyticsData.sortedMajors[0]?.count || 1;
                         const pct = (item.count / maxCount) * 100;
                         return (
-                          <div key={idx} className="flex flex-col gap-1">
+                          <div 
+                            key={idx} 
+                            onClick={() => handleMajorChartClick(item.name)}
+                            className="flex flex-col gap-1 cursor-pointer group/bar hover:opacity-90 transition-all"
+                            title={`Klik untuk filter: ${item.name}`}
+                          >
                             <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
                               <span className="text-[#8a8a86] font-semibold text-[11px]">
                                 {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
                               </span>
                             </div>
                             <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-[#b78103] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#b78103] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -1997,9 +2092,14 @@ export default function App() {
 
                     <div className="grid grid-cols-2 gap-3 mt-4 flex-grow justify-center">
                       {analyticsData.topCities.map((item, idx) => (
-                        <div key={idx} className="bg-[#f7f7f5]/50 border border-[#edece9]/80 rounded-lg p-3 flex justify-between items-center">
+                        <div 
+                          key={idx} 
+                          onClick={() => handleCityChartClick(item.name)}
+                          className="bg-[#f7f7f5]/50 border border-[#edece9]/80 rounded-lg p-3 flex justify-between items-center cursor-pointer hover:border-[#1d7bb8]/40 hover:bg-[#1d7bb8]/5 hover:scale-[1.01] transition-all"
+                          title={`Klik untuk filter: ${item.name}`}
+                        >
                           <div className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-[12px] font-bold text-[#37352f] truncate">{item.name}</span>
+                            <span className="text-[12px] font-bold text-[#37352f] truncate group-hover/card:text-[#1d7bb8]">{item.name}</span>
                             <span className="text-[10px] text-[#8a8a86]">{item.count} Lowongan</span>
                           </div>
                           <span className="text-[12px] font-extrabold text-[#c26100] ml-2 flex-shrink-0">{item.percentage}%</span>
@@ -2242,8 +2342,16 @@ export default function App() {
                 <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#37352f] leading-snug tracking-tight">
                   {selectedJob["Judul Lowongan"]}
                 </h2>
-                <div className="text-[12.5px] text-[#8a8a86] font-medium mt-0.5">
-                  {selectedJob["Perusahaan"]}
+                <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#8a8a86] font-medium mt-0.5 select-none">
+                  <span>{selectedJob["Perusahaan"]}</span>
+                  {(() => {
+                    const deadline = getDeadlineText();
+                    return (
+                      <span className={`text-[8.5px] px-1.5 py-0.5 rounded-sm font-bold border ${deadline.color}`}>
+                        {deadline.text}
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -2633,18 +2741,28 @@ export default function App() {
   );
 }
 
-function EmptyState({ showSavedOnly }) {
+function EmptyState({ showSavedOnly, onReset }) {
   return (
-    <div className="col-span-full py-16 flex flex-col items-center justify-center text-center text-[#9b9a97] gap-3">
-      <HelpCircle className="w-10 h-10" />
-      <div className="text-[14px] font-medium">
-        {showSavedOnly ? "Belum ada lowongan tersimpan" : "Tidak ada lowongan ditemukan"}
+    <div className="col-span-full py-16 px-4 flex flex-col items-center justify-center text-center bg-[#fbfbfa]/30 border border-dashed border-[#edece9] rounded-xl select-none animate-fade-in html.dark:bg-[#202020]/20 html.dark:border-[#2e2e2e] gap-3.5 max-w-xl mx-auto my-4">
+      <HelpCircle className="w-12 h-12 text-[#9b9a97] stroke-[1.25]" />
+      <div className="flex flex-col gap-1">
+        <h3 className="text-[14.5px] font-bold text-[#37352f]">
+          {showSavedOnly ? "Belum ada lowongan tersimpan" : "Tidak ada lowongan ditemukan"}
+        </h3>
+        <p className="text-[12px] text-[#8a8a86] max-w-sm">
+          {showSavedOnly 
+            ? "Klik ikon simpan pada kartu atau baris tabel lowongan untuk memantau lowongan magang favorit Anda."
+            : "Coba sesuaikan kata kunci pencarian atau kurangi beberapa filter untuk melihat lowongan kembali."}
+        </p>
       </div>
-      <div className="text-[12px]">
-        {showSavedOnly 
-          ? "Klik ikon bintang pada kartu atau tabel lowongan untuk menyimpannya di sini."
-          : "Coba ubah kriteria filter pencarian Anda."}
-      </div>
+      {!showSavedOnly && onReset && (
+        <button
+          onClick={onReset}
+          className="mt-1 px-4 py-1.5 text-[11.5px] font-bold text-[#1d7bb8] border border-[#1d7bb8]/25 rounded hover:bg-[#1d7bb8]/5 hover:border-[#1d7bb8]/50 transition-all cursor-pointer shadow-3xs"
+        >
+          Reset Semua Filter
+        </button>
+      )}
     </div>
   );
 }
