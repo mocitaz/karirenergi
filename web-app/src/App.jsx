@@ -731,6 +731,26 @@ export default function App() {
 
   // Memoized calculations for the Analytics Dashboard
   const analyticsData = useMemo(() => {
+    const getJobSector = (comp) => {
+      const c = (comp || "").toLowerCase();
+      if (c.includes("hulu") || c.includes("geothermal") || c.includes("ep cepu") || c.includes("internasional ep")) {
+        return "Hulu (Upstream)";
+      }
+      if (c.includes("patra niaga")) {
+        return "Hilir (Commercial & Trading)";
+      }
+      if (c.includes("shipping") || c.includes("trans kontinental") || c.includes("port & logistics") || c.includes("marine")) {
+        return "Logistik & Perkapalan";
+      }
+      if (c.includes("power") || c.includes("new renewable")) {
+        return "Power & EBT (Energi Baru)";
+      }
+      if (c.includes("gagas") || c.includes("regas") || c.includes("arun") || c.includes("pertamina gas") || c.includes("graha nusantara")) {
+        return "Gas & Infrastruktur";
+      }
+      return "Holding & Jasa Pendukung";
+    };
+
     const totalJobs = filteredListings.length;
 
     // Map all listings to their precise stats (using getDeterministicStats)
@@ -969,7 +989,7 @@ export default function App() {
     // E. Sector Breakdown
     const sectorCounts = {};
     listingsWithStats.forEach(j => {
-      const s = j.Sektor || "Tidak tertera";
+      const s = getJobSector(j.Perusahaan);
       sectorCounts[s] = (sectorCounts[s] || 0) + 1;
     });
     const sectorBreakdown = Object.keys(sectorCounts).map(name => ({
@@ -994,7 +1014,7 @@ export default function App() {
     const sectorQuota = {};
     const sectorCountsForQuota = {};
     listingsWithStats.forEach(j => {
-      const s = j.Sektor || "Tidak tertera";
+      const s = getJobSector(j.Perusahaan);
       sectorQuota[s] = (sectorQuota[s] || 0) + j.preciseKuota;
       sectorCountsForQuota[s] = (sectorCountsForQuota[s] || 0) + 1;
     });
@@ -1007,7 +1027,7 @@ export default function App() {
     const sectorApplicants = {};
     const sectorQuotaForComp = {};
     listingsWithStats.forEach(j => {
-      const s = j.Sektor || "Tidak tertera";
+      const s = getJobSector(j.Perusahaan);
       sectorApplicants[s] = (sectorApplicants[s] || 0) + j.precisePelamar;
       sectorQuotaForComp[s] = (sectorQuotaForComp[s] || 0) + j.preciseKuota;
     });
@@ -1193,6 +1213,22 @@ export default function App() {
     else if (skillName.includes("AutoCAD") || skillName.includes("CAD")) query = "autocad";
     else if (skillName.includes("Data") || skillName.includes("Analytics")) query = "data analytics";
     else if (skillName.includes("Desain") || skillName.includes("Canva")) query = "adobe";
+    
+    if (query) {
+      setSearch(query);
+      setDraftSearch(query);
+      setViewTab("gallery");
+    }
+  };
+
+  const handleSectorChartClick = (sectorName) => {
+    let query = "";
+    if (sectorName.includes("Hulu")) query = "hulu";
+    else if (sectorName.includes("Hilir") || sectorName.includes("Patra")) query = "patra niaga";
+    else if (sectorName.includes("Logistik") || sectorName.includes("shipping")) query = "shipping";
+    else if (sectorName.includes("Power")) query = "power";
+    else if (sectorName.includes("Gas")) query = "gas";
+    else if (sectorName.includes("Holding")) query = "persero";
     
     if (query) {
       setSearch(query);
@@ -2297,16 +2333,21 @@ export default function App() {
                         const maxCount = analyticsData.sectorBreakdown[0]?.count || 1;
                         const pct = (item.count / maxCount) * 100;
                         return (
-                          <div key={idx} className="flex flex-col gap-1.5">
+                          <div 
+                            key={idx} 
+                            onClick={() => handleSectorChartClick(item.name)}
+                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
+                            title={`Klik untuk filter: ${item.name}`}
+                          >
                             <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
                               <span className="text-[#8a8a86] font-semibold text-[11px]">
                                 {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
                               </span>
                             </div>
                             <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-[#0d9488] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#0d9488] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -2417,16 +2458,21 @@ export default function App() {
                         const maxQuota = analyticsData.avgQuotaPerSector[0]?.avgQuota || 1;
                         const pct = (item.avgQuota / maxQuota) * 100;
                         return (
-                          <div key={idx} className="flex flex-col gap-1.5">
+                          <div 
+                            key={idx} 
+                            onClick={() => handleSectorChartClick(item.name)}
+                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
+                            title={`Klik untuk filter: ${item.name}`}
+                          >
                             <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
                               <span className="text-[#8a8a86] font-semibold text-[11px]">
                                 {item.avgQuota} Orang / Loker
                               </span>
                             </div>
                             <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-[#1d7bb8] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#1d7bb8] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -2448,16 +2494,21 @@ export default function App() {
                         const maxRatio = analyticsData.sectoralCompetitionIndex[0]?.ratio || 1;
                         const pct = (item.ratio / maxRatio) * 100;
                         return (
-                          <div key={idx} className="flex flex-col gap-1.5">
+                          <div 
+                            key={idx} 
+                            onClick={() => handleSectorChartClick(item.name)}
+                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
+                            title={`Klik untuk filter: ${item.name}`}
+                          >
                             <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
                               <span className="text-[#c52447] font-bold text-[11px]">
                                 1 : {item.ratio} <span className="text-[#8a8a86] font-normal">({item.passRate}% lolos)</span>
                               </span>
                             </div>
                             <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-[#c52447] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#c52447] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
