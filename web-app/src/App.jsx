@@ -1096,9 +1096,28 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <div className={`p-4 border-t border-[#edece9]/50 text-[10px] text-[#9b9a97] text-center flex-shrink-0 bg-[#f7f7f5]/20 ${sidebarOpen ? "block" : "hidden"
+        <div className={`p-4 border-t border-[#edece9]/50 text-[10.5px] text-[#8a8a86] leading-relaxed flex-shrink-0 bg-[#f7f7f5]/20 ${sidebarOpen ? "block" : "hidden"
           }`}>
-          &copy; 2026 KarirEnergi
+          <div className="flex flex-col gap-1 text-left">
+            <div className="font-bold text-[#5a5a57]">&copy; 2026 KarirEnergi</div>
+            <div>
+              Situs non-resmi (Non-Official). Semua konten database bersumber dari portal rekrutmen PT Pertamina (Persero).
+            </div>
+            <div className="font-semibold text-[#c52447] mt-0.5">
+              Seluruh karya KarirEnergi tidak untuk diperjualbelikan (GRATIS).
+            </div>
+            <div className="mt-1.5 pt-1.5 border-t border-[#edece9] flex items-center gap-1">
+              <span>Source:</span>
+              <a
+                href="https://www.threads.net/@mocitaz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#1d7bb8] hover:underline font-bold"
+              >
+                threads/@mocitaz
+              </a>
+            </div>
+          </div>
         </div>
       </aside>
 
@@ -2182,10 +2201,16 @@ export default function App() {
               )}
 
               {/* Informational Section */}
-              <div className="flex flex-col gap-1.5 p-3.5 bg-[#f7f7f5]/30 rounded-xl border border-[#edece9]/40 text-[12.5px] text-[#5a5a57] leading-relaxed">
+              <div className="flex flex-col gap-2.5 p-3.5 bg-[#f7f7f5]/40 rounded-xl border border-[#edece9] text-[12px] text-[#5a5a57] leading-relaxed">
                 <p>
-                  Program magang ini diposkan langsung oleh pihak <strong>{selectedJob["Perusahaan"]}</strong>. Harap verifikasi kesesuaian kualifikasi program studi Anda dan kumpulkan berkas yang diperlukan sebelum mendaftar. Seluruh proses pendaftaran bersifat gratis.
+                  Program magang ini bersumber langsung dari portal resmi rekrutmen <strong>{selectedJob["Perusahaan"]}</strong>. Harap verifikasi kualifikasi Anda sebelum mendaftar. Seluruh proses pendaftaran bersifat gratis.
                 </p>
+                <div className="border-t border-[#edece9]/70 pt-2.5 mt-0.5 text-[11px] text-[#8a8a86] flex flex-col gap-1 select-none">
+                  <span className="font-bold text-[#5a5a57]">Disclamer & Kredit:</span>
+                  <span>• KarirEnergi adalah situs non-resmi (Non-Official). Semua konten database bersumber dari Pertamina.</span>
+                  <span>• Seluruh karya KarirEnergi bersifat gratis dan <strong>TIDAK untuk diperjualbelikan</strong>.</span>
+                  <span>• Ikuti pembuat di Threads: <a href="https://www.threads.net/@mocitaz" target="_blank" rel="noopener noreferrer" className="text-[#1d7bb8] hover:underline font-bold">@mocitaz</a></span>
+                </div>
               </div>
 
             </div>
