@@ -1310,8 +1310,16 @@ export default function App() {
                 <p className="text-[12.5px] text-[#5a5a57] max-w-2xl leading-relaxed">
                   Pelacak independen program magang resmi Pertamina.
                 </p>
-                <div className="text-[10.5px] text-[#9b9a97] mt-0.5">
-                  Terakhir Diupdate: 3 Juli 2026, 22:30 WIB
+                <div className="text-[10.5px] text-[#9b9a97] mt-0.5 flex items-center gap-2.5 flex-wrap">
+                  <span>Terakhir Diupdate: 3 Juli 2026, 22:30 WIB</span>
+                  <span className="text-[#edece9] select-none">•</span>
+                  <div className="flex items-center gap-1.5 text-[#43873e] font-extrabold select-none">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#43873e] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#43873e]"></span>
+                    </span>
+                    <span>{liveVisitors} orang sedang memantau</span>
+                  </div>
                 </div>
               </div>
 
@@ -1618,17 +1626,12 @@ export default function App() {
                     >
                       {/* Top Part */}
                       <div className="flex flex-col gap-2 flex-grow">
-                        {/* Title and Baru Badge */}
-                        <div className="flex items-start gap-1.5 justify-between">
-                          <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5 flex-1">
-                            {job["Judul Lowongan"]}
-                          </h3>
-                          {isJobNew(job["tanggal_ditemukan"]) && (
-                            <span className="text-[9px] font-extrabold bg-[#edf6ec] text-[#43873e] px-1.5 py-0.5 rounded border border-[#43873e]/10 tracking-wide uppercase select-none flex-shrink-0 animate-pulse mt-0.5">
-                              Baru
-                            </span>
-                          )}
-                        </div>
+
+
+                        {/* Title */}
+                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5">
+                          {job["Judul Lowongan"]}
+                        </h3>
 
                         {/* Company Name (underneath title) */}
                         <div className="text-[11px] text-[#8a8a86] font-semibold leading-normal -mt-0.5">
@@ -1738,17 +1741,11 @@ export default function App() {
                                 <Bookmark className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
                               </button>
                             </td>
-                            <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate">{job["Perusahaan"]}</td>
-                            <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate">
-                              <div className="flex items-center gap-1.5 justify-between">
-                                <span className="truncate flex-1" title={job["Judul Lowongan"]}>{job["Judul Lowongan"]}</span>
-                                {isJobNew(job["tanggal_ditemukan"]) && (
-                                  <span className="text-[8px] font-extrabold bg-[#edf6ec] text-[#43873e] px-1 py-0.25 rounded border border-[#43873e]/10 tracking-wide uppercase select-none flex-shrink-0">
-                                    Baru
-                                  </span>
-                                )}
-                              </div>
+                            <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate" title={job["Perusahaan"]}>{job["Perusahaan"]}</td>
+                            <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate" title={job["Judul Lowongan"]}>
+                              {job["Judul Lowongan"]}
                             </td>
+
                             <td className="p-3 border-r border-[#edece9] max-w-[140px] truncate">{job["Kota"]}</td>
                             <td className="p-3 border-r border-[#edece9] font-bold text-[#9041a8] text-center">{job["Pendidikan"]}</td>
                             <td className="p-3 border-r border-[#edece9] text-[#5a5a57]">
