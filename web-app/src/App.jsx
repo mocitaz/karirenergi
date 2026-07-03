@@ -1654,11 +1654,8 @@ export default function App() {
               </button>
             </div>
 
-            {/* Mobile Result Count & Sorting */}
-            <div className="flex items-center justify-between text-[11.5px] text-[#9b9a97] md:hidden pt-1 border-t border-[#edece9]/40">
-              <span>
-                Menampilkan <span className="font-semibold text-[#37352f]">{filteredListings.length}</span> lowongan
-              </span>
+            {/* Mobile Sorting */}
+            <div className="flex items-center justify-end text-[11.5px] text-[#9b9a97] md:hidden pt-1 border-t border-[#edece9]/40">
               <div className="flex items-center gap-1">
                 <span>Urut:</span>
                 <select
@@ -1680,6 +1677,36 @@ export default function App() {
         {/* Dynamic Database Content Area */}
         <div onScroll={handleScroll} className="flex-1 overflow-y-auto px-6 md:px-10 py-5 md:py-6">
           <div className="max-w-6xl mx-auto">
+
+            {/* Results Count Banner */}
+            {viewTab !== "analytics" && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11.5px] text-[#9b9a97] mb-4 select-none bg-[#f7f7f5]/30 border border-[#edece9]/60 px-3 py-2 rounded-md gap-2">
+                <span className="leading-relaxed">
+                  Menampilkan <span className="font-bold text-[#37352f]">{filteredListings.length}</span> dari <span className="font-semibold text-[#8a8a86]">{listings.length}</span> posisi lowongan magang
+                  {(selectedCompany || search || selectedMajor || selectedCity || selectedEdu || selectedSector || showSavedOnly) ? (
+                    <span className="text-[#1d7bb8] ml-1 font-semibold">
+                      (Filter aktif: {[
+                        selectedCompany ? `Instansi: ${selectedCompany}` : "",
+                        search ? `Kata Kunci: "${search}"` : "",
+                        selectedMajor ? `Jurusan: ${selectedMajor}` : "",
+                        selectedCity ? `Kota: ${selectedCity}` : "",
+                        selectedEdu ? `Jenjang: ${selectedEdu}` : "",
+                        selectedSector ? `Sektor: ${selectedSector}` : "",
+                        showSavedOnly ? "Favorit" : ""
+                      ].filter(Boolean).join(", ")})
+                    </span>
+                  ) : null}
+                </span>
+                {(selectedCompany || search || selectedMajor || selectedCity || selectedEdu || selectedSector || showSavedOnly) && (
+                  <button 
+                    onClick={handleResetFilters}
+                    className="text-[#c52447] hover:underline font-bold cursor-pointer self-start sm:self-auto text-left"
+                  >
+                    Reset Filter
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Gallery View */}
             {viewTab === "gallery" && (
