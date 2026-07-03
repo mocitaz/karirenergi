@@ -327,16 +327,14 @@ export default function App() {
       setToastMessage("");
     }, 3000);
   };
-  // Live Visitor State (Real API + Simulated Fallback)
+  // Live Visitor State (Real API + Persistent LocalStorage Cache)
   const [liveVisitors, setLiveVisitors] = useState(() => {
-    const hour = new Date().getHours();
-    let base = 180;
-    if (hour >= 1 && hour <= 6) base = 40;
-    else if (hour >= 7 && hour <= 11) base = 160;
-    else if (hour >= 12 && hour <= 14) base = 220;
-    else if (hour >= 15 && hour <= 17) base = 190;
-    else if (hour >= 18 && hour <= 23) base = 310;
-    return base + Math.floor(Math.random() * 15) - 7;
+    const cached = localStorage.getItem("live_visitors");
+    if (cached) {
+      const parsed = parseInt(cached, 10);
+      if (!isNaN(parsed) && parsed > 0) return parsed;
+    }
+    return 58; // Stable initial fallback count
   });
 
   useEffect(() => {
@@ -349,6 +347,7 @@ export default function App() {
         .then((data) => {
           if (data && typeof data.active_visitors === "number") {
             setLiveVisitors(data.active_visitors);
+            localStorage.setItem("live_visitors", String(data.active_visitors));
           }
         })
         .catch(() => {
@@ -356,7 +355,9 @@ export default function App() {
           setLiveVisitors((prev) => {
             const change = Math.floor(Math.random() * 3) - 1;
             const nextVal = prev + change;
-            return Math.max(5, Math.min(450, nextVal));
+            const val = Math.max(5, Math.min(450, nextVal));
+            localStorage.setItem("live_visitors", String(val));
+            return val;
           });
         });
     };
@@ -1704,19 +1705,11 @@ export default function App() {
                     >
                       {/* Top Part */}
                       <div className="flex flex-col gap-2 flex-grow">
-                        {/* Company Badge & Deadline Warning */}
-                        <div className="flex items-center justify-between gap-2 select-none">
+                        {/* Company Badge */}
+                        <div className="flex items-center select-none">
                           <span className={`text-[8.5px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wider ${tagColor.bg} ${tagColor.text}`}>
                             {job["Perusahaan"].replace("PT ", "")}
                           </span>
-                          {(() => {
-                            const deadline = getDeadlineText();
-                            return (
-                              <span className={`text-[8.5px] px-1.5 py-0.5 rounded-sm font-bold border ${deadline.color}`}>
-                                {deadline.text}
-                              </span>
-                            );
-                          })()}
                         </div>
 
                         {/* Title */}
@@ -1833,18 +1826,8 @@ export default function App() {
                               </button>
                             </td>
                             <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate" title={job["Perusahaan"]}>{job["Perusahaan"]}</td>
-                            <td className="p-3 border-r border-[#edece9] max-w-[240px] select-none" title={job["Judul Lowongan"]}>
-                              <div className="flex flex-col gap-1">
-                                <span className="font-semibold text-[#1d7bb8] truncate">{job["Judul Lowongan"]}</span>
-                                {(() => {
-                                  const deadline = getDeadlineText();
-                                  return (
-                                    <span className={`text-[8.5px] px-1.5 py-0.25 rounded-sm font-bold border w-fit ${deadline.color}`}>
-                                      {deadline.text}
-                                    </span>
-                                  );
-                                })()}
-                              </div>
+                            <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate" title={job["Judul Lowongan"]}>
+                              {job["Judul Lowongan"]}
                             </td>
 
                             <td className="p-3 border-r border-[#edece9] max-w-[140px] truncate">{job["Kota"]}</td>
@@ -2342,16 +2325,8 @@ export default function App() {
                 <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#37352f] leading-snug tracking-tight">
                   {selectedJob["Judul Lowongan"]}
                 </h2>
-                <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#8a8a86] font-medium mt-0.5 select-none">
-                  <span>{selectedJob["Perusahaan"]}</span>
-                  {(() => {
-                    const deadline = getDeadlineText();
-                    return (
-                      <span className={`text-[8.5px] px-1.5 py-0.5 rounded-sm font-bold border ${deadline.color}`}>
-                        {deadline.text}
-                      </span>
-                    );
-                  })()}
+                <div className="text-[12.5px] text-[#8a8a86] font-medium mt-0.5">
+                  {selectedJob["Perusahaan"]}
                 </div>
               </div>
 
