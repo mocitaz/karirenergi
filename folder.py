@@ -46,6 +46,12 @@
             <div style="display: flex; justify-content: space-between;"><span>Status:</span><span id="scrape-status" style="color: #ffb74d; font-weight: bold;">Mencari halaman...</span></div>
             <div style="display: flex; justify-content: space-between;"><span>Halaman Aktif:</span><span id="scrape-page" style="font-weight: bold; color: #4fc3f7;">1</span></div>
             <div style="display: flex; justify-content: space-between;"><span>Loker Terdeteksi:</span><span id="scrape-count" style="font-weight: bold; color: #81c784;">0</span></div>
+            <div id="scrape-eta-wrapper" style="display: none; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 4px; margin-top: 2px;">
+                <span>Sisa Waktu (ETA):</span><span id="scrape-eta" style="font-weight: bold; color: #e57373;">-</span>
+            </div>
+            <div id="scrape-speed-wrapper" style="display: none; justify-content: space-between;">
+                <span>Kecepatan:</span><span id="scrape-speed" style="font-weight: bold; color: #81c784;">-</span>
+            </div>
             <div style="margin: 14px 0 10px 0;">
                 <div style="display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">
                     <span>Progress Pemindaian</span>
@@ -177,6 +183,8 @@
         }
 
         console.log(`Pindah ke halaman ${pageNum + 1}...`);
+        nextBtn.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        await new Promise(resolve => setTimeout(resolve, 200));
         nextBtn.click();
         pageNum++;
         
@@ -187,7 +195,10 @@
     // Menggunakan iframe untuk mengeksekusi Client-Side JS Pertamina agar data Kota/Industri ter-render sempurna
     if (uniqueJobs.length > 0 && !stopScraping) {
         document.getElementById("scrape-status").innerText = "Menghubungkan detail...";
+        document.getElementById("scrape-eta-wrapper").style.display = "flex";
+        document.getElementById("scrape-speed-wrapper").style.display = "flex";
         
+        const phase2Start = Date.now();
         const concurrency = 5; 
         let currentIndex = 0;
 
@@ -216,6 +227,17 @@
                 document.getElementById("scrape-status").innerText = `Memindai (${index + 1}/${uniqueJobs.length})`;
                 document.getElementById("scrape-progress").style.width = `${progressPercent}%`;
                 document.getElementById("scrape-progress-text").innerText = `${progressPercent}%`;
+
+                // Calculate Speed and ETA
+                if (index > 0) {
+                    const elapsed = (Date.now() - phase2Start) / 1000;
+                    const avgTime = elapsed / index;
+                    const remaining = uniqueJobs.length - (index + 1);
+                    const eta = Math.round(avgTime * remaining);
+                    const etaText = eta > 60 ? `${Math.floor(eta / 60)}m ${eta % 60}s` : `${eta}s`;
+                    document.getElementById("scrape-eta").innerText = etaText;
+                    document.getElementById("scrape-speed").innerText = `${avgTime.toFixed(1)}s / loker`;
+                }
 
                 try {
                     iframe.src = job.detailUrl;
@@ -510,6 +532,11 @@
         document.getElementById("scrape-status").style.color = "#81c784";
         document.getElementById("scrape-progress").style.backgroundColor = "#81c784";
         document.getElementById("scrape-progress-text").innerText = "100%";
+        
+        const etaWrap = document.getElementById("scrape-eta-wrapper");
+        if (etaWrap) etaWrap.style.display = "none";
+        const speedWrap = document.getElementById("scrape-speed-wrapper");
+        if (speedWrap) speedWrap.style.display = "none";
 
         // Hilangkan tombol Hentikan Scraping
         const btnStop = document.getElementById("btn-stop-download");
