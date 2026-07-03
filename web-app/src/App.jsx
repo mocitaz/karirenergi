@@ -1382,16 +1382,10 @@ export default function App() {
                     <div
                       key={job["Link Detail"]}
                       onClick={() => setSelectedJob(job)}
-                      className="group border border-[#edece9] rounded-lg p-4 flex flex-col justify-between gap-3.5 cursor-pointer hover:border-[#dfdfde] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all bg-white"
+                      className="group border border-[#edece9] rounded-lg p-4 flex flex-col justify-between cursor-pointer hover:border-[#dfdfde] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all bg-white"
                     >
-                      <div className="flex flex-col gap-2">
-                        {/* Tags Row */}
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-semibold text-[#5a5a57] bg-[#edece9]/40 border border-[#edece9]/70 px-2 py-0.5 rounded-full select-none">
-                            {job["Pendidikan"]}
-                          </span>
-                        </div>
-
+                      {/* Top Part */}
+                      <div className="flex flex-col gap-2 flex-grow">
                         {/* Title */}
                         <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5">
                           {job["Judul Lowongan"]}
@@ -1402,28 +1396,32 @@ export default function App() {
                           {job["Perusahaan"]}
                         </div>
 
-                        {/* Majors list */}
-                        {majorTags.length > 0 && (
-                           <div className="flex flex-wrap gap-1.5 mt-1">
-                             {majorTags.map((tag, idx) => (
-                               <span key={idx} className="text-[10px] bg-[#f7f7f5] text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm truncate max-w-[105px]">
-                                 {tag}
-                               </span>
-                             ))}
-                           </div>
-                        )}
+                        {/* Majors & Education list */}
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          <span className="text-[10px] bg-[#edece9]/50 text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm font-semibold flex-shrink-0 select-none">
+                            {job["Pendidikan"]}
+                          </span>
+                          {majorTags.map((tag, idx) => (
+                            <span key={idx} className="text-[10px] bg-[#f7f7f5] text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm truncate max-w-[105px]">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
 
                         {/* Location */}
                         <div className="flex items-center gap-1.5 text-[11px] text-[#5a5a57] mt-0.5">
                           <MapPin className="w-3.5 h-3.5 text-[#9b9a97] flex-shrink-0" />
                           <span className="truncate">{job["Kota"]}</span>
                         </div>
+                      </div>
 
+                      {/* Bottom Part (Static Mini Panel & Footer) */}
+                      <div className="mt-3.5 flex flex-col gap-3.5">
                         {/* Quota & Applicants Mini Panel */}
                         {(() => {
                           const comp = getCompetitionLevel(stats.passRate);
                           return (
-                            <div className="grid grid-cols-4 bg-[#f7f7f5]/60 rounded py-2 px-1 text-center text-[10px] border border-[#edece9]/50 mt-2 divide-x divide-[#edece9]/50">
+                            <div className="grid grid-cols-4 bg-[#f7f7f5]/60 rounded py-2 px-1 text-center text-[10px] border border-[#edece9]/50 divide-x divide-[#edece9]/50">
                               <div className="flex flex-col justify-center px-0.5">
                                 <span className="text-[#9b9a97] text-[7.5px] font-bold uppercase tracking-wider">Kuota</span>
                                 <span className="text-[#37352f] font-bold text-[10.5px] mt-0.5 leading-tight">{stats.kuota}</span>
@@ -1443,21 +1441,21 @@ export default function App() {
                             </div>
                           );
                         })()}
-                      </div>
 
-                      {/* Footer border / info */}
-                      <div className="flex items-center justify-between text-[11px] pt-2.5 border-t border-[#edece9]/50 text-[#9b9a97]">
-                        <span className="group-hover:text-[#1d7bb8] transition-colors flex items-center gap-1 font-medium">
-                          Detail Loker
-                          <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-                        </span>
-                        <button
-                          onClick={(e) => toggleSaveJob(job["Link Detail"], e)}
-                          className="p-1 rounded hover:bg-[#edece9] text-[#9b9a97] hover:text-[#b78103] transition-colors cursor-pointer flex items-center justify-center"
-                          title={savedJobs.includes(job["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
-                        >
-                          <Bookmark className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
-                        </button>
+                        {/* Footer border / info */}
+                        <div className="flex items-center justify-between text-[11px] pt-2.5 border-t border-[#edece9]/50 text-[#9b9a97]">
+                          <span className="group-hover:text-[#1d7bb8] transition-colors flex items-center gap-1 font-medium">
+                            Detail Loker
+                            <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                          </span>
+                          <button
+                            onClick={(e) => toggleSaveJob(job["Link Detail"], e)}
+                            className="p-1 rounded hover:bg-[#edece9] text-[#9b9a97] hover:text-[#b78103] transition-colors cursor-pointer flex items-center justify-center"
+                            title={savedJobs.includes(job["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
+                          >
+                            <Bookmark className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
