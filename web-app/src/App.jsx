@@ -1969,15 +1969,13 @@ export default function App() {
             <div className="flex-1 overflow-y-auto px-5 md:px-8 pt-5 pb-6 flex flex-col gap-5">
 
               {/* Job Title & Corporate Identity */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#1d7bb8] bg-[#e8f4fa] px-2.5 py-0.5 rounded-full border border-[#1d7bb8]/15">
-                    {selectedJob["Perusahaan"]}
-                  </span>
-                </div>
-                <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#37352f] leading-snug tracking-tight mt-1">
+              <div className="flex flex-col gap-1">
+                <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#37352f] leading-snug tracking-tight">
                   {selectedJob["Judul Lowongan"]}
                 </h2>
+                <div className="text-[12.5px] text-[#5a5a57] font-medium mt-0.5">
+                  {selectedJob["Perusahaan"]}
+                </div>
               </div>
 
               {/* 2-Column Responsive Dashboard Layout */}
