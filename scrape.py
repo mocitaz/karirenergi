@@ -38,7 +38,7 @@ REQUIREMENT_KEYWORDS = [
     "editing", "visualisasi", "stakeholder", "speaking", "planning", 
     "strategic", "event", "office", "ms.", "microsoft", "kualifikasi", "requirements", 
     "tata kelola", "document", "analisa", "pengolahan", "penyusunan",
-    "git", "coding", "software", "application", "cloud", "java", "python", "javascript", 
+    "git", "coding", "application", "cloud", "java", "python", "javascript", 
     "html", "css", "sql", "c++", "c#", "php", "golang", "rust", "react", "node", "aws", 
     "docker", "kubernetes", "figma", "ui/ux", "hardskill", "softskill", "skills", 
     "knowledge", "ability", "capability", "experience", "understanding", "interest", 
