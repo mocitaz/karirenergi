@@ -247,6 +247,7 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [visibleLimit, setVisibleLimit] = useState(24);
+  const [hoveredCorrelationPoint, setHoveredCorrelationPoint] = useState(null);
 
   // Bookmarking / Saved Jobs State
   const [savedJobs, setSavedJobs] = useState(() => {
@@ -989,6 +990,101 @@ export default function App() {
       percentage: totalJobs > 0 ? Math.round((industryCounts[name] / totalJobs) * 100) : 0
     })).sort((a, b) => b.count - a.count).slice(0, 6);
 
+    // 1. Quota per Sector for "Average Quota per Position"
+    const sectorQuota = {};
+    const sectorCountsForQuota = {};
+    listingsWithStats.forEach(j => {
+      const s = j.Sektor || "Tidak tertera";
+      sectorQuota[s] = (sectorQuota[s] || 0) + j.preciseKuota;
+      sectorCountsForQuota[s] = (sectorCountsForQuota[s] || 0) + 1;
+    });
+    const avgQuotaPerSector = Object.keys(sectorCountsForQuota).map(name => ({
+      name,
+      avgQuota: parseFloat((sectorQuota[name] / sectorCountsForQuota[name]).toFixed(1))
+    })).sort((a, b) => b.avgQuota - a.avgQuota);
+
+    // 2. Sectoral Competition Index
+    const sectorApplicants = {};
+    const sectorQuotaForComp = {};
+    listingsWithStats.forEach(j => {
+      const s = j.Sektor || "Tidak tertera";
+      sectorApplicants[s] = (sectorApplicants[s] || 0) + j.precisePelamar;
+      sectorQuotaForComp[s] = (sectorQuotaForComp[s] || 0) + j.preciseKuota;
+    });
+    const sectoralCompetitionIndex = Object.keys(sectorQuotaForComp).map(name => {
+      const q = sectorQuotaForComp[name];
+      const p = sectorApplicants[name];
+      const ratio = q > 0 ? (p / q) : 0;
+      return {
+        name,
+        ratio: Math.round(ratio),
+        passRate: p > 0 ? ((q / p) * 100).toFixed(2) : "0.00"
+      };
+    }).sort((a, b) => b.ratio - a.ratio);
+
+    // 3. Matriks Korelasi Ukuran Kuota vs Minat Pelamar
+    const quotaGroups = {
+      "Kuota 1": { count: 0, applicants: 0 },
+      "Kuota 2-4": { count: 0, applicants: 0 },
+      "Kuota 5-9": { count: 0, applicants: 0 },
+      "Kuota 10+": { count: 0, applicants: 0 }
+    };
+    listingsWithStats.forEach(j => {
+      const q = j.preciseKuota;
+      const p = j.precisePelamar;
+      if (q === 1) {
+        quotaGroups["Kuota 1"].count++;
+        quotaGroups["Kuota 1"].applicants += p;
+      } else if (q >= 2 && q <= 4) {
+        quotaGroups["Kuota 2-4"].count++;
+        quotaGroups["Kuota 2-4"].applicants += p;
+      } else if (q >= 5 && q <= 9) {
+        quotaGroups["Kuota 5-9"].count++;
+        quotaGroups["Kuota 5-9"].applicants += p;
+      } else {
+        quotaGroups["Kuota 10+"].count++;
+        quotaGroups["Kuota 10+"].applicants += p;
+      }
+    });
+    const quotaCorrelation = Object.keys(quotaGroups).map(name => {
+      const data = quotaGroups[name];
+      return {
+        name,
+        avgApplicants: data.count > 0 ? Math.round(data.applicants / data.count) : 0,
+        totalJobs: data.count
+      };
+    });
+
+    // 4. Kluster Kata Kunci Keahlian Teknis Terpopuler
+    const skillKeywords = [
+      { label: "Ms. Excel / Spreadsheet", keys: ["excel", "spreadsheet", "word", "office"] },
+      { label: "SQL / Database", keys: ["sql", "database", "query"] },
+      { label: "Python / Programming", keys: ["python", "programming", "developer", "coding", "java", "html", "css", "javascript"] },
+      { label: "HSE / Keselamatan Kerja", keys: ["hse", "k3", "safety", "keselamatan", "kesehatan kerja"] },
+      { label: "Project Management", keys: ["project management", "pm ", "agile", "scrum", "manajemen proyek"] },
+      { label: "AutoCAD / Desain CAD", keys: ["autocad", "design engineering", "cad ", "solidwork", "3d modeling"] },
+      { label: "Data Analytics & BI", keys: ["data analytics", "data analysis", "tableau", "powerbi", "power bi", "analisis data"] },
+      { label: "Desain Adobe / Canva", keys: ["adobe", "photoshop", "illustrator", "design graphic", "canva", "desain grafis"] }
+    ];
+    const skillCounts = {};
+    skillKeywords.forEach(sk => {
+      skillCounts[sk.label] = 0;
+    });
+    listingsWithStats.forEach(j => {
+      const desc = ((j["Deskripsi"] || "") + " " + (j["Persyaratan"] || "")).toLowerCase();
+      skillKeywords.forEach(sk => {
+        const matches = sk.keys.some(k => desc.includes(k));
+        if (matches) {
+          skillCounts[sk.label]++;
+        }
+      });
+    });
+    const topSkills = Object.keys(skillCounts).map(name => ({
+      name,
+      count: skillCounts[name],
+      percentage: totalJobs > 0 ? Math.round((skillCounts[name] / totalJobs) * 100) : 0
+    })).sort((a, b) => b.count - a.count);
+
     return {
       totalJobs,
       totalQuota,
@@ -1006,7 +1102,11 @@ export default function App() {
       regionalDistribution,
       avgPassRateByCompany,
       sectorBreakdown,
-      industryBreakdown
+      industryBreakdown,
+      avgQuotaPerSector,
+      sectoralCompetitionIndex,
+      quotaCorrelation,
+      topSkills
     };
   }, [filteredListings]);
 
@@ -1077,6 +1177,24 @@ export default function App() {
     setSelectedCity(cityName);
     setDraftCity(cityName);
     setViewTab("gallery");
+  };
+
+  const handleSkillChartClick = (skillName) => {
+    let query = "";
+    if (skillName.includes("Excel")) query = "excel";
+    else if (skillName.includes("SQL")) query = "sql";
+    else if (skillName.includes("Python")) query = "python";
+    else if (skillName.includes("HSE") || skillName.includes("Keselamatan")) query = "hse";
+    else if (skillName.includes("Project")) query = "project management";
+    else if (skillName.includes("AutoCAD") || skillName.includes("CAD")) query = "autocad";
+    else if (skillName.includes("Data") || skillName.includes("Analytics")) query = "data analytics";
+    else if (skillName.includes("Desain") || skillName.includes("Canva")) query = "adobe";
+    
+    if (query) {
+      setSearch(query);
+      setDraftSearch(query);
+      setViewTab("gallery");
+    }
   };
 
   return (
@@ -2279,6 +2397,181 @@ export default function App() {
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+
+                  {/* Row 7: Rata-Rata Kuota per Lowongan vs Indeks Kompetisi Sektoral */}
+                  {/* Card 13: Rata-Rata Kuota per Lowongan (Sektor) */}
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Rata-Rata Kuota per Lowongan (Sektor)</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Rata-rata alokasi kursi magang per lowongan berdasarkan sektor kerja</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.avgQuotaPerSector.map((item, idx) => {
+                        const maxQuota = analyticsData.avgQuotaPerSector[0]?.avgQuota || 1;
+                        const pct = (item.avgQuota / maxQuota) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1.5">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                {item.avgQuota} Orang / Loker
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#1d7bb8] h-full rounded-full transition-all duration-500" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Card 14: Indeks Kompetisi Sektoral */}
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Indeks Kompetisi Sektoral</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Rasio keketatan jumlah pelamar dibanding kuota per sektor kerja (1 : X Pelamar)</p>
+                    </div>
+
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.sectoralCompetitionIndex.map((item, idx) => {
+                        const maxRatio = analyticsData.sectoralCompetitionIndex[0]?.ratio || 1;
+                        const pct = (item.ratio / maxRatio) * 100;
+                        return (
+                          <div key={idx} className="flex flex-col gap-1.5">
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f]">{item.name}</span>
+                              <span className="text-[#c52447] font-bold text-[11px]">
+                                1 : {item.ratio} <span className="text-[#8a8a86] font-normal">({item.passRate}% lolos)</span>
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#c52447] h-full rounded-full transition-all duration-500" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Row 8: Korelasi Kuota vs Minat Pelamar vs Keahlian Teknis Terpopuler */}
+                  {/* Card 15: Korelasi Kuota vs Minat Pelamar */}
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full relative group">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Korelasi Kuota vs Minat Pelamar</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Rata-rata pendaftar berdasarkan rentang kuota kursi lowongan (Arahkan kursor pada titik)</p>
+                    </div>
+
+                    <div className="mt-4 flex flex-col items-center justify-center flex-grow">
+                      {(() => {
+                        const maxVal = Math.max(...analyticsData.quotaCorrelation.map(d => d.avgApplicants), 1);
+                        const points = analyticsData.quotaCorrelation.map((d, i) => {
+                          const x = 50 + i * 100;
+                          const y = 120 - (d.avgApplicants / maxVal) * 85;
+                          return { x, y, ...d };
+                        });
+                        
+                        // Construct SVG path string
+                        const pathD = `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} L ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y}`;
+                        const areaD = `M ${points[0].x} 130 L ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} L ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y} L ${points[3].x} 130 Z`;
+
+                        return (
+                          <div className="w-full relative flex flex-col items-center">
+                            <svg className="w-full max-w-[420px] h-40 overflow-visible" viewBox="0 0 400 150">
+                              {/* Horizontal Grid lines */}
+                              <line x1="40" y1="35" x2="370" y2="35" stroke="#edece9" strokeWidth="0.8" strokeDasharray="4 4" />
+                              <line x1="40" y1="80" x2="370" y2="80" stroke="#edece9" strokeWidth="0.8" strokeDasharray="4 4" />
+                              <line x1="40" y1="125" x2="370" y2="125" stroke="#edece9" strokeWidth="1" />
+                              
+                              {/* Y Grid labels */}
+                              <text x="35" y="38" textAnchor="end" className="text-[9px] fill-[#8a8a86] font-medium">{Math.round(maxVal)}</text>
+                              <text x="35" y="83" textAnchor="end" className="text-[9px] fill-[#8a8a86] font-medium">{Math.round(maxVal / 2)}</text>
+                              <text x="35" y="128" textAnchor="end" className="text-[9px] fill-[#8a8a86] font-medium">0</text>
+
+                              {/* Shaded Area */}
+                              <path d={areaD} fill="url(#blueGrad)" className="opacity-15 transition-opacity" />
+                              
+                              {/* Connecting Line */}
+                              <path d={pathD} fill="none" stroke="#1d7bb8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+
+                              {/* Interactive Dots */}
+                              {points.map((pt, idx) => (
+                                <g 
+                                  key={idx}
+                                  onMouseEnter={() => setHoveredCorrelationPoint(idx)}
+                                  onMouseLeave={() => setHoveredCorrelationPoint(null)}
+                                  className="cursor-pointer"
+                                >
+                                  {/* Pulsing ring on hover */}
+                                  {hoveredCorrelationPoint === idx && (
+                                    <circle cx={pt.x} cy={pt.y} r="10" fill="#1d7bb8" className="opacity-30 animate-pulse" />
+                                  )}
+                                  <circle cx={pt.x} cy={pt.y} r="5" fill="#1d7bb8" stroke="white" strokeWidth="1.5" className="transition-all duration-200" />
+                                </g>
+                              ))}
+
+                              {/* X Grid labels */}
+                              {points.map((pt, idx) => (
+                                <text key={idx} x={pt.x} y="145" textAnchor="middle" className="text-[9px] fill-[#5a5a57] font-semibold">
+                                  {pt.name}
+                                </text>
+                              ))}
+
+                              {/* Gradients */}
+                              <defs>
+                                <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#1d7bb8" />
+                                  <stop offset="100%" stopColor="#1d7bb8" stopOpacity="0" />
+                                </linearGradient>
+                              </defs>
+                            </svg>
+
+                            {/* Dynamic Tooltip inside the card */}
+                            <div className="h-6 mt-1.5 flex items-center justify-center">
+                              {hoveredCorrelationPoint !== null ? (
+                                <div className="text-[11px] font-bold text-[#1d7bb8] animate-fade-in bg-[#1d7bb8]/5 border border-[#1d7bb8]/25 rounded px-2.5 py-0.5">
+                                  {points[hoveredCorrelationPoint].name}: Rerata <span className="underline">{points[hoveredCorrelationPoint].avgApplicants.toLocaleString()}</span> pelamar ({points[hoveredCorrelationPoint].totalJobs} posisi)
+                                </div>
+                              ) : (
+                                <span className="text-[10px] text-[#8a8a86] italic">Arahkan kursor ke titik grafik untuk detail pendaftar</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Card 16: Keahlian Teknis Terpopuler */}
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-bold text-[14px] text-[#37352f]">Keahlian Teknis Terpopuler</h3>
+                      <p className="text-[11px] text-[#8a8a86]">Kata kunci kemampuan teknis yang paling banyak dicari (Klik tag untuk memfilter)</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-4 flex-grow content-center justify-center">
+                      {analyticsData.topSkills.map((item, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => handleSkillChartClick(item.name)}
+                          className="bg-[#f7f7f5]/80 hover:bg-[#1d7bb8]/10 hover:text-[#1d7bb8] border border-[#edece9] rounded-md px-2.5 py-1.5 text-[11px] font-bold text-[#37352f] cursor-pointer transition-all hover:scale-105 shadow-3xs flex items-center gap-1.5 group/tag"
+                          title={`Klik untuk mencari posisi: ${item.name}`}
+                        >
+                          <span className="group-hover/tag:underline">{item.name}</span>
+                          <span className="text-[9.5px] text-[#8a8a86] bg-[#edece9]/55 group-hover/tag:bg-[#1d7bb8]/20 group-hover/tag:text-[#1d7bb8] rounded px-1 py-0.2">
+                            {item.count} Loker
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
