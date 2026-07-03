@@ -295,7 +295,7 @@ export default function App() {
       setToastMessage("");
     }, 3000);
   };
-  // Simulated Live Visitor State
+  // Live Visitor State (Real API + Simulated Fallback)
   const [liveVisitors, setLiveVisitors] = useState(() => {
     const hour = new Date().getHours();
     let base = 180;
@@ -308,13 +308,29 @@ export default function App() {
   });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveVisitors((prev) => {
-        const change = Math.floor(Math.random() * 5) - 2;
-        const nextVal = prev + change;
-        return Math.max(20, Math.min(450, nextVal));
-      });
-    }, 4500);
+    const fetchVisitors = () => {
+      fetch("/api/active-visitors")
+        .then((res) => {
+          if (!res.ok) throw new Error("API Offline");
+          return res.json();
+        })
+        .then((data) => {
+          if (data && typeof data.active_visitors === "number") {
+            setLiveVisitors(data.active_visitors);
+          }
+        })
+        .catch(() => {
+          // Fallback simulation in case API is down or local development
+          setLiveVisitors((prev) => {
+            const change = Math.floor(Math.random() * 3) - 1;
+            const nextVal = prev + change;
+            return Math.max(5, Math.min(450, nextVal));
+          });
+        });
+    };
+
+    fetchVisitors();
+    const interval = setInterval(fetchVisitors, 15000);
     return () => clearInterval(interval);
   }, []);
 

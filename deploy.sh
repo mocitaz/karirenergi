@@ -63,6 +63,13 @@ server {
         try_files \$uri \$uri/ /index.html;
     }
 
+    # Proxy API real-time visitors backend
+    location /api/active-visitors {
+        proxy_pass http://127.0.0.1:5000/active-visitors;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+
     # Cache static assets
     location ~* \.(?:css|js|jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
         expires 1M;
