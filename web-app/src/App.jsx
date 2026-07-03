@@ -1973,7 +1973,7 @@ export default function App() {
                 <h2 className="text-[18px] md:text-[20px] font-extrabold text-[#37352f] leading-snug tracking-tight">
                   {selectedJob["Judul Lowongan"]}
                 </h2>
-                <div className="text-[12.5px] text-[#5a5a57] font-medium mt-0.5">
+                <div className="text-[12.5px] text-[#8a8a86] font-medium mt-0.5">
                   {selectedJob["Perusahaan"]}
                 </div>
               </div>
