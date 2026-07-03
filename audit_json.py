@@ -54,7 +54,7 @@ REQUIREMENT_KEYWORDS = [
     "observasi", "komunikatif", "leadership", "english", "menulis", "tulisan", 
     "laporan", "minat", "pengalaman", "pemahaman", "proaktif", "attention", 
     "teamwork", "learning", "claims", "contract", "machine learning", "procedure", 
-    "desain", "editing", "visualisasi", "stakeholder", "speaking", "planning", 
+    "editing", "visualisasi", "stakeholder", "speaking", "planning", 
     "strategic", "event", "office", "ms.", "microsoft", "kualifikasi", "requirements", 
     "tata kelola", "document", "analisa", "pengolahan", "penyusunan",
     "git", "coding", "software", "application", "cloud", "java", "python", "javascript", 
@@ -172,7 +172,8 @@ def clean_jurusan(jurusan_str):
         token_lower = token.lower()
         has_keyword = False
         for kw in REQUIREMENT_KEYWORDS:
-            if kw in token_lower:
+            pattern = r'\b' + re.escape(kw) + r'\b'
+            if re.search(pattern, token_lower):
                 has_keyword = True
                 break
         

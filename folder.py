@@ -339,7 +339,7 @@
                             "observasi", "komunikatif", "leadership", "english", "menulis", "tulisan", 
                             "laporan", "minat", "pengalaman", "pemahaman", "proaktif", "attention", 
                             "teamwork", "learning", "claims", "contract", "machine learning", "procedure", 
-                            "desain", "editing", "visualisasi", "stakeholder", "speaking", "planning", 
+                            "editing", "visualisasi", "stakeholder", "speaking", "planning", 
                             "strategic", "event", "office", "ms.", "microsoft", "kualifikasi", "requirements", 
                             "tata kelola", "document", "analisa", "pengolahan", "penyusunan",
                             "git", "coding", "software", "application", "cloud", "java", "python", "javascript", 
@@ -380,7 +380,9 @@
                             let tokenLower = token.toLowerCase();
                             let hasKeyword = false;
                             for (let kw of requirementKeywords) {
-                                if (tokenLower.includes(kw)) {
+                                const escapedKw = kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                                const kwPattern = new RegExp('\\b' + escapedKw + '\\b', 'i');
+                                if (kwPattern.test(tokenLower)) {
                                     hasKeyword = true;
                                     break;
                                 }
