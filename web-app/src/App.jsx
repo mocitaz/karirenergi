@@ -1878,17 +1878,11 @@ export default function App() {
                   </table>
                 </div>
                  {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} onReset={handleResetFilters} />}
-              </div>
-            )}
-
-            {viewTab === "analytics" && (
+                 {viewTab === "analytics" && (
               <div className="flex flex-col gap-6 animate-fade-in pb-10 select-none">
                 
                 {/* Executive Insights Summary Panel */}
-                <div className="bg-gradient-to-r from-[#fbfbfa] via-white to-[#fbfbfa] border border-[#edece9] rounded-xl p-5 shadow-3xs flex flex-col md:flex-row items-start md:items-center justify-between gap-5 select-none relative overflow-hidden group/insight">
-                  {/* Subtle top indicator */}
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1d7bb8] via-[#b78103] to-[#c52447]"></div>
-                  
+                <div className="bg-[#f7f7f5]/55 border border-[#edece9] rounded-lg p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 select-none relative overflow-hidden group/insight">
                   <div className="flex gap-4 items-start md:items-center">
                     <div className="bg-[#edece9]/60 p-2.5 rounded-lg border border-[#edece9] flex-shrink-0 group-hover/insight:scale-105 transition-transform">
                       <TrendingUp className="w-6 h-6 text-[#b78103]" />
@@ -1909,27 +1903,27 @@ export default function App() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-gradient-to-br from-white to-[#fbfbfa]/60 border border-[#edece9] border-t-3 border-t-[#1d7bb8] rounded-xl p-5 flex flex-col gap-1.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
+                  <div className="bg-[#f7f7f5]/50 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs hover:-translate-y-0.5 transition-all duration-300 cursor-default">
                     <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Total Posisi Loker</span>
-                    <span className="text-3xl font-extrabold text-[#37352f] tracking-tight">{analyticsData.totalJobs}</span>
+                    <span className="text-2xl font-extrabold text-[#37352f] tracking-tight">{analyticsData.totalJobs}</span>
                     <span className="text-[10px] text-[#8a8a86] mt-0.5">Aktif di database</span>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-white to-[#fbfbfa]/60 border border-[#edece9] border-t-3 border-t-[#c26100] rounded-xl p-5 flex flex-col gap-1.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
+                  <div className="bg-[#f7f7f5]/50 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs hover:-translate-y-0.5 transition-all duration-300 cursor-default">
                     <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Total Kuota Penerimaan</span>
-                    <span className="text-3xl font-extrabold text-[#c26100] tracking-tight">{analyticsData.totalQuota}</span>
+                    <span className="text-2xl font-extrabold text-[#c26100] tracking-tight">{analyticsData.totalQuota}</span>
                     <span className="text-[10px] text-[#8a8a86] mt-0.5">Orang mahasiswa magang</span>
                   </div>
 
-                  <div className="bg-gradient-to-br from-white to-[#fbfbfa]/60 border border-[#edece9] border-t-3 border-t-[#9041a8] rounded-xl p-5 flex flex-col gap-1.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
+                  <div className="bg-[#f7f7f5]/50 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs hover:-translate-y-0.5 transition-all duration-300 cursor-default">
                     <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Total Pendaftar Aktif</span>
-                    <span className="text-3xl font-extrabold text-[#37352f] tracking-tight">{analyticsData.totalApplicants.toLocaleString()}</span>
+                    <span className="text-2xl font-extrabold text-[#37352f] tracking-tight">{analyticsData.totalApplicants.toLocaleString()}</span>
                     <span className="text-[10px] text-[#8a8a86] mt-0.5">Pelamar terdaftar</span>
                   </div>
 
-                  <div className="bg-gradient-to-br from-white to-[#fbfbfa]/60 border border-[#edece9] border-t-3 border-t-[#c52447] rounded-xl p-5 flex flex-col gap-1.5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
+                  <div className="bg-[#f7f7f5]/50 border border-[#edece9] rounded-lg p-4 flex flex-col gap-1 shadow-3xs hover:-translate-y-0.5 transition-all duration-300 cursor-default">
                     <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Rata-Rata Keketatan</span>
-                    <span className="text-3xl font-extrabold text-[#c52447] tracking-tight">{analyticsData.avgPassRate}%</span>
+                    <span className="text-2xl font-extrabold text-[#c52447] tracking-tight">{analyticsData.avgPassRate}%</span>
                     <span className="text-[10px] text-[#8a8a86] mt-0.5">Peluang kelulusan rata-rata</span>
                   </div>
                 </div>
@@ -1939,7 +1933,7 @@ export default function App() {
                   
                   {/* Row 1: Leaderboard Anak Perusahaan vs Kebutuhan Rumpun Jurusan Terbanyak */}
                   {/* Card 1: Leaderboard Anak Perusahaan */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Leaderboard Anak Perusahaan</h3>
                       <p className="text-[11px] text-[#8a8a86]">Anak perusahaan/subsidiari Pertamina dengan jumlah loker magang terbanyak</p>
@@ -1964,7 +1958,7 @@ export default function App() {
                             </div>
                             <div className="w-full bg-[#edece9]/50 h-2.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-[#b78103] via-[#dca11d] to-[#c26100] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
+                                className="bg-[#b78103] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -1975,7 +1969,7 @@ export default function App() {
                   </div>
 
                   {/* Card 2: Kebutuhan Rumpun Jurusan Terbanyak */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Kebutuhan Rumpun Jurusan Terbanyak</h3>
                       <p className="text-[11px] text-[#8a8a86]">Kategori program studi yang paling sering dicari pada prasyarat pendaftaran</p>
@@ -2000,7 +1994,7 @@ export default function App() {
                             </div>
                             <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-[#1d7bb8] via-[#3a9ad9] to-[#155a8a] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
+                                className="bg-[#1d7bb8] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -2012,7 +2006,7 @@ export default function App() {
 
                   {/* Row 2: Top 5 Posisi Paling Kompetitif vs Top 5 Peluang Lolos Tertinggi */}
                   {/* Card 3: Top 5 Posisi Paling Kompetitif */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Posisi Paling Kompetitif</h3>
                       <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio jumlah pelamar per kuota kursi tertinggi (Klik untuk buka detail)</p>
@@ -2039,7 +2033,7 @@ export default function App() {
                   </div>
 
                   {/* Card 4: Top 5 Peluang Lolos Tertinggi */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Peluang Lolos Tertinggi</h3>
                       <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio persaingan terendah (Paling ramah pelamar - Klik untuk detail)</p>
@@ -2067,7 +2061,7 @@ export default function App() {
 
                   {/* Row 3: Klasifikasi Tingkat Persaingan vs Avg Peluang Lolos Anak Perusahaan */}
                   {/* Card 5: Klasifikasi Tingkat Persaingan */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Klasifikasi Tingkat Persaingan</h3>
                       <p className="text-[11px] text-[#8a8a86]">Distribusi tingkat keketatan persaingan masuk lowongan magang</p>
@@ -2090,7 +2084,7 @@ export default function App() {
                   </div>
 
                   {/* Card 6: Avg Peluang Lolos Anak Perusahaan */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Avg Peluang Lolos Anak Perusahaan</h3>
                       <p className="text-[11px] text-[#8a8a86]">Anak perusahaan Pertamina dengan peluang kelulusan magang rata-rata tertinggi</p>
@@ -2110,7 +2104,7 @@ export default function App() {
 
                   {/* Row 4: Distribusi Lokasi / Kota vs Sebaran Wilayah / Region */}
                   {/* Card 7: Distribusi Lokasi / Kota */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Distribusi Lokasi / Kota</h3>
                       <p className="text-[11px] text-[#8a8a86]">6 Kota teratas dengan sebaran penempatan magang terbanyak</p>
@@ -2135,7 +2129,7 @@ export default function App() {
                   </div>
 
                   {/* Card 8: Sebaran Wilayah / Region */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Wilayah / Region</h3>
                       <p className="text-[11px] text-[#8a8a86]">Pembagian penempatan magang berdasarkan kluster wilayah Indonesia</p>
@@ -2155,7 +2149,7 @@ export default function App() {
                             </div>
                             <div className="w-full bg-[#edece9]/50 h-2 rounded-full overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-[#c26100] to-[#ea580c] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#c26100] h-full rounded-full transition-all duration-500" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -2167,7 +2161,7 @@ export default function App() {
 
                   {/* Row 5: Sebaran Berdasarkan Sektor Kerja vs Analisis Industri Terpopuler */}
                   {/* Card 9: Sebaran Berdasarkan Sektor Kerja */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Berdasarkan Sektor Kerja</h3>
                       <p className="text-[11px] text-[#8a8a86]">Pembagian lowongan magang berdasarkan sektor industri terkait</p>
@@ -2187,7 +2181,7 @@ export default function App() {
                             </div>
                             <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-[#0d9488] to-[#0f766e] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#0d9488] h-full rounded-full transition-all duration-500" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -2198,7 +2192,7 @@ export default function App() {
                   </div>
 
                   {/* Card 10: Analisis Industri Terpopuler */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Analisis Industri Terpopuler</h3>
                       <p className="text-[11px] text-[#8a8a86]">Pembagian lowongan berdasarkan sub-kategori bidang industri</p>
@@ -2218,7 +2212,7 @@ export default function App() {
                             </div>
                             <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-[#8a8a86] to-[#5a5a57] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#8a8a86] h-full rounded-full transition-all duration-500" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -2230,7 +2224,7 @@ export default function App() {
 
                   {/* Row 6: Sebaran Kualifikasi Jenjang Pendidikan vs Kategori Fungsi & Peran Pekerjaan */}
                   {/* Card 11: Sebaran Kualifikasi Jenjang Pendidikan */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Kualifikasi Jenjang Pendidikan</h3>
                       <p className="text-[11px] text-[#8a8a86]">Persentase prasyarat tingkat pendidikan minimal bagi calon pelamar</p>
@@ -2242,7 +2236,7 @@ export default function App() {
                           <span className="text-[12px] font-bold text-[#37352f] w-14">{item.name}</span>
                           <div className="flex-1 bg-[#edece9]/50 h-3.5 rounded overflow-hidden flex">
                             <div 
-                              className="bg-gradient-to-r from-[#9041a8] to-[#701a88] h-full transition-all duration-500 rounded-r" 
+                              className="bg-[#9041a8] h-full transition-all duration-500 rounded-r" 
                               style={{ width: `${item.percentage}%` }}
                             ></div>
                           </div>
@@ -2255,7 +2249,7 @@ export default function App() {
                   </div>
 
                   {/* Card 12: Kategori Fungsi & Peran Pekerjaan */}
-                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Kategori Fungsi & Peran Pekerjaan</h3>
                       <p className="text-[11px] text-[#8a8a86]">Klasifikasi penempatan posisi magang berdasarkan divisi bidang peran</p>
@@ -2275,7 +2269,7 @@ export default function App() {
                             </div>
                             <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
                               <div 
-                                className="bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] h-full rounded-full transition-all duration-500" 
+                                className="bg-[#2563eb] h-full rounded-full transition-all duration-500" 
                                 style={{ width: `${pct}%` }}
                               ></div>
                             </div>
@@ -2288,7 +2282,12 @@ export default function App() {
                 </div>
               </div>
             )}
+            {/* Table View Footer */}
+            {viewTab === "table" && filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} onReset={handleResetFilters} />}
+              </div>
+            )}
 
+            {/* End of Main Content Wrapper */}
           </div>
         </div>
       </main>
