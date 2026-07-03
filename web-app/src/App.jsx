@@ -157,7 +157,7 @@ export function renderDeskripsiPekerjaan(text) {
   });
 }
 
-// Clean and swap title parts: "INTERNSHIP 2026 - PT Company - Position" -> "Position - PT Company"
+// Clean and swap title parts to show only position: "INTERNSHIP 2026 - PT Company - Position" -> "Position"
 export function formatTitle(rawTitle) {
   if (!rawTitle) return "";
   const parts = rawTitle.split(/\s*[-–]\s*/);
@@ -168,17 +168,23 @@ export function formatTitle(rawTitle) {
   const firstPart = parts[0].trim();
   const isInternshipPrefix = /^INTERNSHIP\s*\d*$/i.test(firstPart);
 
+  let title = rawTitle;
   if (isInternshipPrefix) {
     if (parts.length === 2) {
-      return parts[1].trim();
+      title = parts[1].trim();
     } else if (parts.length >= 3) {
-      const company = parts[1].trim();
-      const position = parts.slice(2).join(" - ").trim();
-      return `${position} - ${company}`;
+      title = parts.slice(2).join(" - ").trim();
+    }
+  } else {
+    const lastPart = parts[parts.length - 1].trim();
+    if (/^PT\b|^Persero\b/i.test(lastPart) || lastPart.toLowerCase().includes("pertamina")) {
+      title = parts.slice(0, -1).join(" - ").trim();
+    } else {
+      title = parts.join(" - ").trim();
     }
   }
 
-  return rawTitle;
+  return title.replace(/^INTERNSHIP\s*\d*\s*[-–]?\s*/i, "").trim();
 }
 
 export default function App() {
