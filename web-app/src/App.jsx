@@ -1732,15 +1732,9 @@ export default function App() {
                     >
                       {/* Top Part */}
                       <div className="flex flex-col gap-2 flex-grow">
-                        {/* Company Badge */}
-                        <div className="flex items-center select-none">
-                          <span className={`text-[8.5px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wider ${tagColor.bg} ${tagColor.text}`}>
-                            {job["Perusahaan"].replace("PT ", "")}
-                          </span>
-                        </div>
 
                         {/* Title */}
-                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2 mt-0.5">
+                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2">
                           {job["Judul Lowongan"]}
                         </h3>
 
