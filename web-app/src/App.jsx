@@ -1106,7 +1106,7 @@ export default function App() {
             </div>
 
             <p className="text-[10.5px] text-[#5a5a57] leading-relaxed">
-              Katalog independen. Semua data diperoleh dari rekrutmen resmi Pertamina. Karya ini bersifat gratis & tidak diperjualbelikan.
+              Katalog independen. Semua data diperoleh dari rekrutmen resmi Pertamina. Karya ini bersifat gratis & tidak boleh diperjualbelikan.
             </p>
 
             <a
@@ -2209,7 +2209,7 @@ export default function App() {
                 <div className="border-t border-[#edece9]/70 pt-2.5 mt-0.5 text-[11px] text-[#8a8a86] flex flex-col gap-1 select-none">
                   <span className="font-bold text-[#5a5a57]">Disclamer & Kredit:</span>
                   <span>• KarirEnergi adalah situs non-resmi (Non-Official). Semua konten database bersumber dari Pertamina.</span>
-                  <span>• Seluruh karya KarirEnergi bersifat gratis dan <strong>TIDAK untuk diperjualbelikan</strong>.</span>
+                  <span>• Seluruh karya KarirEnergi bersifat gratis dan <strong>tidak boleh diperjualbelikan</strong>.</span>
                   <span>• Ikuti pembuat di Threads: <a href="https://www.threads.net/@mocitaz" target="_blank" rel="noopener noreferrer" className="text-[#1d7bb8] hover:underline font-bold">@mocitaz</a></span>
                 </div>
               </div>
