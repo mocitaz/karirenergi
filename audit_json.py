@@ -328,7 +328,9 @@ for json_file in json_files:
                     "Jurusan": jurusan,
                     "Link Detail": link,
                     "Kuota": kuota,
-                    "Pelamar": pelamar
+                    "Pelamar": pelamar,
+                    "Deskripsi Pekerjaan": item.get("Deskripsi Pekerjaan", "Tidak tertera"),
+                    "Persyaratan": item.get("Persyaratan", "Tidak tertera")
                 })
     except Exception as e:
         print(f"Error reading {filename}: {e}")

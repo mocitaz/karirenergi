@@ -2097,6 +2097,29 @@ export default function App() {
                 </div>
               </div>
 
+              {/* Job Description & Requirements from Database */}
+              {selectedJob["Deskripsi Pekerjaan"] && selectedJob["Deskripsi Pekerjaan"] !== "Tidak tertera" && (
+                <div className="flex flex-col gap-2 p-4 bg-white rounded-xl border border-[#edece9] text-[13px] text-[#37352f] leading-relaxed shadow-sm">
+                  <h4 className="font-extrabold text-[#37352f] text-[13px] border-b border-[#edece9] pb-2 mb-1.5 flex items-center gap-1.5">
+                    <span>📋</span> Deskripsi Pekerjaan
+                  </h4>
+                  <div className="whitespace-pre-line pl-1.5 text-[#5a5a57]">
+                    {selectedJob["Deskripsi Pekerjaan"]}
+                  </div>
+                </div>
+              )}
+
+              {selectedJob["Persyaratan"] && selectedJob["Persyaratan"] !== "Tidak tertera" && (
+                <div className="flex flex-col gap-2 p-4 bg-white rounded-xl border border-[#edece9] text-[13px] text-[#37352f] leading-relaxed shadow-sm">
+                  <h4 className="font-extrabold text-[#37352f] text-[13px] border-b border-[#edece9] pb-2 mb-1.5 flex items-center gap-1.5">
+                    <span>⚡</span> Persyaratan & Keahlian
+                  </h4>
+                  <div className="whitespace-pre-line pl-1.5 text-[#5a5a57]">
+                    {selectedJob["Persyaratan"]}
+                  </div>
+                </div>
+              )}
+
               {/* Informational Section */}
               <div className="flex flex-col gap-1.5 p-3.5 bg-[#f7f7f5]/30 rounded-xl border border-[#edece9]/40 text-[12.5px] text-[#5a5a57] leading-relaxed">
                 <p>

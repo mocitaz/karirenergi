@@ -418,6 +418,24 @@ def run():
                         val = val[:idx_req].strip()
                     jurusan = clean_jurusan(val)
                     
+                job_desc = "Tidak tertera"
+                requirements = "Tidak tertera"
+                
+                # Extract Job Description & Requirements
+                job_desc_match = re.search(r'Job Description([\s\S]*?)(?=Requirements|$)', full_text, re.IGNORECASE)
+                if job_desc_match:
+                    text = job_desc_match.group(1).strip()
+                    if text.startswith(":"):
+                        text = text[1:].strip()
+                    job_desc = text
+                    
+                req_match = re.search(r'Requirements([\s\S]*?)(?=\$\(document\)\.ready|Apply|$)', full_text, re.IGNORECASE)
+                if req_match:
+                    text = req_match.group(1).strip()
+                    if text.startswith(":"):
+                        text = text[1:].strip()
+                    requirements = text
+
                 hasil_scraping.append({
                     "Judul Lowongan": job["judul"],
                     "Perusahaan": job["perusahaan"],
@@ -428,7 +446,9 @@ def run():
                     "Jurusan": jurusan,
                     "Kuota": job["kuota"],
                     "Pelamar": job["pelamar"],
-                    "Link Detail": job["detailUrl"]
+                    "Link Detail": job["detailUrl"],
+                    "Deskripsi Pekerjaan": job_desc,
+                    "Persyaratan": requirements
                 })
                 
             except Exception as ex:

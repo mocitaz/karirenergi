@@ -329,6 +329,24 @@
                         jurusan = val.trim();
                     }
 
+                    let jobDesc = "Tidak tertera";
+                    let requirements = "Tidak tertera";
+
+                    // Ekstrak Job Description & Requirements secara utuh
+                    const jobDescMatch = fullText.match(/Job Description([\s\S]*?)(?=Requirements|$)/i);
+                    if (jobDescMatch) {
+                        let text = jobDescMatch[1].trim();
+                        if (text.startsWith(":")) text = text.substring(1).trim();
+                        jobDesc = text;
+                    }
+                    
+                    const reqMatch = fullText.match(/Requirements([\s\S]*?)(?=\$\(document\)\.ready|Apply|$)/i);
+                    if (reqMatch) {
+                        let text = reqMatch[1].trim();
+                        if (text.startsWith(":")) text = text.substring(1).trim();
+                        requirements = text;
+                    }
+
                     // Clean Jurusan from script injection & requirements text
                     const cleanJurusanStr = (jStr) => {
                         if (!jStr) return "Semua Jurusan / Tidak Tertera";
@@ -454,7 +472,9 @@
                         "Jurusan": jurusan,
                         "Link Detail": job.detailUrl,
                         "Kuota": job.kuota,
-                        "Pelamar": job.pelamar
+                        "Pelamar": job.pelamar,
+                        "Deskripsi Pekerjaan": jobDesc,
+                        "Persyaratan": requirements
                     });
 
                 } catch (err) {
@@ -493,9 +513,9 @@
             return String(text).replace(/[\r\n]+/g, ' ').replace(/"/g, '""').trim();
         };
 
-        let csvContent = "\uFEFFJudul Lowongan,Perusahaan,Kota,Industri,Sektor,Pendidikan,Jurusan,Link Detail,Kuota,Pelamar\n";
+        let csvContent = "\uFEFFJudul Lowongan,Perusahaan,Kota,Industri,Sektor,Pendidikan,Jurusan,Link Detail,Kuota,Pelamar,Deskripsi Pekerjaan,Persyaratan\n";
         hasilScraping.forEach(row => {
-            csvContent += `"${cleanCSVField(row["Judul Lowongan"])}","${cleanCSVField(row["Perusahaan"])}","${cleanCSVField(row["Kota"])}","${cleanCSVField(row["Industri"])}","${cleanCSVField(row["Sektor"])}","${cleanCSVField(row["Pendidikan"])}","${cleanCSVField(row["Jurusan"])}","${cleanCSVField(row["Link Detail"])}","${row["Kuota"]}","${row["Pelamar"]}"\n`;
+            csvContent += `"${cleanCSVField(row["Judul Lowongan"])}","${cleanCSVField(row["Perusahaan"])}","${cleanCSVField(row["Kota"])}","${cleanCSVField(row["Industri"])}","${cleanCSVField(row["Sektor"])}","${cleanCSVField(row["Pendidikan"])}","${cleanCSVField(row["Jurusan"])}","${cleanCSVField(row["Link Detail"])}","${row["Kuota"]}","${row["Pelamar"]}","${cleanCSVField(row["Deskripsi Pekerjaan"])}","${cleanCSVField(row["Persyaratan"])}"\n`;
         });
 
         // Siapkan File JSON
