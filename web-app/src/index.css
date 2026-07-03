@@ -95,13 +95,20 @@ html.dark .bg-white\/95 {
   border-color: #2e2e2e !important;
 }
 
-/* Specific panels and cards inside layouts */
+/* Translucent panels and cards (Locations, charts, stats grid) */
 html.dark .bg-\[\#f7f7f5\]\/60,
 html.dark .bg-\[\#f7f7f5\]\/55,
+html.dark .bg-\[\#f7f7f5\]\/50,
 html.dark .bg-\[\#f7f7f5\]\/40,
 html.dark .bg-\[\#f7f7f5\]\/30,
 html.dark .bg-\[\#f2f1ee\]\/50,
-html.dark .bg-\[\#f9f9f8\],
+html.dark .bg-\[\#f9f9f8\] {
+  background-color: rgba(255, 255, 255, 0.035) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e3e3e2 !important;
+}
+
+/* Solid gray cards / table headers */
 html.dark .bg-\[\#f7f7f5\] {
   background-color: #252525 !important;
   border-color: #2e2e2e !important;
