@@ -49,7 +49,7 @@ REQUIREMENT_KEYWORDS = [
 
 def clean_jurusan(jurusan_str):
     if not jurusan_str:
-        return "Semua Jurusan / Tidak tertera"
+        return "Semua Jurusan / Tidak Tertera"
     
     dirty_indicator = "$(document).ready"
     if dirty_indicator in jurusan_str:
@@ -59,6 +59,10 @@ def clean_jurusan(jurusan_str):
     # Insert space at camelCase boundary
     cleaned = re.sub(r'([a-z])([A-Z])', r'\1, \2', jurusan_str)
     
+    # Pre-split normalization for K3 variations
+    cleaned = re.sub(r'keselamatan\s+dan\s+kesehatan\s+kerja(?:\s*\(k3\))?', 'Kesehatan & Keselamatan Kerja (K3)', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'keselamatan\s+kesehatan\s+kerja(?:\s*\(k3\))?', 'Kesehatan & Keselamatan Kerja (K3)', cleaned, flags=re.IGNORECASE)
+    
     # Split by separators
     tokens = re.split(r',|;|\bdan\b|\bserta\b', cleaned, flags=re.IGNORECASE)
     
@@ -67,14 +71,74 @@ def clean_jurusan(jurusan_str):
         "design komunikasi visual": "Desain Komunikasi Visual (DKV)",
         "design grafis": "Desain Grafis",
         "dkv": "Desain Komunikasi Visual (DKV)",
+        "all": "Semua Jurusan / Tidak Tertera",
+        "biotechnology": "Bioteknologi",
+        "business anaytics": "Business Analytics",
+        "business information system": "Business Information System",
+        "bussines administration": "Business Administration",
+        "bussines management": "Business Management",
+        "business management": "Business Management",
+        "cyber security / keamanan siber": "Cyber Security / Keamanan Siber",
+        "data science / sains data": "Data Science / Sains Data",
+        "esri arc": "Semua Jurusan / Tidak Tertera",
+        "konsep dasar pengembangan aplikasi": "Semua Jurusan / Tidak Tertera",
+        "security": "Cyber Security",
+        "applied chemistry": "Applied Chemistry",
+        "teknik elektro (fokus di program studi pemrograman it)": "Teknik Elektro",
+        "teknik industri": "Teknik Industri",
+        "teknologi informasi": "Teknologi Informasi",
+        "informatics": "Informatika",
+        "information systems": "Sistem Informasi",
+        "information system": "Sistem Informasi",
+        "information technology": "Teknologi Informasi",
+        "international relations": "Hubungan Internasional",
+        "communications": "Ilmu Komunikasi",
+        "economics": "Ekonomi",
+        "k3": "Kesehatan & Keselamatan Kerja (K3)",
+        "k3u": "Kesehatan & Keselamatan Kerja (K3)",
+        "kesehatan kerja (k3)": "Kesehatan & Keselamatan Kerja (K3)",
+        "kesehatan keselamatan kerja": "Kesehatan & Keselamatan Kerja (K3)",
+        "kesehatan kerja": "Kesehatan & Keselamatan Kerja (K3)",
+        "seluruh teknik": "Semua Jurusan Teknik",
+        "semua jurusan teknik": "Semua Jurusan Teknik",
         "akturia": "Aktuaria",
         "akutansi": "Akuntansi",
         "psiklogi": "Psikologi",
         "admitrasi": "Administrasi",
         "keskatriatan": "Kesekretariatan",
         "hukum pi": "Hukum Pidana",
+        "bisnis management": "Business Management",
+        "electro": "Teknik Elektro",
+        "industrial engineering": "Teknik Industri",
+        "management": "Manajemen",
+        "management / administrasi bisnis": "Manajemen / Administrasi Bisnis",
+        "system computer": "Sistem Komputer",
+        "public relation": "Public Relations",
+        "teknik metallurgy": "Teknik Metalurgi",
     }
     
+    def capitalize_major(major_name):
+        words = major_name.split(" ")
+        capitalized_words = []
+        acronyms = {"it", "dkv", "k3", "tkj", "esri", "s1", "d3", "d4", "hise", "hse", "hrd", "pr", "ai", "dkv)"}
+        for word in words:
+            clean_word = word.strip("()/,.-")
+            if clean_word.lower() in acronyms:
+                capitalized_words.append(word.upper())
+            elif "/" in word:
+                parts = word.split("/")
+                capitalized_parts = [p[0].upper() + p[1:] if len(p) > 1 else p.upper() for p in parts]
+                capitalized_words.append("/".join(capitalized_parts))
+            else:
+                if len(word) > 1:
+                    if word.startswith("("):
+                        capitalized_words.append("(" + word[1].upper() + word[2:])
+                    else:
+                        capitalized_words.append(word[0].upper() + word[1:])
+                else:
+                    capitalized_words.append(word.upper())
+        return " ".join(capitalized_words)
+
     valid_majors = []
     for token in tokens:
         token = token.strip()
@@ -93,8 +157,8 @@ def clean_jurusan(jurusan_str):
         if has_keyword:
             break
             
-        # Apply corrections with word boundary match where appropriate
-        for typo, correction in MAJOR_CORRECTIONS.items():
+        # Apply corrections with word boundary match where appropriate (longest typo first to prevent nesting)
+        for typo, correction in sorted(MAJOR_CORRECTIONS.items(), key=lambda x: len(x[0]), reverse=True):
             if correction.lower() in token.lower():
                 continue
             left_boundary = r'\b' if typo[0].isalnum() else ''
@@ -105,13 +169,14 @@ def clean_jurusan(jurusan_str):
                 token_lower = token.lower()
                 
         token = re.sub(r'\s+', ' ', token).strip()
+        token = capitalize_major(token)
         valid_majors.append(token)
         
     if not valid_majors:
-        return "Semua Jurusan / Tidak tertera"
+        return "Semua Jurusan / Tidak Tertera"
         
     final_str = ", ".join(valid_majors).strip().rstrip(",. ")
-    return final_str if final_str else "Semua Jurusan / Tidak tertera"
+    return final_str if final_str else "Semua Jurusan / Tidak Tertera"
 
 
 def run():

@@ -311,7 +311,7 @@
 
                     // Clean Jurusan from script injection & requirements text
                     const cleanJurusanStr = (jStr) => {
-                        if (!jStr) return "Semua Jurusan / Tidak tertera";
+                        if (!jStr) return "Semua Jurusan / Tidak Tertera";
                         
                         const dirtyIndicator = "$(document).ready";
                         if (jStr.includes(dirtyIndicator)) {
@@ -321,6 +321,10 @@
                         
                         // 1. Insert space at camelCase boundary (e.g. EkonomiMenguasai -> Ekonomi, Menguasai)
                         let cleaned = jStr.replace(/([a-z])([A-Z])/g, '$1, $2');
+                        
+                        // Pre-split normalization for K3 variations
+                        cleaned = cleaned.replace(/keselamatan\s+dan\s+kesehatan\s+kerja(\s*\(k3\))?/gi, 'Kesehatan & Keselamatan Kerja (K3)');
+                        cleaned = cleaned.replace(/keselamatan\s+kesehatan\s+kerja(\s*\(k3\))?/gi, 'Kesehatan & Keselamatan Kerja (K3)');
                         
                         // 2. Split by separators
                         const tokens = cleaned.split(/[,;\n\r]|\band\b|\bdan\b|\bserta\b/i);
@@ -357,7 +361,15 @@
                             "psiklogi": "Psikologi",
                             "admitrasi": "Administrasi",
                             "keskatriatan": "Kesekretariatan",
-                            "hukum pi": "Hukum Pidana"
+                            "hukum pi": "Hukum Pidana",
+                            "bisnis management": "Business Management",
+                            "electro": "Teknik Elektro",
+                            "industrial engineering": "Teknik Industri",
+                            "management": "Manajemen",
+                            "management / administrasi bisnis": "Manajemen / Administrasi Bisnis",
+                            "system computer": "Sistem Komputer",
+                            "public relation": "Public Relations",
+                            "teknik metallurgy": "Teknik Metalurgi"
                         };
 
                         const validMajors = [];
@@ -378,8 +390,9 @@
                                 break;
                             }
                             
-                            // Apply corrections with word boundary match where appropriate
-                            for (let [typo, correction] of Object.entries(majorCorrections)) {
+                            // Apply corrections with word boundary match where appropriate (longest typo first to prevent nesting)
+                            const sortedCorrections = Object.entries(majorCorrections).sort((a, b) => b[0].length - a[0].length);
+                            for (let [typo, correction] of sortedCorrections) {
                                 if (tokenLower.includes(correction.toLowerCase())) {
                                     continue;
                                 }
@@ -398,8 +411,8 @@
                         }
                         
                         if (validMajors.length === 0) {
-                            return "Semua Jurusan / Tidak tertera";
-                        }
+                             return "Semua Jurusan / Tidak Tertera";
+                         }
                         return validMajors.join(", ").trim().replace(/[,.\s]+$/, '');
                     };
                     jurusan = cleanJurusanStr(jurusan);

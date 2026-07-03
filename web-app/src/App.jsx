@@ -372,24 +372,18 @@ export default function App() {
         sectorCounts[job["Sektor"]] = (sectorCounts[job["Sektor"]] || 0) + 1;
       }
 
-      if (job["Jurusan"] && job["Jurusan"] !== "Semua Jurusan / Tidak tertera") {
-        const parts = job["Jurusan"].split(/,|\bserta\b|dan|;/gi);
+      if (job["Jurusan"] && job["Jurusan"] !== "Semua Jurusan / Tidak Tertera" && job["Jurusan"] !== "Semua Jurusan / Tidak tertera") {
+        const parts = job["Jurusan"].split(",");
         const seenMajors = new Set();
         parts.forEach((p) => {
-          const trimmed = p.replace(/[\s\.\-\(\)]+/g, " ").trim();
-          const capitalized = trimmed
-            .split(" ")
-            .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-            .join(" ");
-
+          const trimmed = p.trim();
           if (
-            capitalized &&
-            capitalized.length > 2 &&
-            capitalized.length < 40 &&
-            !capitalized.toLowerCase().includes("tidak tertera") &&
-            !capitalized.toLowerCase().includes("semua jurusan")
+            trimmed &&
+            trimmed.length > 2 &&
+            !trimmed.toLowerCase().includes("tidak tertera") &&
+            !trimmed.toLowerCase().includes("semua jurusan")
           ) {
-            seenMajors.add(capitalized);
+            seenMajors.add(trimmed);
           }
         });
         seenMajors.forEach((m) => {
@@ -1372,7 +1366,7 @@ export default function App() {
                   // Extract first two majors for inline tags
                   const majorTags = job["Jurusan"]
                     ? job["Jurusan"]
-                      .split(/,|\bserta\b|dan|;/gi)
+                      .split(",")
                       .map((j) => j.trim())
                       .filter((j) => j && !j.toLowerCase().includes("tidak tertera") && !j.toLowerCase().includes("semua jurusan"))
                       .slice(0, 2)
@@ -2086,7 +2080,7 @@ export default function App() {
                 </h4>
                 <div className="flex flex-wrap gap-1.5 p-1">
                   {selectedJob["Jurusan"]
-                    .split(/,|\bserta\b|dan|;/gi)
+                    .split(",")
                     .map((j) => j.trim())
                     .filter(Boolean)
                     .map((item, idx) => {
