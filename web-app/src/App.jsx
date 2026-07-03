@@ -1096,25 +1096,29 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <div className={`p-4 border-t border-[#edece9]/50 text-[10.5px] text-[#8a8a86] leading-relaxed flex-shrink-0 bg-[#f7f7f5]/20 ${sidebarOpen ? "block" : "hidden"
-          }`}>
-          <div className="flex flex-col gap-1 text-left">
-            <div className="font-bold text-[#5a5a57]">&copy; 2026 KarirEnergi</div>
-            <div>
-              Situs non-resmi (Non-Official). Semua konten database bersumber dari portal rekrutmen PT Pertamina (Persero).
+        <div className={`p-3.5 border-t border-[#edece9]/50 flex-shrink-0 bg-[#f7f7f5]/30 ${sidebarOpen ? "block" : "hidden"}`}>
+          <div className="flex flex-col gap-2 text-left">
+            <div className="flex items-center justify-between text-[11px] font-bold text-[#37352f] select-none">
+              <span>&copy; 2026 KarirEnergi</span>
+              <span className="text-[9px] font-extrabold bg-[#edf6ec] text-[#43873e] px-1.5 py-0.5 rounded-md border border-[#43873e]/10 tracking-wide uppercase">
+                100% GRATIS
+              </span>
             </div>
-            <div className="font-semibold text-[#c52447] mt-0.5">
-              Seluruh karya KarirEnergi tidak untuk diperjualbelikan (GRATIS).
-            </div>
-            <div className="mt-1.5 pt-1.5 border-t border-[#edece9] flex items-center gap-1">
-              <span>Source:</span>
+            
+            <p className="text-[10px] text-[#8a8a86] leading-relaxed">
+              Situs independen non-resmi (Non-Official). Konten database bersumber dari portal resmi PT Pertamina (Persero) dan tidak diperjualbelikan.
+            </p>
+            
+            <div className="flex items-center justify-between pt-2 border-t border-[#edece9]/60 text-[10px]">
+              <span className="text-[#9b9a97] font-medium select-none">Source & Update:</span>
               <a
                 href="https://www.threads.net/@mocitaz"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#1d7bb8] hover:underline font-bold"
+                className="flex items-center gap-1 font-bold text-[#1d7bb8] hover:text-[#145d8f] bg-[#1d7bb8]/5 hover:bg-[#1d7bb8]/10 px-2 py-0.75 rounded-md border border-[#1d7bb8]/10 transition-all select-none"
               >
-                threads/@mocitaz
+                <span>threads/@mocitaz</span>
+                <ArrowUpRight className="w-2.5 h-2.5" />
               </a>
             </div>
           </div>
