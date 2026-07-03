@@ -1877,8 +1877,11 @@ export default function App() {
                     </tbody>
                   </table>
                 </div>
-                 {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} onReset={handleResetFilters} />}
-                 {viewTab === "analytics" && (
+                {filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} onReset={handleResetFilters} />}
+              </div>
+            )}
+
+            {viewTab === "analytics" && (
               <div className="flex flex-col gap-6 animate-fade-in pb-10 select-none">
                 
                 {/* Executive Insights Summary Panel */}
@@ -2280,10 +2283,6 @@ export default function App() {
                   </div>
 
                 </div>
-              </div>
-            )}
-            {/* Table View Footer */}
-            {viewTab === "table" && filteredListings.length === 0 && <EmptyState showSavedOnly={showSavedOnly} onReset={handleResetFilters} />}
               </div>
             )}
 
