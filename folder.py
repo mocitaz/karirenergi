@@ -352,10 +352,10 @@
                         ];
                         
                         const majorCorrections = {
-                            "design komunikasi visual (dkv)": "Desain Komunikasi Visual (DKV)",
-                            "design komunikasi visual": "Desain Komunikasi Visual (DKV)",
+                            "design komunikasi visual (dkv)": "Desain Komunikasi Visual",
+                            "design komunikasi visual": "Desain Komunikasi Visual",
                             "design grafis": "Desain Grafis",
-                            "dkv": "Desain Komunikasi Visual (DKV)",
+                            "dkv": "Desain Komunikasi Visual",
                             "akturia": "Aktuaria",
                             "akutansi": "Akuntansi",
                             "psiklogi": "Psikologi",

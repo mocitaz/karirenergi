@@ -88,10 +88,10 @@ def clean_jurusan(jurusan_str):
     tokens = re.split(r',|;|\bdan\b|\bserta\b', cleaned, flags=re.IGNORECASE)
     
     MAJOR_CORRECTIONS = {
-        "design komunikasi visual (dkv)": "Desain Komunikasi Visual (DKV)",
-        "design komunikasi visual": "Desain Komunikasi Visual (DKV)",
+        "design komunikasi visual (dkv)": "Desain Komunikasi Visual",
+        "design komunikasi visual": "Desain Komunikasi Visual",
         "design grafis": "Desain Grafis",
-        "dkv": "Desain Komunikasi Visual (DKV)",
+        "dkv": "Desain Komunikasi Visual",
         "all": "Semua Jurusan / Tidak Tertera",
         "biotechnology": "Bioteknologi",
         "business anaytics": "Business Analytics",
