@@ -2503,191 +2503,193 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Row 7: Rata-Rata Kuota per Lowongan vs Indeks Kompetisi Sektoral */}
-                  {/* Card 13: Rata-Rata Kuota per Lowongan (Sektor) */}
-                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
-                    <div className="flex flex-col gap-1">
-                      <h3 className="font-bold text-[14px] text-[#37352f]">Rata-Rata Kuota per Lowongan (Sektor)</h3>
-                      <p className="text-[11px] text-[#8a8a86]">Rata-rata alokasi kursi magang per lowongan berdasarkan sektor kerja</p>
+                  {/* Row 7: Sektor & Keahlian Analisis (4-Column Row, Forced side-by-side) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:col-span-2">
+                    
+                    {/* Card 13: Rata-Rata Kuota per Lowongan (Sektor) */}
+                    <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Rata-Rata Kuota per Lowongan (Sektor)</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Rata-rata alokasi kursi magang per lowongan berdasarkan sektor kerja</p>
+                      </div>
+
+                      <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                        {analyticsData.avgQuotaPerSector.map((item, idx) => {
+                          const maxQuota = analyticsData.avgQuotaPerSector[0]?.avgQuota || 1;
+                          const pct = (item.avgQuota / maxQuota) * 100;
+                          return (
+                            <div 
+                              key={idx} 
+                              onClick={() => handleSectorChartClick(item.name)}
+                              className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
+                              title={`Klik untuk filter: ${item.name}`}
+                            >
+                              <div className="flex justify-between items-center text-[12px]">
+                                <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
+                                <span className="text-[#8a8a86] font-semibold text-[11px]">
+                                  {item.avgQuota} Orang / Loker
+                                </span>
+                              </div>
+                              <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                                <div 
+                                  className="bg-[#1d7bb8] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
+                                  style={{ width: `${pct}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
 
-                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
-                      {analyticsData.avgQuotaPerSector.map((item, idx) => {
-                        const maxQuota = analyticsData.avgQuotaPerSector[0]?.avgQuota || 1;
-                        const pct = (item.avgQuota / maxQuota) * 100;
-                        return (
-                          <div 
-                            key={idx} 
-                            onClick={() => handleSectorChartClick(item.name)}
-                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
-                            title={`Klik untuk filter: ${item.name}`}
+                    {/* Card 14: Indeks Kompetisi Sektoral */}
+                    <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Indeks Kompetisi Sektoral</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Rasio keketatan jumlah pelamar dibanding kuota per sektor kerja (1 : X Pelamar)</p>
+                      </div>
+
+                      <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                        {analyticsData.sectoralCompetitionIndex.map((item, idx) => {
+                          const maxRatio = analyticsData.sectoralCompetitionIndex[0]?.ratio || 1;
+                          const pct = (item.ratio / maxRatio) * 100;
+                          return (
+                            <div 
+                              key={idx} 
+                              onClick={() => handleSectorChartClick(item.name)}
+                              className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
+                              title={`Klik untuk filter: ${item.name}`}
+                            >
+                              <div className="flex justify-between items-center text-[12px]">
+                                <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
+                                <span className="text-[#c52447] font-bold text-[11px]">
+                                  1 : {item.ratio} <span className="text-[#8a8a86] font-normal">({item.passRate}% lolos)</span>
+                                </span>
+                              </div>
+                              <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                                <div 
+                                  className="bg-[#c52447] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
+                                  style={{ width: `${pct}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Card 15: Korelasi Kuota vs Minat Pelamar */}
+                    <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full relative group">
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Korelasi Kuota vs Minat Pelamar</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Rata-rata pendaftar berdasarkan rentang kuota (Arahkan kursor ke titik)</p>
+                      </div>
+
+                      <div className="mt-4 flex flex-col items-center justify-center flex-grow">
+                        {(() => {
+                          const maxVal = Math.max(...analyticsData.quotaCorrelation.map(d => d.avgApplicants), 1);
+                          const points = analyticsData.quotaCorrelation.map((d, i) => {
+                            const x = 40 + i * 80;
+                            const y = 120 - (d.avgApplicants / maxVal) * 85;
+                            return { x, y, ...d };
+                          });
+                          
+                          // Construct SVG path string
+                          const pathD = `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} L ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y}`;
+                          const areaD = `M ${points[0].x} 130 L ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} L ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y} L ${points[3].x} 130 Z`;
+
+                          return (
+                            <div className="w-full relative flex flex-col items-center">
+                              <svg className="w-full h-40 overflow-visible" viewBox="0 0 300 150">
+                                {/* Horizontal Grid lines */}
+                                <line x1="30" y1="35" x2="280" y2="35" stroke="#edece9" strokeWidth="0.8" strokeDasharray="4 4" />
+                                <line x1="30" y1="80" x2="280" y2="80" stroke="#edece9" strokeWidth="0.8" strokeDasharray="4 4" />
+                                <line x1="30" y1="125" x2="280" y2="125" stroke="#edece9" strokeWidth="1" />
+                                
+                                {/* Y Grid labels */}
+                                <text x="25" y="38" textAnchor="end" className="text-[8px] fill-[#8a8a86] font-medium">{Math.round(maxVal)}</text>
+                                <text x="25" y="83" textAnchor="end" className="text-[8px] fill-[#8a8a86] font-medium">{Math.round(maxVal / 2)}</text>
+                                <text x="25" y="128" textAnchor="end" className="text-[8px] fill-[#8a8a86] font-medium">0</text>
+
+                                {/* Shaded Area */}
+                                <path d={areaD} fill="url(#blueGradCol)" className="opacity-15 transition-opacity" />
+                                
+                                {/* Connecting Line */}
+                                <path d={pathD} fill="none" stroke="#1d7bb8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+
+                                {/* Interactive Dots */}
+                                {points.map((pt, idx) => (
+                                  <g 
+                                    key={idx}
+                                    onMouseEnter={() => setHoveredCorrelationPoint(idx)}
+                                    onMouseLeave={() => setHoveredCorrelationPoint(null)}
+                                    className="cursor-pointer"
+                                  >
+                                    {/* Pulsing ring on hover */}
+                                    {hoveredCorrelationPoint === idx && (
+                                      <circle cx={pt.x} cy={pt.y} r="8" fill="#1d7bb8" className="opacity-30 animate-pulse" />
+                                    )}
+                                    <circle cx={pt.x} cy={pt.y} r="4" fill="#1d7bb8" stroke="white" strokeWidth="1.5" className="transition-all duration-200" />
+                                  </g>
+                                ))}
+
+                                {/* X Grid labels */}
+                                {points.map((pt, idx) => (
+                                  <text key={idx} x={pt.x} y="142" textAnchor="middle" className="text-[8px] fill-[#5a5a57] font-semibold">
+                                    {pt.name.replace("Kuota ", "")}
+                                  </text>
+                                ))}
+
+                                {/* Gradients */}
+                                <defs>
+                                  <linearGradient id="blueGradCol" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#1d7bb8" />
+                                    <stop offset="100%" stopColor="#1d7bb8" stopOpacity="0" />
+                                  </linearGradient>
+                                </defs>
+                              </svg>
+
+                              {/* Dynamic Tooltip inside the card */}
+                              <div className="h-6 mt-1 flex items-center justify-center text-center">
+                                {hoveredCorrelationPoint !== null ? (
+                                  <div className="text-[9.5px] font-bold text-[#1d7bb8] animate-fade-in bg-[#1d7bb8]/5 border border-[#1d7bb8]/25 rounded px-1.5 py-0.2">
+                                    {points[hoveredCorrelationPoint].name}: <span className="underline">{points[hoveredCorrelationPoint].avgApplicants}</span> pelamar
+                                  </div>
+                                ) : (
+                                  <span className="text-[8.5px] text-[#8a8a86] italic">Arahkan kursor ke titik</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    {/* Card 16: Keahlian Teknis Terpopuler */}
+                    <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
+                      <div className="flex flex-col gap-1">
+                        <h3 className="font-bold text-[14px] text-[#37352f]">Keahlian Teknis Terpopuler</h3>
+                        <p className="text-[11px] text-[#8a8a86]">Klik tag keahlian terpopuler untuk memfilter lowongan</p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5 mt-4 flex-grow content-center justify-center">
+                        {analyticsData.topSkills.map((item, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => handleSkillChartClick(item.name)}
+                            className="bg-[#f7f7f5]/80 hover:bg-[#1d7bb8]/10 hover:text-[#1d7bb8] border border-[#edece9] rounded-md px-2 py-1 text-[10px] font-bold text-[#37352f] cursor-pointer transition-all hover:scale-105 shadow-3xs flex items-center gap-1 group/tag"
+                            title={`Klik untuk mencari posisi: ${item.name}`}
                           >
-                            <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
-                              <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                {item.avgQuota} Orang / Loker
-                              </span>
-                            </div>
-                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
-                              <div 
-                                className="bg-[#1d7bb8] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
-                                style={{ width: `${pct}%` }}
-                              ></div>
-                            </div>
+                            <span className="group-hover/tag:underline">{item.name}</span>
+                            <span className="text-[8.5px] text-[#8a8a86] bg-[#edece9]/55 group-hover/tag:bg-[#1d7bb8]/20 group-hover/tag:text-[#1d7bb8] rounded px-1 py-0.2">
+                              {item.count}
+                            </span>
                           </div>
-                        );
-                      })}
+                        ))}
+                      </div>
                     </div>
+
                   </div>
-
-                  {/* Card 14: Indeks Kompetisi Sektoral */}
-                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
-                    <div className="flex flex-col gap-1">
-                      <h3 className="font-bold text-[14px] text-[#37352f]">Indeks Kompetisi Sektoral</h3>
-                      <p className="text-[11px] text-[#8a8a86]">Rasio keketatan jumlah pelamar dibanding kuota per sektor kerja (1 : X Pelamar)</p>
-                    </div>
-
-                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
-                      {analyticsData.sectoralCompetitionIndex.map((item, idx) => {
-                        const maxRatio = analyticsData.sectoralCompetitionIndex[0]?.ratio || 1;
-                        const pct = (item.ratio / maxRatio) * 100;
-                        return (
-                          <div 
-                            key={idx} 
-                            onClick={() => handleSectorChartClick(item.name)}
-                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
-                            title={`Klik untuk filter: ${item.name}`}
-                          >
-                            <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
-                              <span className="text-[#c52447] font-bold text-[11px]">
-                                1 : {item.ratio} <span className="text-[#8a8a86] font-normal">({item.passRate}% lolos)</span>
-                              </span>
-                            </div>
-                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
-                              <div 
-                                className="bg-[#c52447] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
-                                style={{ width: `${pct}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Row 8: Korelasi Kuota vs Minat Pelamar vs Keahlian Teknis Terpopuler */}
-                  {/* Card 15: Korelasi Kuota vs Minat Pelamar */}
-                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full relative group">
-                    <div className="flex flex-col gap-1">
-                      <h3 className="font-bold text-[14px] text-[#37352f]">Korelasi Kuota vs Minat Pelamar</h3>
-                      <p className="text-[11px] text-[#8a8a86]">Rata-rata pendaftar berdasarkan rentang kuota kursi lowongan (Arahkan kursor pada titik)</p>
-                    </div>
-
-                    <div className="mt-4 flex flex-col items-center justify-center flex-grow">
-                      {(() => {
-                        const maxVal = Math.max(...analyticsData.quotaCorrelation.map(d => d.avgApplicants), 1);
-                        const points = analyticsData.quotaCorrelation.map((d, i) => {
-                          const x = 50 + i * 100;
-                          const y = 120 - (d.avgApplicants / maxVal) * 85;
-                          return { x, y, ...d };
-                        });
-                        
-                        // Construct SVG path string
-                        const pathD = `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} L ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y}`;
-                        const areaD = `M ${points[0].x} 130 L ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} L ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y} L ${points[3].x} 130 Z`;
-
-                        return (
-                          <div className="w-full relative flex flex-col items-center">
-                            <svg className="w-full max-w-[420px] h-40 overflow-visible" viewBox="0 0 400 150">
-                              {/* Horizontal Grid lines */}
-                              <line x1="40" y1="35" x2="370" y2="35" stroke="#edece9" strokeWidth="0.8" strokeDasharray="4 4" />
-                              <line x1="40" y1="80" x2="370" y2="80" stroke="#edece9" strokeWidth="0.8" strokeDasharray="4 4" />
-                              <line x1="40" y1="125" x2="370" y2="125" stroke="#edece9" strokeWidth="1" />
-                              
-                              {/* Y Grid labels */}
-                              <text x="35" y="38" textAnchor="end" className="text-[9px] fill-[#8a8a86] font-medium">{Math.round(maxVal)}</text>
-                              <text x="35" y="83" textAnchor="end" className="text-[9px] fill-[#8a8a86] font-medium">{Math.round(maxVal / 2)}</text>
-                              <text x="35" y="128" textAnchor="end" className="text-[9px] fill-[#8a8a86] font-medium">0</text>
-
-                              {/* Shaded Area */}
-                              <path d={areaD} fill="url(#blueGrad)" className="opacity-15 transition-opacity" />
-                              
-                              {/* Connecting Line */}
-                              <path d={pathD} fill="none" stroke="#1d7bb8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-
-                              {/* Interactive Dots */}
-                              {points.map((pt, idx) => (
-                                <g 
-                                  key={idx}
-                                  onMouseEnter={() => setHoveredCorrelationPoint(idx)}
-                                  onMouseLeave={() => setHoveredCorrelationPoint(null)}
-                                  className="cursor-pointer"
-                                >
-                                  {/* Pulsing ring on hover */}
-                                  {hoveredCorrelationPoint === idx && (
-                                    <circle cx={pt.x} cy={pt.y} r="10" fill="#1d7bb8" className="opacity-30 animate-pulse" />
-                                  )}
-                                  <circle cx={pt.x} cy={pt.y} r="5" fill="#1d7bb8" stroke="white" strokeWidth="1.5" className="transition-all duration-200" />
-                                </g>
-                              ))}
-
-                              {/* X Grid labels */}
-                              {points.map((pt, idx) => (
-                                <text key={idx} x={pt.x} y="145" textAnchor="middle" className="text-[9px] fill-[#5a5a57] font-semibold">
-                                  {pt.name}
-                                </text>
-                              ))}
-
-                              {/* Gradients */}
-                              <defs>
-                                <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="0%" stopColor="#1d7bb8" />
-                                  <stop offset="100%" stopColor="#1d7bb8" stopOpacity="0" />
-                                </linearGradient>
-                              </defs>
-                            </svg>
-
-                            {/* Dynamic Tooltip inside the card */}
-                            <div className="h-6 mt-1.5 flex items-center justify-center">
-                              {hoveredCorrelationPoint !== null ? (
-                                <div className="text-[11px] font-bold text-[#1d7bb8] animate-fade-in bg-[#1d7bb8]/5 border border-[#1d7bb8]/25 rounded px-2.5 py-0.5">
-                                  {points[hoveredCorrelationPoint].name}: Rerata <span className="underline">{points[hoveredCorrelationPoint].avgApplicants.toLocaleString()}</span> pelamar ({points[hoveredCorrelationPoint].totalJobs} posisi)
-                                </div>
-                              ) : (
-                                <span className="text-[10px] text-[#8a8a86] italic">Arahkan kursor ke titik grafik untuk detail pendaftar</span>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  </div>
-
-                  {/* Card 16: Keahlian Teknis Terpopuler */}
-                  <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
-                    <div className="flex flex-col gap-1">
-                      <h3 className="font-bold text-[14px] text-[#37352f]">Keahlian Teknis Terpopuler</h3>
-                      <p className="text-[11px] text-[#8a8a86]">Kata kunci kemampuan teknis yang paling banyak dicari (Klik tag untuk memfilter)</p>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mt-4 flex-grow content-center justify-center">
-                      {analyticsData.topSkills.map((item, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => handleSkillChartClick(item.name)}
-                          className="bg-[#f7f7f5]/80 hover:bg-[#1d7bb8]/10 hover:text-[#1d7bb8] border border-[#edece9] rounded-md px-2.5 py-1.5 text-[11px] font-bold text-[#37352f] cursor-pointer transition-all hover:scale-105 shadow-3xs flex items-center gap-1.5 group/tag"
-                          title={`Klik untuk mencari posisi: ${item.name}`}
-                        >
-                          <span className="group-hover/tag:underline">{item.name}</span>
-                          <span className="text-[9.5px] text-[#8a8a86] bg-[#edece9]/55 group-hover/tag:bg-[#1d7bb8]/20 group-hover/tag:text-[#1d7bb8] rounded px-1 py-0.2">
-                            {item.count} Loker
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
                 </div>
               </div>
             )}
