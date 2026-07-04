@@ -250,6 +250,10 @@ export default function App() {
   const [hoveredCorrelationPoint, setHoveredCorrelationPoint] = useState(null);
   const [hoveredEduBar, setHoveredEduBar] = useState(null);
   const [hoveredSectorSlice, setHoveredSectorSlice] = useState(null);
+  const [hoveredCompanyBar, setHoveredCompanyBar] = useState(null);
+  const [hoveredMajorBar, setHoveredMajorBar] = useState(null);
+  const [hoveredCityBar, setHoveredCityBar] = useState(null);
+  const [hoveredRegionSlice, setHoveredRegionSlice] = useState(null);
 
   // Bookmarking / Saved Jobs State
   const [savedJobs, setSavedJobs] = useState(() => {
@@ -2148,32 +2152,114 @@ export default function App() {
                       <p className="text-[11px] text-[#8a8a86]">Anak perusahaan/subsidiari Pertamina dengan jumlah loker magang terbanyak</p>
                     </div>
                     
-                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
-                      {analyticsData.companyLeaderboard.map((item, idx) => {
-                        const maxVacancies = analyticsData.companyLeaderboard[0]?.vacancies || 1;
-                        const pct = (item.vacancies / maxVacancies) * 100;
+                    <div className="mt-4 flex flex-col items-center justify-center flex-grow">
+                      {(() => {
+                        const maxVal = Math.max(...analyticsData.companyLeaderboard.map(d => d.vacancies), 1);
+                        const width = 340;
+                        const height = 210;
+                        const paddingLeft = 140;
+                        const paddingRight = 15;
+                        const paddingTop = 10;
+                        const paddingBottom = 20;
+                        
+                        const chartW = width - paddingLeft - paddingRight;
+                        const chartH = height - paddingTop - paddingBottom;
+                        
                         return (
-                          <div 
-                            key={idx} 
-                            onClick={() => handleCompanyChartClick(item.name)}
-                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
-                            title={`Klik untuk filter: ${item.name}`}
-                          >
-                            <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-bold text-[#37352f] truncate max-w-[240px] group-hover/bar:text-[#1d7bb8] transition-colors">{idx + 1}. {item.name}</span>
-                              <span className="text-[#5a5a57] font-semibold text-[11px] flex-shrink-0">
-                                {item.vacancies} Posisi <span className="text-[#8a8a86] font-normal">• {item.applicants.toLocaleString()} pelamar</span>
-                              </span>
-                            </div>
-                            <div className="w-full bg-[#edece9]/50 h-2.5 rounded-full overflow-hidden">
-                              <div 
-                                className="bg-[#b78103] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
-                                style={{ width: `${pct}%` }}
-                              ></div>
+                          <div className="w-full relative flex flex-col items-center select-none">
+                            <svg className="w-full h-52 overflow-visible" viewBox={`0 0 ${width} ${height}`}>
+                              {/* Grid lines */}
+                              <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={paddingTop + chartH} stroke="#edece9" strokeWidth="1" />
+                              <line x1={paddingLeft + chartW / 2} y1={paddingTop} x2={paddingLeft + chartW / 2} y2={paddingTop + chartH} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              <line x1={paddingLeft + chartW} y1={paddingTop} x2={paddingLeft + chartW} y2={paddingTop + chartH} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              
+                              {/* X Axis labels */}
+                              <text x={paddingLeft} y={paddingTop + chartH + 12} textAnchor="middle" className="text-[7.5px] fill-[#8a8a86] font-medium">0</text>
+                              <text x={paddingLeft + chartW / 2} y={paddingTop + chartH + 12} textAnchor="middle" className="text-[7.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal / 2)}</text>
+                              <text x={paddingLeft + chartW} y={paddingTop + chartH + 12} textAnchor="middle" className="text-[7.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal)}</text>
+                              
+                              {analyticsData.companyLeaderboard.map((item, idx) => {
+                                const barH = 12;
+                                const spacing = (chartH - (barH * analyticsData.companyLeaderboard.length)) / (analyticsData.companyLeaderboard.length + 1);
+                                const y = paddingTop + spacing + idx * (barH + spacing);
+                                const barW = (item.vacancies / maxVal) * chartW;
+                                
+                                // Shorten names for display on left if too long
+                                const displayName = item.name.replace("PT Pertamina ", "").replace("Tbk", "").trim();
+                                
+                                return (
+                                  <g 
+                                    key={idx}
+                                    onMouseEnter={() => setHoveredCompanyBar(idx)}
+                                    onMouseLeave={() => setHoveredCompanyBar(null)}
+                                    onClick={() => handleCompanyChartClick(item.name)}
+                                    className="cursor-pointer"
+                                  >
+                                    {/* Hover catcher row */}
+                                    <rect 
+                                      x="0" 
+                                      y={y - spacing/2} 
+                                      width={width} 
+                                      height={barH + spacing} 
+                                      fill="transparent" 
+                                    />
+                                    
+                                    {/* Company Label */}
+                                    <text 
+                                      x={paddingLeft - 8} 
+                                      y={y + barH / 2 + 3} 
+                                      textAnchor="end" 
+                                      className={`text-[8.5px] font-bold transition-colors ${hoveredCompanyBar === idx ? 'fill-[#1d7bb8]' : 'fill-[#37352f]'}`}
+                                    >
+                                      {displayName}
+                                    </text>
+                                    
+                                    {/* Bar Background Track */}
+                                    <rect 
+                                      x={paddingLeft} 
+                                      y={y} 
+                                      width={chartW} 
+                                      height={barH} 
+                                      rx="3" 
+                                      fill="#edece9" 
+                                      className="opacity-25" 
+                                    />
+                                    
+                                    {/* Active Gradient Bar */}
+                                    <rect 
+                                      x={paddingLeft} 
+                                      y={y} 
+                                      width={barW} 
+                                      height={barH} 
+                                      rx="3" 
+                                      fill="url(#goldGradCol)" 
+                                      className={`transition-all duration-300 ${hoveredCompanyBar === idx ? 'brightness-110' : ''}`}
+                                    />
+                                  </g>
+                                );
+                              })}
+                              
+                              <defs>
+                                <linearGradient id="goldGradCol" x1="0" y1="0" x2="1" y2="0">
+                                  <stop offset="0%" stopColor="#b78103" />
+                                  <stop offset="100%" stopColor="#fbbf24" />
+                                </linearGradient>
+                              </defs>
+                            </svg>
+                            
+                            {/* Dynamic Tooltip inside card */}
+                            <div className="h-6 mt-1 flex items-center justify-center text-center">
+                              {hoveredCompanyBar !== null ? (
+                                <div className="text-[10px] font-bold text-[#b78103] animate-fade-in bg-[#fdfaf2] border border-[#fde68a]/50 rounded-full px-3 py-0.5 shadow-3xs">
+                                  {analyticsData.companyLeaderboard[hoveredCompanyBar].name}: <span className="underline">{analyticsData.companyLeaderboard[hoveredCompanyBar].vacancies} Loker</span> • {analyticsData.companyLeaderboard[hoveredCompanyBar].applicants.toLocaleString()} Pelamar
+                                </div>
+                              ) : (
+                                <span className="text-[9px] text-[#8a8a86] italic">Arahkan kursor ke bar anak perusahaan</span>
+                              )}
                             </div>
                           </div>
                         );
-                      })}
+                      })()}
                     </div>
                   </div>
 
@@ -2184,32 +2270,125 @@ export default function App() {
                       <p className="text-[11px] text-[#8a8a86]">Kategori program studi yang paling sering dicari pada prasyarat pendaftaran</p>
                     </div>
 
-                    <div className="flex flex-col gap-3 mt-4 flex-grow justify-center">
-                      {analyticsData.sortedMajors.map((item, idx) => {
-                        const maxCount = analyticsData.sortedMajors[0]?.count || 1;
-                        const pct = (item.count / maxCount) * 100;
+                    <div className="mt-4 flex flex-col items-center justify-center flex-grow">
+                      {(() => {
+                        const maxVal = Math.max(...analyticsData.sortedMajors.map(d => d.count), 1);
+                        const width = 320;
+                        const height = 145;
+                        const paddingLeft = 30;
+                        const paddingRight = 10;
+                        const paddingTop = 15;
+                        const paddingBottom = 30;
+                        
+                        const chartW = width - paddingLeft - paddingRight;
+                        const chartH = height - paddingTop - paddingBottom;
+                        
+                        const shortLabels = {
+                          "Teknik / STEM": "STEM",
+                          "Manajemen / Bisnis": "Bisnis",
+                          "Ekonomi & Akuntansi": "Keuangan",
+                          "Teknologi Informasi & Komputer": "IT",
+                          "Psikologi / Human Resources": "HR",
+                          "Hukum & Legal": "Hukum",
+                          "Statistika / Matematika": "Sains",
+                          "Semua Jurusan": "Semua"
+                        };
+                        
                         return (
-                          <div 
-                            key={idx} 
-                            onClick={() => handleMajorChartClick(item.name)}
-                            className="flex flex-col gap-1 cursor-pointer group/bar hover:opacity-90 transition-all"
-                            title={`Klik untuk filter: ${item.name}`}
-                          >
-                            <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
-                              <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
-                              </span>
-                            </div>
-                            <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
-                              <div 
-                                className="bg-[#1d7bb8] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
-                                style={{ width: `${pct}%` }}
-                              ></div>
+                          <div className="w-full relative flex flex-col items-center select-none">
+                            <svg className="w-full h-48 overflow-visible" viewBox={`0 0 ${width} ${height}`}>
+                              {/* Grid lines */}
+                              <line x1={paddingLeft} y1={paddingTop} x2={width - paddingRight} y2={paddingTop} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              <line x1={paddingLeft} y1={paddingTop + chartH / 2} x2={width - paddingRight} y2={paddingTop + chartH / 2} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              <line x1={paddingLeft} y1={paddingTop + chartH} x2={width - paddingRight} y2={paddingTop + chartH} stroke="#edece9" strokeWidth="1" />
+                              
+                              {/* Y Axis labels */}
+                              <text x={paddingLeft - 8} y={paddingTop + 3} textAnchor="end" className="text-[7.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal)}</text>
+                              <text x={paddingLeft - 8} y={paddingTop + chartH / 2 + 3} textAnchor="end" className="text-[7.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal / 2)}</text>
+                              <text x={paddingLeft - 8} y={paddingTop + chartH + 3} textAnchor="end" className="text-[7.5px] fill-[#8a8a86] font-medium">0</text>
+                              
+                              {/* Columns */}
+                              {analyticsData.sortedMajors.map((item, idx) => {
+                                const barW = 18;
+                                const spacing = (chartW - (barW * analyticsData.sortedMajors.length)) / (analyticsData.sortedMajors.length + 1);
+                                const x = paddingLeft + spacing + idx * (barW + spacing);
+                                const barH = (item.count / maxVal) * chartH;
+                                const y = paddingTop + chartH - barH;
+                                const label = shortLabels[item.name] || item.name;
+                                
+                                return (
+                                  <g 
+                                    key={idx}
+                                    onMouseEnter={() => setHoveredMajorBar(idx)}
+                                    onMouseLeave={() => setHoveredMajorBar(null)}
+                                    onClick={() => handleMajorChartClick(item.name)}
+                                    className="cursor-pointer"
+                                  >
+                                    {/* Hover catcher */}
+                                    <rect 
+                                      x={x - spacing/2} 
+                                      y={paddingTop} 
+                                      width={barW + spacing} 
+                                      height={chartH} 
+                                      fill="transparent" 
+                                    />
+                                    
+                                    {/* Bar Background Track */}
+                                    <rect 
+                                      x={x} 
+                                      y={paddingTop} 
+                                      width={barW} 
+                                      height={chartH} 
+                                      rx="3" 
+                                      fill="#edece9" 
+                                      className="opacity-20" 
+                                    />
+                                    
+                                    {/* Column Bar */}
+                                    <rect 
+                                      x={x} 
+                                      y={y} 
+                                      width={barW} 
+                                      height={barH} 
+                                      rx="3" 
+                                      fill="url(#blueGradColChart)" 
+                                      className={`transition-all duration-300 ${hoveredMajorBar === idx ? 'brightness-90 filter drop-shadow-sm' : ''}`}
+                                    />
+                                    
+                                    {/* X Axis label */}
+                                    <text 
+                                      x={x + barW / 2} 
+                                      y={paddingTop + chartH + 12} 
+                                      textAnchor="middle" 
+                                      className={`text-[8.5px] font-bold transition-colors ${hoveredMajorBar === idx ? 'fill-[#1d7bb8]' : 'fill-[#5a5a57]'}`}
+                                    >
+                                      {label}
+                                    </text>
+                                  </g>
+                                );
+                              })}
+                              
+                              <defs>
+                                <linearGradient id="blueGradColChart" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#1d7bb8" />
+                                  <stop offset="100%" stopColor="#60a5fa" />
+                                </linearGradient>
+                              </defs>
+                            </svg>
+                            
+                            {/* Tooltip inside card */}
+                            <div className="h-6 mt-1 flex items-center justify-center text-center">
+                              {hoveredMajorBar !== null ? (
+                                <div className="text-[10px] font-bold text-[#1d7bb8] animate-fade-in bg-[#e8f4fa] border border-[#93c5fd]/50 rounded-full px-3 py-0.5 shadow-3xs">
+                                  {analyticsData.sortedMajors[hoveredMajorBar].name}: <span className="underline">{analyticsData.sortedMajors[hoveredMajorBar].count} Loker</span> ({analyticsData.sortedMajors[hoveredMajorBar].percentage}%)
+                                </div>
+                              ) : (
+                                <span className="text-[9px] text-[#8a8a86] italic">Arahkan kursor ke kolom rumpun jurusan</span>
+                              )}
                             </div>
                           </div>
                         );
-                      })}
+                      })()}
                     </div>
                   </div>
 
@@ -2377,21 +2556,126 @@ export default function App() {
                       <p className="text-[11px] text-[#8a8a86]">6 Kota teratas dengan sebaran penempatan magang terbanyak</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 mt-4 flex-grow justify-center">
-                      {analyticsData.topCities.map((item, idx) => (
-                        <div 
-                          key={idx} 
-                          onClick={() => handleCityChartClick(item.name)}
-                          className="bg-[#f7f7f5]/50 border border-[#edece9]/80 rounded-lg p-3 flex justify-between items-center cursor-pointer hover:border-[#1d7bb8]/40 hover:bg-[#1d7bb8]/5 hover:scale-[1.02] hover:shadow-2xs transition-all duration-200"
-                          title={`Klik untuk filter: ${item.name}`}
-                        >
-                          <div className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-[12px] font-bold text-[#37352f] truncate group-hover/card:text-[#1d7bb8]">{item.name}</span>
-                            <span className="text-[10px] text-[#8a8a86]">{item.count} Lowongan</span>
+                    <div className="mt-4 flex flex-col items-center justify-center flex-grow">
+                      {(() => {
+                        const maxVal = Math.max(...analyticsData.topCities.map(d => d.count), 1);
+                        const width = 300;
+                        const height = 140;
+                        const paddingLeft = 35;
+                        const paddingRight = 15;
+                        const paddingTop = 15;
+                        const paddingBottom = 25;
+                        
+                        const chartW = width - paddingLeft - paddingRight;
+                        const chartH = height - paddingTop - paddingBottom;
+                        
+                        const getShortCityName = (name) => {
+                          const n = name.toLowerCase();
+                          if (n.includes("jakarta pusat")) return "Jakpus";
+                          if (n.includes("jakarta selatan")) return "Jaksel";
+                          if (n.includes("jakarta barat")) return "Jakbar";
+                          if (n.includes("jakarta utara")) return "Jakut";
+                          if (n.includes("jakarta timur")) return "Jaktim";
+                          if (n.includes("surabaya")) return "Sby";
+                          return name;
+                        };
+                        
+                        return (
+                          <div className="w-full relative flex flex-col items-center select-none">
+                            <svg className="w-full h-36 overflow-visible" viewBox={`0 0 ${width} ${height}`}>
+                              {/* Horizontal Grid lines */}
+                              <line x1={paddingLeft} y1={paddingTop} x2={width - paddingRight} y2={paddingTop} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              <line x1={paddingLeft} y1={paddingTop + chartH / 2} x2={width - paddingRight} y2={paddingTop + chartH / 2} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              <line x1={paddingLeft} y1={paddingTop + chartH} x2={width - paddingRight} y2={paddingTop + chartH} stroke="#edece9" strokeWidth="1" />
+                              
+                              {/* Y Axis Labels */}
+                              <text x={paddingLeft - 8} y={paddingTop + 3} textAnchor="end" className="text-[8.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal)}</text>
+                              <text x={paddingLeft - 8} y={paddingTop + chartH / 2 + 3} textAnchor="end" className="text-[8.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal / 2)}</text>
+                              <text x={paddingLeft - 8} y={paddingTop + chartH + 3} textAnchor="end" className="text-[8.5px] fill-[#8a8a86] font-medium">0</text>
+                              
+                              {/* Columns */}
+                              {analyticsData.topCities.map((item, idx) => {
+                                const barW = 22;
+                                const spacing = (chartW - (barW * analyticsData.topCities.length)) / (analyticsData.topCities.length + 1);
+                                const x = paddingLeft + spacing + idx * (barW + spacing);
+                                const barH = (item.count / maxVal) * chartH;
+                                const y = paddingTop + chartH - barH;
+                                const label = getShortCityName(item.name);
+                                
+                                return (
+                                  <g 
+                                    key={idx}
+                                    onMouseEnter={() => setHoveredCityBar(idx)}
+                                    onMouseLeave={() => setHoveredCityBar(null)}
+                                    onClick={() => handleCityChartClick(item.name)}
+                                    className="cursor-pointer"
+                                  >
+                                    {/* Transparent click/hover catcher rectangle */}
+                                    <rect 
+                                      x={x - spacing/2} 
+                                      y={paddingTop} 
+                                      width={barW + spacing} 
+                                      height={chartH} 
+                                      fill="transparent" 
+                                    />
+                                    
+                                    {/* Bar Background track */}
+                                    <rect 
+                                      x={x} 
+                                      y={paddingTop} 
+                                      width={barW} 
+                                      height={chartH} 
+                                      rx="3" 
+                                      fill="#edece9" 
+                                      className="opacity-20" 
+                                    />
+                                    
+                                    {/* Main Gradient Bar */}
+                                    <rect 
+                                      x={x} 
+                                      y={y} 
+                                      width={barW} 
+                                      height={barH} 
+                                      rx="3" 
+                                      fill="url(#orangeGradColChart)" 
+                                      className={`transition-all duration-300 ${hoveredCityBar === idx ? 'brightness-95 filter drop-shadow-sm' : ''}`}
+                                    />
+                                    
+                                    {/* X Axis Label */}
+                                    <text 
+                                      x={x + barW / 2} 
+                                      y={paddingTop + chartH + 14} 
+                                      textAnchor="middle" 
+                                      className={`text-[8.5px] font-bold transition-colors ${hoveredCityBar === idx ? 'fill-[#c26100]' : 'fill-[#5a5a57]'}`}
+                                    >
+                                      {label}
+                                    </text>
+                                  </g>
+                                );
+                              })}
+                              
+                              {/* Gradients */}
+                              <defs>
+                                <linearGradient id="orangeGradColChart" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#c26100" />
+                                  <stop offset="100%" stopColor="#fb923c" />
+                                </linearGradient>
+                              </defs>
+                            </svg>
+                            
+                            {/* Dynamic Tooltip inside card */}
+                            <div className="h-6 mt-1 flex items-center justify-center text-center">
+                              {hoveredCityBar !== null ? (
+                                <div className="text-[10px] font-bold text-[#c26100] animate-fade-in bg-[#fdf6f0] border border-[#fbd38d]/50 rounded-full px-3 py-0.5 shadow-3xs">
+                                  {analyticsData.topCities[hoveredCityBar].name}: <span className="underline">{analyticsData.topCities[hoveredCityBar].count} Loker</span> ({analyticsData.topCities[hoveredCityBar].percentage}%)
+                                </div>
+                              ) : (
+                                <span className="text-[9px] text-[#8a8a86] italic">Arahkan kursor ke kolom kota</span>
+                              )}
+                            </div>
                           </div>
-                          <span className="text-[12px] font-extrabold text-[#c26100] ml-2 flex-shrink-0">{item.percentage}%</span>
-                        </div>
-                      ))}
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -2402,27 +2686,123 @@ export default function App() {
                       <p className="text-[11px] text-[#8a8a86]">Pembagian penempatan magang berdasarkan kluster wilayah Indonesia</p>
                     </div>
 
-                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
-                      {analyticsData.regionalDistribution.map((item, idx) => {
-                        const maxCount = analyticsData.regionalDistribution[0]?.count || 1;
-                        const pct = (item.count / maxCount) * 100;
+                    <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-6 flex-grow">
+                      {(() => {
+                        const regions = analyticsData.regionalDistribution;
+                        const total = regions.reduce((sum, r) => sum + r.count, 0);
+                        
+                        const r = 50;
+                        const circ = 2 * Math.PI * r; // ~314.16
+                        
+                        // Premium colors matching regional themes
+                        const colors = [
+                          "#c26100", // Orange (Jabodetabek)
+                          "#1d7bb8", // Blue (Jawa & Bali)
+                          "#0d9488", // Teal (Sumatera)
+                          "#9041a8", // Purple (Kalimantan & Sulawesi)
+                          "#c52447"  // Red (Indonesia Timur)
+                        ];
+                        
+                        let accumulatedPercent = 0;
+                        
+                        const slices = regions.map((item, idx) => {
+                          const percentage = total > 0 ? (item.count / total) * 100 : 0;
+                          const dashLength = (percentage / 100) * circ;
+                          const dashOffset = -((accumulatedPercent / 100) * circ);
+                          accumulatedPercent += percentage;
+                          
+                          return {
+                            ...item,
+                            percentage,
+                            dashLength,
+                            dashOffset,
+                            color: colors[idx % colors.length]
+                          };
+                        });
+                        
+                        const activeSliceIdx = hoveredRegionSlice !== null ? hoveredRegionSlice : 0;
+                        const activeSlice = slices[activeSliceIdx];
+                        
                         return (
-                          <div key={idx} className="flex flex-col gap-1.5">
-                            <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f]">{item.name}</span>
-                              <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
-                              </span>
+                          <>
+                            {/* SVG Donut */}
+                            <div className="w-1/2 flex justify-center relative select-none">
+                              <svg className="w-40 h-40 transform -rotate-90 overflow-visible" viewBox="0 0 120 120">
+                                {/* Base track circle */}
+                                <circle 
+                                  cx="60" 
+                                  cy="60" 
+                                  r={r} 
+                                  fill="transparent" 
+                                  stroke="#edece9" 
+                                  strokeWidth="10" 
+                                  className="opacity-40"
+                                />
+                                
+                                {slices.map((slice, idx) => {
+                                  if (slice.percentage <= 0) return null;
+                                  return (
+                                    <circle 
+                                      key={idx}
+                                      cx="60" 
+                                      cy="60" 
+                                      r={r} 
+                                      fill="transparent" 
+                                      stroke={slice.color} 
+                                      strokeWidth={hoveredRegionSlice === idx ? "13" : "10"}
+                                      strokeDasharray={`${slice.dashLength} ${circ}`} 
+                                      strokeDashoffset={slice.dashOffset}
+                                      strokeLinecap="butt"
+                                      className="transition-all duration-300 cursor-pointer"
+                                      onMouseEnter={() => setHoveredRegionSlice(idx)}
+                                      onMouseLeave={() => setHoveredRegionSlice(null)}
+                                    />
+                                  );
+                                })}
+                              </svg>
+                              
+                              {/* Central textual info */}
+                              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none select-none px-4">
+                                {activeSlice ? (
+                                  <>
+                                    <span className="text-[9px] font-bold text-[#8a8a86] uppercase tracking-wider truncate max-w-[85px]" title={activeSlice.name}>{activeSlice.name.split(" ")[0]}</span>
+                                    <span className="text-[13px] font-extrabold text-[#37352f] leading-none mt-1">{activeSlice.count} Loker</span>
+                                    <span className="text-[9px] font-semibold text-[#8a8a86] mt-0.5">{activeSlice.percentage.toFixed(0)}%</span>
+                                  </>
+                                ) : (
+                                  <span className="text-[10px] text-[#8a8a86] font-bold">Wilayah</span>
+                                )}
+                              </div>
                             </div>
-                            <div className="w-full bg-[#edece9]/50 h-2 rounded-full overflow-hidden">
-                              <div 
-                                className="bg-[#c26100] h-full rounded-full transition-all duration-500" 
-                                style={{ width: `${pct}%` }}
-                              ></div>
+                            
+                            {/* Legend Panel */}
+                            <div className="w-1/2 flex flex-col gap-1.5 select-none">
+                              {slices.map((slice, idx) => (
+                                <div 
+                                  key={idx}
+                                  onMouseEnter={() => setHoveredRegionSlice(idx)}
+                                  onMouseLeave={() => setHoveredRegionSlice(null)}
+                                  className={`flex items-center justify-between p-1.5 rounded-md cursor-default transition-colors border ${
+                                    hoveredRegionSlice === idx 
+                                      ? "bg-[#f7f7f5]/80 border-[#edece9]" 
+                                      : "border-transparent hover:bg-[#f7f7f5]/40"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: slice.color }} />
+                                    <span className={`text-[11.5px] truncate font-medium ${hoveredRegionSlice === idx ? "text-[#1d7bb8]" : "text-[#37352f]"}`}>
+                                      {slice.name}
+                                    </span>
+                                  </div>
+                                  <span className="text-[11px] text-[#8a8a86] font-semibold flex-shrink-0 ml-2">
+                                    {slice.count}
+                                  </span>
+                                </div>
+                              ))}
                             </div>
-                          </div>
+                          </>
                         );
-                      })}
+                      })()}
                     </div>
                   </div>
 
