@@ -2228,14 +2228,18 @@ export default function App() {
                         };
 
                         const handleRegionClick = (regName) => {
-                          setSelectedRegionMap(regName);
-                          setViewTab("gallery");
+                          if (selectedRegionMap === regName) {
+                            setSelectedRegionMap(null);
+                          } else {
+                            setSelectedRegionMap(regName);
+                          }
                         };
 
                         const isHovered = (regName) => hoveredRegionMap === regName;
+                        const isSelected = (regName) => selectedRegionMap === regName;
 
                         return (
-                          <svg className="w-full h-auto max-h-[220px] overflow-visible" viewBox="0 0 600 220">
+                          <svg className="w-full h-auto max-h-[200px] overflow-visible" viewBox="0 0 600 220">
                             {/* Sumatera Group */}
                             <g
                               onMouseEnter={() => setHoveredRegionMap("Sumatera")}
@@ -2244,10 +2248,10 @@ export default function App() {
                               className="cursor-pointer group/region transition-all duration-300"
                             >
                               <path
-                                d="M 45,45 C 55,40 75,55 95,75 C 115,95 135,120 160,145 C 170,155 175,165 180,175 C 175,185 160,185 150,180 L 130,170 C 110,150 80,120 60,95 C 45,70 35,55 45,45 Z"
+                                d="M 40,40 L 52,38 L 56,46 L 70,55 L 82,65 L 98,82 L 115,98 L 132,112 L 152,135 L 168,148 L 180,172 L 175,182 L 160,180 L 150,170 L 138,166 L 122,152 L 110,146 L 98,128 L 84,120 L 70,98 L 56,82 L 45,62 Z"
                                 fill={getRegionColor("Sumatera")}
-                                stroke={isHovered("Sumatera") ? "#1d7bb8" : "#ffffff"}
-                                strokeWidth={isHovered("Sumatera") ? "2" : "1.2"}
+                                stroke={isHovered("Sumatera") || isSelected("Sumatera") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Sumatera") || isSelected("Sumatera") ? "2" : "1.2"}
                                 className="transition-all duration-300"
                               />
                             </g>
@@ -2261,18 +2265,18 @@ export default function App() {
                             >
                               {/* Java Main Path */}
                               <path
-                                d="M 180,186 L 210,186 C 235,188 260,191 285,193 L 320,193 L 330,197 L 320,200 C 285,200 250,198 215,196 L 180,192 Z"
+                                d="M 180,186 L 192,183 L 202,183 L 218,186 L 232,186 L 248,190 L 262,190 L 278,192 L 292,193 L 308,193 L 320,196 L 314,199 L 300,198 L 286,197 L 272,196 L 258,196 L 242,194 L 228,194 L 212,192 L 196,191 L 180,189 Z"
                                 fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")}
-                                stroke={isHovered("Jawa & Bali (Luar Jabodetabek)") ? "#1d7bb8" : "#ffffff"}
-                                strokeWidth={isHovered("Jawa & Bali (Luar Jabodetabek)") ? "2" : "1.2"}
+                                stroke={isHovered("Jawa & Bali (Luar Jabodetabek)") || isSelected("Jawa & Bali (Luar Jabodetabek)") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Jawa & Bali (Luar Jabodetabek)") || isSelected("Jawa & Bali (Luar Jabodetabek)") ? "2" : "1.2"}
                                 className="transition-all duration-300"
                               />
-                              {/* Bali, Lombok, Sumbawa, Flores, Timor Dots */}
-                              <circle cx="332" cy="198" r="2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
-                              <circle cx="340" cy="199" r="2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
-                              <circle cx="351" cy="199" r="3.2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
-                              <circle cx="378" cy="198" r="3.5" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
-                              <circle cx="406" cy="201" r="4.5" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              {/* Bali, Lombok, Sumbawa, Flores, Timor Paths & Dots */}
+                              <circle cx="332" cy="198" r="2.2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="340" cy="199" r="2.2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <path d="M 346,198 L 356,198 L 358,201 L 348,201 Z" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <path d="M 370,197 L 384,197 L 382,201 L 372,201 Z" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <path d="M 398,199 L 412,202 L 410,205 L 396,202 Z" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
                             </g>
 
                             {/* Kalimantan & Sulawesi Group */}
@@ -2284,18 +2288,18 @@ export default function App() {
                             >
                               {/* Kalimantan Path */}
                               <path
-                                d="M 225,95 C 245,85 275,85 295,100 C 305,110 315,125 310,140 C 305,155 285,165 265,167 C 245,169 230,160 225,150 C 220,140 215,120 225,95 Z"
+                                d="M 220,95 L 238,88 L 252,85 L 270,82 L 282,88 L 298,98 L 310,110 L 314,122 L 310,138 L 300,150 L 284,158 L 270,162 L 254,162 L 240,157 L 230,148 L 222,135 L 218,120 Z"
                                 fill={getRegionColor("Kalimantan & Sulawesi")}
-                                stroke={isHovered("Kalimantan & Sulawesi") ? "#1d7bb8" : "#ffffff"}
-                                strokeWidth={isHovered("Kalimantan & Sulawesi") ? "2" : "1.2"}
+                                stroke={isHovered("Kalimantan & Sulawesi") || isSelected("Kalimantan & Sulawesi") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Kalimantan & Sulawesi") || isSelected("Kalimantan & Sulawesi") ? "2" : "1.2"}
                                 className="transition-all duration-300"
                               />
                               {/* Sulawesi Path */}
                               <path
-                                d="M 330,105 C 335,95 355,95 360,105 L 360,125 C 375,120 390,120 395,125 L 375,133 C 370,135 365,140 365,150 C 375,155 385,160 390,165 L 380,170 C 370,165 360,157 355,150 C 350,157 340,165 330,170 L 335,155 C 340,145 340,140 335,135 C 325,130 315,130 310,125 Z"
+                                d="M 330,105 L 345,100 L 360,98 L 375,98 L 390,102 L 395,105 L 380,112 L 365,115 L 360,125 L 375,122 L 390,122 L 395,125 L 382,130 L 368,135 L 365,145 L 380,152 L 390,158 L 382,165 L 370,160 L 360,152 L 355,148 C 352,155 342,165 330,170 L 335,152 L 340,140 L 338,132 L 328,128 L 318,128 L 310,123 L 322,118 Z"
                                 fill={getRegionColor("Kalimantan & Sulawesi")}
-                                stroke={isHovered("Kalimantan & Sulawesi") ? "#1d7bb8" : "#ffffff"}
-                                strokeWidth={isHovered("Kalimantan & Sulawesi") ? "2" : "1.2"}
+                                stroke={isHovered("Kalimantan & Sulawesi") || isSelected("Kalimantan & Sulawesi") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Kalimantan & Sulawesi") || isSelected("Kalimantan & Sulawesi") ? "2" : "1.2"}
                                 className="transition-all duration-300"
                               />
                             </g>
@@ -2307,16 +2311,16 @@ export default function App() {
                               onClick={() => handleRegionClick("Indonesia Timur & Lainnya")}
                               className="cursor-pointer group/region transition-all duration-300"
                             >
-                              {/* Maluku Dots */}
-                              <circle cx="413" cy="103" r="3" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
-                              <circle cx="427" cy="138" r="2.8" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
-                              <circle cx="410" cy="140" r="2" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
+                              {/* Maluku Paths & Dots */}
+                              <path d="M 412,98 L 418,98 L 416,108 L 410,108 Z" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="430" cy="140" r="3" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="412" cy="142" r="2.5" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
                               {/* Papua Path */}
                               <path
-                                d="M 465,125 C 475,115 495,110 505,120 C 510,125 505,135 520,135 C 535,135 555,140 570,145 L 570,180 C 545,180 515,175 495,170 C 480,165 470,155 465,145 C 460,135 455,130 465,125 Z"
+                                d="M 465,125 L 475,115 L 485,110 L 495,110 L 490,120 L 495,125 L 505,125 L 520,128 L 535,130 L 555,135 L 570,140 L 575,150 L 570,180 L 550,180 L 530,176 L 510,172 L 495,168 L 480,162 L 468,150 L 465,140 L 460,135 Z"
                                 fill={getRegionColor("Indonesia Timur & Lainnya")}
-                                stroke={isHovered("Indonesia Timur & Lainnya") ? "#1d7bb8" : "#ffffff"}
-                                strokeWidth={isHovered("Indonesia Timur & Lainnya") ? "2" : "1.2"}
+                                stroke={isHovered("Indonesia Timur & Lainnya") || isSelected("Indonesia Timur & Lainnya") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Indonesia Timur & Lainnya") || isSelected("Indonesia Timur & Lainnya") ? "2" : "1.2"}
                                 className="transition-all duration-300"
                               />
                             </g>
@@ -2384,6 +2388,19 @@ export default function App() {
                                 )}
                               </div>
                             </div>
+
+                            {/* CTA button to view matching jobs */}
+                            {activeCount > 0 && (
+                              <button
+                                onClick={() => {
+                                  setSelectedRegionMap(activeReg);
+                                  setViewTab("gallery");
+                                }}
+                                className="w-full bg-[#1d7bb8] hover:bg-[#155a8a] text-white font-bold py-1.5 px-3 rounded text-[11px] transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-3xs"
+                              >
+                                <span>Lihat {activeCount} Lowongan</span>
+                              </button>
+                            )}
 
                             {/* Choropleth Kerapatan Legend */}
                             <div className="flex flex-col gap-1 border-t border-[#edece9]/60 pt-2.5">
