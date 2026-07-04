@@ -4597,7 +4597,7 @@ export default function App() {
 
                     <div className="flex items-center justify-between text-[11.5px] border-t border-[#edece9]/50 pt-2 mt-1">
                       <span className="text-[#9b9a97] font-semibold flex items-center gap-1">
-                        🏆 Keketatan Rank
+                        Keketatan Rank
                       </span>
                       <span className="text-[#1d7bb8] bg-[#e8f4fd] px-2 py-0.5 rounded font-extrabold text-[11.5px]">
                         #{selectedJob.competitionRank} dari {selectedJob.totalJobsCount} Loker
