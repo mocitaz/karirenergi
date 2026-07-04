@@ -248,6 +248,8 @@ export default function App() {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [visibleLimit, setVisibleLimit] = useState(24);
   const [hoveredCorrelationPoint, setHoveredCorrelationPoint] = useState(null);
+  const [hoveredEduBar, setHoveredEduBar] = useState(null);
+  const [hoveredSectorSlice, setHoveredSectorSlice] = useState(null);
 
   // Bookmarking / Saved Jobs State
   const [savedJobs, setSavedJobs] = useState(() => {
@@ -2429,35 +2431,133 @@ export default function App() {
                   <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Sebaran Berdasarkan Sektor Kerja</h3>
-                      <p className="text-[11px] text-[#8a8a86]">Pembagian lowongan magang berdasarkan sektor industri terkait</p>
+                      <p className="text-[11px] text-[#8a8a86]">Pembagian lowongan magang berdasarkan sektor sub-holding Pertamina</p>
                     </div>
 
-                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
-                      {analyticsData.sectorBreakdown.map((item, idx) => {
-                        const maxCount = analyticsData.sectorBreakdown[0]?.count || 1;
-                        const pct = (item.count / maxCount) * 100;
+                    <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-6 flex-grow">
+                      {(() => {
+                        const sectors = analyticsData.sectorBreakdown;
+                        const total = sectors.reduce((sum, s) => sum + s.count, 0);
+                        
+                        // Circle parameters
+                        const r = 50;
+                        const circ = 2 * Math.PI * r; // ~314.16
+                        
+                        // Premium colors for the 6 sectors
+                        const colors = [
+                          "#0d9488", // Teal
+                          "#1d7bb8", // Blue
+                          "#9041a8", // Purple
+                          "#c26100", // Orange
+                          "#c52447", // Red
+                          "#5a5a57"  // Gray
+                        ];
+                        
+                        let accumulatedPercent = 0;
+                        
+                        const slices = sectors.map((s, idx) => {
+                          const percentage = total > 0 ? (s.count / total) * 100 : 0;
+                          const dashLength = (percentage / 100) * circ;
+                          const dashOffset = circ - ((accumulatedPercent / 100) * circ);
+                          accumulatedPercent += percentage;
+                          
+                          return {
+                            ...s,
+                            percentage,
+                            dashLength,
+                            dashOffset,
+                            color: colors[idx % colors.length]
+                          };
+                        });
+                        
+                        // Selected slice to display in center (defaults to hovered, otherwise largest)
+                        const activeSliceIdx = hoveredSectorSlice !== null ? hoveredSectorSlice : 0;
+                        const activeSlice = slices[activeSliceIdx];
+                        
                         return (
-                          <div 
-                            key={idx} 
-                            onClick={() => handleSectorChartClick(item.name)}
-                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
-                            title={`Klik untuk filter: ${item.name}`}
-                          >
-                            <div className="flex justify-between items-center text-[12px]">
-                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors">{item.name}</span>
-                              <span className="text-[#8a8a86] font-semibold text-[11px]">
-                                {item.count} Loker <span className="font-normal">({item.percentage}%)</span>
-                              </span>
+                          <>
+                            {/* SVG Donut */}
+                            <div className="w-1/2 flex justify-center relative select-none">
+                              <svg className="w-40 h-40 transform -rotate-90 overflow-visible" viewBox="0 0 120 120">
+                                {/* Base track circle */}
+                                <circle 
+                                  cx="60" 
+                                  cy="60" 
+                                  r={r} 
+                                  fill="transparent" 
+                                  stroke="#edece9" 
+                                  strokeWidth="10" 
+                                  className="opacity-40"
+                                />
+                                
+                                {slices.map((slice, idx) => {
+                                  if (slice.percentage <= 0) return null;
+                                  return (
+                                    <circle 
+                                      key={idx}
+                                      cx="60" 
+                                      cy="60" 
+                                      r={r} 
+                                      fill="transparent" 
+                                      stroke={slice.color} 
+                                      strokeWidth={hoveredSectorSlice === idx ? "13" : "10"}
+                                      strokeDasharray={`${slice.dashLength} ${circ}`} 
+                                      strokeDashoffset={slice.dashOffset}
+                                      strokeLinecap="butt"
+                                      className="transition-all duration-300 cursor-pointer"
+                                      onMouseEnter={() => setHoveredSectorSlice(idx)}
+                                      onMouseLeave={() => setHoveredSectorSlice(null)}
+                                      onClick={() => handleSectorChartClick(slice.name)}
+                                      title={`Klik untuk filter: ${slice.name}`}
+                                    />
+                                  );
+                                })}
+                              </svg>
+                              
+                              {/* Central textual info (Absolute center of donut chart) */}
+                              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none select-none px-4">
+                                {activeSlice ? (
+                                  <>
+                                    <span className="text-[9px] font-bold text-[#8a8a86] uppercase tracking-wider truncate max-w-[85px]" title={activeSlice.name}>{activeSlice.name.split(" ")[0]}</span>
+                                    <span className="text-[13px] font-extrabold text-[#37352f] leading-none mt-1">{activeSlice.count} Loker</span>
+                                    <span className="text-[9px] font-semibold text-[#8a8a86] mt-0.5">{activeSlice.percentage.toFixed(0)}%</span>
+                                  </>
+                                ) : (
+                                  <span className="text-[10px] text-[#8a8a86] font-bold">Sektor</span>
+                                )}
+                              </div>
                             </div>
-                            <div className="w-full bg-[#edece9]/30 h-1.5 rounded-full overflow-hidden">
-                              <div 
-                                className="bg-[#0d9488] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
-                                style={{ width: `${pct}%` }}
-                              ></div>
+                            
+                            {/* Legend Panel */}
+                            <div className="w-1/2 flex flex-col gap-1.5 select-none">
+                              {slices.map((slice, idx) => (
+                                <div 
+                                  key={idx}
+                                  onClick={() => handleSectorChartClick(slice.name)}
+                                  onMouseEnter={() => setHoveredSectorSlice(idx)}
+                                  onMouseLeave={() => setHoveredSectorSlice(null)}
+                                  className={`flex items-center justify-between p-1.5 rounded-md cursor-pointer transition-colors border ${
+                                    hoveredSectorSlice === idx 
+                                      ? "bg-[#f7f7f5]/80 border-[#edece9]" 
+                                      : "border-transparent hover:bg-[#f7f7f5]/40"
+                                  }`}
+                                  title={`Klik untuk filter: ${slice.name}`}
+                                >
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: slice.color }} />
+                                    <span className={`text-[11.5px] truncate font-medium ${hoveredSectorSlice === idx ? "text-[#1d7bb8]" : "text-[#37352f]"}`}>
+                                      {slice.name}
+                                    </span>
+                                  </div>
+                                  <span className="text-[11px] text-[#8a8a86] font-semibold flex-shrink-0 ml-2">
+                                    {slice.count}
+                                  </span>
+                                </div>
+                              ))}
                             </div>
-                          </div>
+                          </>
                         );
-                      })}
+                      })()}
                     </div>
                   </div>
 
@@ -2500,21 +2600,113 @@ export default function App() {
                       <p className="text-[11px] text-[#8a8a86]">Persentase prasyarat tingkat pendidikan minimal bagi calon pelamar</p>
                     </div>
 
-                    <div className="flex flex-col gap-3 mt-4 flex-grow justify-center">
-                      {analyticsData.eduBreakdown.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between gap-4">
-                          <span className="text-[12px] font-bold text-[#37352f] w-14">{item.name}</span>
-                          <div className="flex-1 bg-[#edece9]/50 h-3.5 rounded overflow-hidden flex">
-                            <div 
-                              className="bg-[#9041a8] h-full transition-all duration-500 rounded-r" 
-                              style={{ width: `${item.percentage}%` }}
-                            ></div>
+                    <div className="mt-4 flex flex-col items-center justify-center flex-grow">
+                      {(() => {
+                        const maxVal = Math.max(...analyticsData.eduBreakdown.map(d => d.count), 1);
+                        const width = 300;
+                        const height = 140;
+                        const paddingLeft = 35;
+                        const paddingRight = 15;
+                        const paddingTop = 15;
+                        const paddingBottom = 25;
+                        
+                        const chartW = width - paddingLeft - paddingRight;
+                        const chartH = height - paddingTop - paddingBottom;
+                        
+                        return (
+                          <div className="w-full relative flex flex-col items-center select-none">
+                            <svg className="w-full h-36 overflow-visible" viewBox={`0 0 ${width} ${height}`}>
+                              {/* Horizontal Grid lines */}
+                              <line x1={paddingLeft} y1={paddingTop} x2={width - paddingRight} y2={paddingTop} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              <line x1={paddingLeft} y1={paddingTop + chartH / 2} x2={width - paddingRight} y2={paddingTop + chartH / 2} stroke="#edece9" strokeWidth="0.8" strokeDasharray="3 3" />
+                              <line x1={paddingLeft} y1={paddingTop + chartH} x2={width - paddingRight} y2={paddingTop + chartH} stroke="#edece9" strokeWidth="1" />
+                              
+                              {/* Y Axis Labels */}
+                              <text x={paddingLeft - 8} y={paddingTop + 3} textAnchor="end" className="text-[8.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal)}</text>
+                              <text x={paddingLeft - 8} y={paddingTop + chartH / 2 + 3} textAnchor="end" className="text-[8.5px] fill-[#8a8a86] font-medium">{Math.round(maxVal / 2)}</text>
+                              <text x={paddingLeft - 8} y={paddingTop + chartH + 3} textAnchor="end" className="text-[8.5px] fill-[#8a8a86] font-medium">0</text>
+                              
+                              {/* Columns */}
+                              {analyticsData.eduBreakdown.map((item, idx) => {
+                                const barW = 32;
+                                const spacing = (chartW - (barW * analyticsData.eduBreakdown.length)) / (analyticsData.eduBreakdown.length + 1);
+                                const x = paddingLeft + spacing + idx * (barW + spacing);
+                                const barH = (item.count / maxVal) * chartH;
+                                const y = paddingTop + chartH - barH;
+                                
+                                return (
+                                  <g 
+                                    key={idx}
+                                    onMouseEnter={() => setHoveredEduBar(idx)}
+                                    onMouseLeave={() => setHoveredEduBar(null)}
+                                    className="cursor-help"
+                                  >
+                                    {/* Transparent click/hover catcher rectangle */}
+                                    <rect 
+                                      x={x - spacing/2} 
+                                      y={paddingTop} 
+                                      width={barW + spacing} 
+                                      height={chartH} 
+                                      fill="transparent" 
+                                    />
+                                    
+                                    {/* Bar Background track */}
+                                    <rect 
+                                      x={x} 
+                                      y={paddingTop} 
+                                      width={barW} 
+                                      height={chartH} 
+                                      rx="4" 
+                                      fill="#edece9" 
+                                      className="opacity-20" 
+                                    />
+                                    
+                                    {/* Main Gradient Bar */}
+                                    <rect 
+                                      x={x} 
+                                      y={y} 
+                                      width={barW} 
+                                      height={barH} 
+                                      rx="4" 
+                                      fill="url(#purpleGradCol)" 
+                                      className={`transition-all duration-300 ${hoveredEduBar === idx ? 'brightness-90 filter drop-shadow-sm' : ''}`}
+                                    />
+                                    
+                                    {/* X Axis Label */}
+                                    <text 
+                                      x={x + barW / 2} 
+                                      y={paddingTop + chartH + 15} 
+                                      textAnchor="middle" 
+                                      className={`text-[9.5px] font-bold transition-colors ${hoveredEduBar === idx ? 'fill-[#6b21a8]' : 'fill-[#5a5a57]'}`}
+                                    >
+                                      {item.name}
+                                    </text>
+                                  </g>
+                                );
+                              })}
+                              
+                              {/* Gradients */}
+                              <defs>
+                                <linearGradient id="purpleGradCol" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#9041a8" />
+                                  <stop offset="100%" stopColor="#c084fc" />
+                                </linearGradient>
+                              </defs>
+                            </svg>
+                            
+                            {/* Dynamic Tooltip inside card */}
+                            <div className="h-6 mt-1 flex items-center justify-center text-center">
+                              {hoveredEduBar !== null ? (
+                                <div className="text-[10px] font-bold text-[#6b21a8] animate-fade-in bg-[#f3ebf7] border border-[#d8b4fe]/50 rounded-full px-3 py-0.5 shadow-3xs">
+                                  {analyticsData.eduBreakdown[hoveredEduBar].name}: <span className="underline">{analyticsData.eduBreakdown[hoveredEduBar].count}</span> Loker ({analyticsData.eduBreakdown[hoveredEduBar].percentage}%)
+                                </div>
+                              ) : (
+                                <span className="text-[9px] text-[#8a8a86] italic">Arahkan kursor ke kolom jenjang</span>
+                              )}
+                            </div>
                           </div>
-                          <span className="text-[11.5px] text-[#5a5a57] font-semibold w-16 text-right flex-shrink-0">
-                            {item.count} Loker <span className="text-[10px] text-[#8a8a86] font-normal">({item.percentage}%)</span>
-                          </span>
-                        </div>
-                      ))}
+                        );
+                      })()}
                     </div>
                   </div>
 
