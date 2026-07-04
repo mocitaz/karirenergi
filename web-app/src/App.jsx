@@ -79,6 +79,13 @@ export function getDeadlineText() {
   };
 }
 
+// Extract unique job ID from linkDetail URL
+export function getJobId(linkDetail) {
+  if (!linkDetail) return "";
+  const parts = linkDetail.trim().split("/");
+  return parts[parts.length - 1] || "";
+}
+
 // Generate realistic deterministic stats based on unique listing fields
 export function getDeterministicStats(title, company, link, dbKuota, dbPelamar) {
   // If database already contains real scraped Kuota and Pelamar details, use them
@@ -280,9 +287,42 @@ export default function App() {
     localStorage.setItem("karirenergi-saved-jobs", JSON.stringify(savedJobs));
   }, [savedJobs]);
 
+  // Auto-open job modal if "?job=XXXX" query param is present on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get("job");
+    if (jobId && listings && listings.length > 0) {
+      const match = listings.find((j) => getJobId(j["Link Detail"]) === jobId);
+      if (match) {
+        setSelectedJob(match);
+      }
+    }
+  }, [listings]);
+
+  // Sync selectedJob state to the address bar query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (selectedJob) {
+      const currentJobId = getJobId(selectedJob["Link Detail"]);
+      if (params.get("job") !== currentJobId) {
+        params.set("job", currentJobId);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.pushState(null, "", newUrl);
+      }
+    } else {
+      if (params.has("job")) {
+        params.delete("job");
+        const cleanQuery = params.toString();
+        const newUrl = cleanQuery ? `${window.location.pathname}?${cleanQuery}` : window.location.pathname;
+        window.history.replaceState(null, "", newUrl);
+      }
+    }
+  }, [selectedJob]);
+
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [pendingBookmark, setPendingBookmark] = useState(null);
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Dark Mode State
   const [darkMode, setDarkMode] = useState(() => {
@@ -391,7 +431,8 @@ export default function App() {
     if (e) e.stopPropagation();
     if (!selectedJob) return;
 
-    const shareUrl = `${window.location.origin}${window.location.pathname}?job=${encodeURIComponent(selectedJob["Link Detail"])}`;
+    const jobId = getJobId(selectedJob["Link Detail"]);
+    const shareUrl = `${window.location.origin}${window.location.pathname}?job=${jobId}`;
     const shareText = `Lowongan Magang Pertamina: ${selectedJob["Judul Lowongan"]} - ${selectedJob["Perusahaan"]}.\nCek info kualifikasi & jurusan lengkapnya di: ${shareUrl}`;
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -411,6 +452,18 @@ export default function App() {
       }
       document.body.removeChild(textarea);
     }
+  };
+
+  // WhatsApp share handler
+  const handleShareWhatsApp = (e) => {
+    if (e) e.stopPropagation();
+    if (!selectedJob) return;
+
+    const jobId = getJobId(selectedJob["Link Detail"]);
+    const shareUrl = `${window.location.origin}${window.location.pathname}?job=${jobId}`;
+    const message = `Lowongan Magang Pertamina:\n*${selectedJob["Judul Lowongan"]}* - *${selectedJob["Perusahaan"]}*\n\nCek info kualifikasi & jurusan lengkapnya di:\n${shareUrl}`;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, "_blank");
   };
 
   const toggleSaveJob = (linkDetail, e) => {
@@ -4264,11 +4317,21 @@ export default function App() {
                 </button>
                 <button
                   onClick={handleShareJob}
-                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#1d7bb8] transition-colors cursor-pointer flex items-center gap-1 select-none"
-                  title="Bagikan Lowongan"
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#1d7bb8] transition-colors cursor-pointer flex items-center gap-1.5 select-none"
+                  title="Salin Tautan Lowongan"
                 >
                   <Share2 className="w-4 h-4" />
-                  <span className="text-[11.5px] font-medium hidden sm:inline">Bagikan</span>
+                  <span className="text-[11.5px] font-semibold hidden sm:inline">Salin Link</span>
+                </button>
+                <button
+                  onClick={handleShareWhatsApp}
+                  className="p-2 rounded hover:bg-[#edece9] text-[#5a5a57] hover:text-[#25D366] transition-colors cursor-pointer flex items-center gap-1.5 select-none"
+                  title="Bagikan ke WhatsApp"
+                >
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.403.002 9.803-4.394 9.806-9.8.001-2.605-1.01-5.056-2.85-6.897-1.84-1.841-4.29-2.853-6.897-2.853-5.407 0-9.81 4.403-9.814 9.81-.001 1.488.387 2.94 1.132 4.215l-.993 3.63 3.738-.981zm11.368-6.41c-.301-.15-1.778-.879-2.052-.978-.275-.1-.475-.15-.675.15-.2.3-.778.979-.95 1.178-.173.199-.347.224-.648.075-.3-.15-1.266-.467-2.41-1.485-.89-.791-1.49-1.77-1.665-2.07-.175-.3-.019-.462.13-.61.135-.133.301-.35.451-.524.15-.174.2-.299.3-.499.1-.2.05-.375-.025-.524-.075-.15-.675-1.625-.925-2.225-.244-.599-.49-.519-.675-.529-.174-.008-.374-.01-.574-.01-.2 0-.526.075-.801.374-.275.3-1.05 1.028-1.05 2.508s1.075 2.903 1.225 3.102c.15.2 2.11 3.224 5.112 4.521.714.308 1.272.493 1.707.63.717.228 1.37.196 1.885.119.574-.086 1.778-.726 2.027-1.427.25-.7.25-1.3.175-1.427-.075-.125-.275-.199-.575-.349z" />
+                  </svg>
+                  <span className="text-[11.5px] font-semibold hidden sm:inline">WhatsApp</span>
                 </button>
                 <span className="w-px h-4 bg-[#edece9] mx-0.5"></span>
                 <button
