@@ -86,6 +86,24 @@ export function getJobId(linkDetail) {
   return parts[parts.length - 1] || "";
 }
 
+// Compute relative time for last updated label
+export function getRelativeUpdateTime() {
+  const lastUpdated = new Date("2026-07-04T14:20:00+07:00");
+  const diffMs = new Date() - lastUpdated;
+  if (diffMs < 0) return "baru saja";
+  
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  if (diffMins < 1) return "baru saja";
+  if (diffMins < 60) return `${diffMins} menit yang lalu`;
+  
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  if (diffHours < 24) return `${diffHours} jam yang lalu`;
+  
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 1) return "kemarin";
+  return `${diffDays} hari yang lalu`;
+}
+
 // Generate realistic deterministic stats based on unique listing fields
 export function getDeterministicStats(title, company, link, dbKuota, dbPelamar) {
   // If database already contains real scraped Kuota and Pelamar details, use them
@@ -1815,7 +1833,7 @@ export default function App() {
                   Pelacak independen program magang resmi Pertamina.
                 </p>
                 <div className="text-[10.5px] text-[#9b9a97] mt-0.5 flex items-center gap-2.5 flex-wrap">
-                  <span>Terakhir Diupdate: 4 Juli 2026, 14:20 WIB</span>
+                  <span>Terakhir Diupdate: 4 Juli 2026, 14:20 WIB ({getRelativeUpdateTime()})</span>
                   <span className="text-[#edece9] select-none">•</span>
                   <div className="flex items-center gap-1.5 text-[#43873e] font-extrabold select-none">
                     <span className="relative flex h-1.5 w-1.5">
