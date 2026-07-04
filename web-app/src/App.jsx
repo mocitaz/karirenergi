@@ -2403,23 +2403,6 @@ export default function App() {
   />
 </g>
 
-/* Jabodetabek Group */
-<g
-  onMouseEnter={() => setHoveredRegionMap("Jabodetabek")}
-  onMouseLeave={() => setHoveredRegionMap(null)}
-  onClick={() => handleRegionClick("Jabodetabek")}
-  className="cursor-pointer group/region transition-all duration-300"
->
-  <path
-    id="id-jk"
-    aria-label="Jakarta Raya"
-    d="m 173.98571,239.51789 -0.26,0.49 0.16,0.73 -0.3,0.61 -0.64,0.23 -0.42,0.57 -0.21,-0.28 0.38,-0.45 0.03,-0.4 -0.33,-0.26 0.02,-0.42 -0.28,0.04 -0.54,0.49 -0.05,0.31 -0.26,-0.16 0.28,-0.59 0.99,-0.75 0.52,0.12 0,-0.26 0.49,0.02 0.26,-0.16 0.16,0.12 z m 25.57,-7.41 1.8,0.34 0.73,-0.41 1.4,-0.09 0,0 -0.06,1.98 -0.41,0.86 -0.64,0.17 0.06,0.56 0.21,0.37 -0.21,0.95 -0.18,0.06 -0.85,-0.49 -0.9,0.25 -0.11,-0.16 0.24,-0.68 -0.53,0.06 0,0 0,0 0,0 -0.44,-0.76 -0.16,-0.73 -0.39,-0.08 0.02,-0.66 -0.61,-0.33 0.03,-1.12 0.6,-0.26 0,0 0.4,0.17 z"
-    fill={getRegionColor("Jabodetabek")}
-    stroke={isHovered("Jabodetabek") || isSelected("Jabodetabek") ? "#1d7bb8" : "#ffffff"}
-    strokeWidth={isHovered("Jabodetabek") || isSelected("Jabodetabek") ? "1.5" : "0.5"}
-    className="transition-all duration-300"
-  />
-</g>
 
 /* Kalimantan & Sulawesi Group */
 <g
@@ -2583,28 +2566,48 @@ export default function App() {
   />
 </g>
 
-                            {"/* Jabodetabek Pulse (Placed on top of Java to override hover z-index) */"}
+                            {/* Jabodetabek Group (Placed on top of Java/Sumatera to override z-index and expand hit target) */}
                             <g
                               onMouseEnter={() => setHoveredRegionMap("Jabodetabek")}
                               onMouseLeave={() => setHoveredRegionMap(null)}
                               onClick={() => handleRegionClick("Jabodetabek")}
-                              className="cursor-pointer group/region"
+                              className="cursor-pointer group/region transition-all duration-300"
                             >
+                              {/* Jakarta Path */}
+                              <path
+                                id="id-jk"
+                                aria-label="Jakarta Raya"
+                                d="m 173.98571,239.51789 -0.26,0.49 0.16,0.73 -0.3,0.61 -0.64,0.23 -0.42,0.57 -0.21,-0.28 0.38,-0.45 0.03,-0.4 -0.33,-0.26 0.02,-0.42 -0.28,0.04 -0.54,0.49 -0.05,0.31 -0.26,-0.16 0.28,-0.59 0.99,-0.75 0.52,0.12 0,-0.26 0.49,0.02 0.26,-0.16 0.16,0.12 z m 25.57,-7.41 1.8,0.34 0.73,-0.41 1.4,-0.09 0,0 -0.06,1.98 -0.41,0.86 -0.64,0.17 0.06,0.56 0.21,0.37 -0.21,0.95 -0.18,0.06 -0.85,-0.49 -0.9,0.25 -0.11,-0.16 0.24,-0.68 -0.53,0.06 0,0 0,0 0,0 -0.44,-0.76 -0.16,-0.73 -0.39,-0.08 0.02,-0.66 -0.61,-0.33 0.03,-1.12 0.6,-0.26 0,0 0.4,0.17 z"
+                                fill={getRegionColor("Jabodetabek")}
+                                stroke={isHovered("Jabodetabek") || isSelected("Jabodetabek") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Jabodetabek") || isSelected("Jabodetabek") ? "1.5" : "0.5"}
+                                className="transition-all duration-300"
+                              />
+                              {/* Pulse effect */}
                               <circle
                                 cx="186"
                                 cy="237"
-                                r="6"
+                                r="8"
                                 fill="#1d7bb8"
                                 className="opacity-40 pointer-events-none animate-ping"
                               />
+                              {/* Center dot */}
                               <circle
                                 cx="186"
                                 cy="237"
-                                r="3.5"
+                                r="4"
                                 fill="#1d7bb8"
                                 stroke="#ffffff"
                                 strokeWidth="0.8"
                                 className="group-hover/region:scale-125 transition-transform"
+                              />
+                              {/* Large invisible circle to expand hover target size */}
+                              <circle
+                                cx="186"
+                                cy="237"
+                                r="20"
+                                fill="transparent"
+                                className="cursor-pointer"
                               />
                             </g>
                           </svg>
