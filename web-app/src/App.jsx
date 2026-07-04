@@ -254,6 +254,8 @@ export default function App() {
   const [hoveredMajorBar, setHoveredMajorBar] = useState(null);
   const [hoveredCityBar, setHoveredCityBar] = useState(null);
   const [hoveredRegionSlice, setHoveredRegionSlice] = useState(null);
+  const [hoveredRegionMap, setHoveredRegionMap] = useState(null);
+  const [selectedRegionMap, setSelectedRegionMap] = useState(null);
 
   // Bookmarking / Saved Jobs State
   const [savedJobs, setSavedJobs] = useState(() => {
@@ -664,7 +666,29 @@ export default function App() {
       const matchSector = !selectedSector || job["Sektor"] === selectedSector;
       const matchSaved = !showSavedOnly || savedJobs.includes(job["Link Detail"]);
 
-      return matchCompany && matchMajor && matchCity && matchEdu && matchSector && matchSaved;
+      let matchRegion = true;
+      if (selectedRegionMap) {
+        const city = (job["Kota"] || "").toLowerCase();
+        if (selectedRegionMap === "Jabodetabek") {
+          matchRegion = city.includes("jakarta") || city.includes("bekasi") || city.includes("tangerang") || city.includes("depok") || city.includes("bogor");
+        } else if (selectedRegionMap === "Jawa & Bali (Luar Jabodetabek)") {
+          matchRegion = city.includes("bandung") || city.includes("semarang") || city.includes("surabaya") || city.includes("tasikmalaya") || city.includes("cilacap") || city.includes("cirebon") || city.includes("bali");
+        } else if (selectedRegionMap === "Sumatera") {
+          matchRegion = city.includes("medan") || city.includes("palembang") || city.includes("dumai") || city.includes("lhokseumawe") || city.includes("indramayu") || city.includes("balongan") || city.includes("tanggamus") || city.includes("muara enim") || city.includes("sumatera") || city.includes("lampung");
+        } else if (selectedRegionMap === "Kalimantan & Sulawesi") {
+          matchRegion = city.includes("balikpapan") || city.includes("makassar") || city.includes("kalimantan") || city.includes("sulawesi") || city.includes("banjarmasin") || city.includes("samarinda");
+        } else {
+          // Indonesia Timur & Lainnya
+          matchRegion = !(
+            city.includes("jakarta") || city.includes("bekasi") || city.includes("tangerang") || city.includes("depok") || city.includes("bogor") ||
+            city.includes("bandung") || city.includes("semarang") || city.includes("surabaya") || city.includes("tasikmalaya") || city.includes("cilacap") || city.includes("cirebon") || city.includes("bali") ||
+            city.includes("medan") || city.includes("palembang") || city.includes("dumai") || city.includes("lhokseumawe") || city.includes("indramayu") || city.includes("balongan") || city.includes("tanggamus") || city.includes("muara enim") || city.includes("sumatera") || city.includes("lampung") ||
+            city.includes("balikpapan") || city.includes("makassar") || city.includes("kalimantan") || city.includes("sulawesi") || city.includes("banjarmasin") || city.includes("samarinda")
+          );
+        }
+      }
+
+      return matchCompany && matchMajor && matchCity && matchEdu && matchSector && matchSaved && matchRegion;
     });
 
     // 2. Apply Fuse.js fuzzy search if search query is active
@@ -1139,6 +1163,41 @@ export default function App() {
       percentage: totalJobs > 0 ? Math.round((skillCounts[name] / totalJobs) * 100) : 0
     })).sort((a, b) => b.count - a.count);
 
+    // 5. Pemetaan Kota riil untuk masing-masing Region Map
+    const mapRegionCities = {
+      "Jabodetabek": {},
+      "Jawa & Bali (Luar Jabodetabek)": {},
+      "Sumatera": {},
+      "Kalimantan & Sulawesi": {},
+      "Indonesia Timur & Lainnya": {}
+    };
+    
+    listingsWithStats.forEach(j => {
+      const city = j.Kota || "Tidak tertera";
+      const cityLower = city.toLowerCase();
+      let regionKey = "Indonesia Timur & Lainnya";
+      
+      if (cityLower.includes("jakarta") || cityLower.includes("bekasi") || cityLower.includes("tangerang") || cityLower.includes("depok") || cityLower.includes("bogor")) {
+        regionKey = "Jabodetabek";
+      } else if (cityLower.includes("bandung") || cityLower.includes("semarang") || cityLower.includes("surabaya") || cityLower.includes("tasikmalaya") || cityLower.includes("cilacap") || cityLower.includes("cirebon") || cityLower.includes("bali")) {
+        regionKey = "Jawa & Bali (Luar Jabodetabek)";
+      } else if (cityLower.includes("medan") || cityLower.includes("palembang") || cityLower.includes("dumai") || cityLower.includes("lhokseumawe") || cityLower.includes("indramayu") || cityLower.includes("balongan") || cityLower.includes("tanggamus") || cityLower.includes("muara enim") || cityLower.includes("sumatera") || cityLower.includes("lampung")) {
+        regionKey = "Sumatera";
+      } else if (cityLower.includes("balikpapan") || cityLower.includes("makassar") || cityLower.includes("kalimantan") || cityLower.includes("sulawesi") || cityLower.includes("banjarmasin") || cityLower.includes("samarinda")) {
+        regionKey = "Kalimantan & Sulawesi";
+      }
+      
+      mapRegionCities[regionKey][city] = (mapRegionCities[regionKey][city] || 0) + 1;
+    });
+    
+    const regionCitiesSorted = {};
+    Object.keys(mapRegionCities).forEach(reg => {
+      regionCitiesSorted[reg] = Object.keys(mapRegionCities[reg]).map(cityName => ({
+        name: cityName,
+        count: mapRegionCities[reg][cityName]
+      })).sort((a, b) => b.count - a.count);
+    });
+
     return {
       totalJobs,
       totalQuota,
@@ -1160,7 +1219,8 @@ export default function App() {
       avgQuotaPerSector,
       sectoralCompetitionIndex,
       quotaCorrelation,
-      topSkills
+      topSkills,
+      regionCitiesSorted
     };
   }, [filteredListings]);
 
@@ -1199,6 +1259,7 @@ export default function App() {
     setSelectedCity("");
     setSelectedEdu("");
     setSelectedSector("");
+    setSelectedRegionMap(null);
     setSortBy("perusahaan");
     setShowSavedOnly(false);
   };
@@ -1879,7 +1940,7 @@ export default function App() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11.5px] text-[#9b9a97] mb-4 select-none bg-[#f7f7f5]/30 border border-[#edece9]/60 px-3 py-2 rounded-md gap-2">
                 <span className="leading-relaxed">
                   Menampilkan <span className="font-bold text-[#37352f]">{filteredListings.length}</span> dari <span className="font-semibold text-[#8a8a86]">{listings.length}</span> posisi lowongan magang
-                  {(selectedCompany || search || selectedMajor || selectedCity || selectedEdu || selectedSector || showSavedOnly) ? (
+                  {(selectedCompany || search || selectedMajor || selectedCity || selectedEdu || selectedSector || showSavedOnly || selectedRegionMap) ? (
                     <span className="text-[#1d7bb8] ml-1 font-semibold">
                       (Filter aktif: {[
                         selectedCompany ? `Instansi: ${selectedCompany}` : "",
@@ -1888,12 +1949,13 @@ export default function App() {
                         selectedCity ? `Kota: ${selectedCity}` : "",
                         selectedEdu ? `Jenjang: ${selectedEdu}` : "",
                         selectedSector ? `Sektor: ${selectedSector}` : "",
+                        selectedRegionMap ? `Wilayah: ${selectedRegionMap}` : "",
                         showSavedOnly ? "Favorit" : ""
                       ].filter(Boolean).join(", ")})
                     </span>
                   ) : null}
                 </span>
-                {(selectedCompany || search || selectedMajor || selectedCity || selectedEdu || selectedSector || showSavedOnly) && (
+                {(selectedCompany || search || selectedMajor || selectedCity || selectedEdu || selectedSector || showSavedOnly || selectedRegionMap) && (
                   <button 
                     onClick={handleResetFilters}
                     className="text-[#c52447] hover:underline font-bold cursor-pointer self-start sm:self-auto text-left"
@@ -2138,6 +2200,207 @@ export default function App() {
                     <span className="text-[11px] font-bold text-[#8a8a86] uppercase tracking-wider">Rata-Rata Keketatan</span>
                     <span className="text-2xl font-extrabold text-[#c52447] tracking-tight">{analyticsData.avgPassRate}%</span>
                     <span className="text-[10px] text-[#8a8a86] mt-0.5">Peluang kelulusan rata-rata</span>
+                  </div>
+                </div>
+
+                {/* SVG Indonesia Map Card */}
+                <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="font-bold text-[14px] text-[#37352f]">Peta Interaktif Sebaran Loker Magang</h3>
+                    <p className="text-[11px] text-[#8a8a86]">Sentuh atau arahkan kursor ke pulau/wilayah untuk rincian kota penempatan magang</p>
+                  </div>
+
+                  <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mt-2">
+                    {/* SVG Map Container */}
+                    <div className="w-full lg:w-2/3 flex justify-center relative select-none">
+                      {(() => {
+                        // Region stats for coloring
+                        const getRegionCount = (regName) => {
+                          const r = analyticsData.regionalDistribution.find(x => x.name === regName);
+                          return r ? r.count : 0;
+                        };
+                        const getRegionColor = (regName) => {
+                          const count = getRegionCount(regName);
+                          if (count === 0) return "#f4f4f5";
+                          if (count <= 5) return "#dbeafe";
+                          if (count <= 25) return "#93c5fd";
+                          return "#1d7bb8";
+                        };
+
+                        const handleRegionClick = (regName) => {
+                          setSelectedRegionMap(regName);
+                          setViewTab("gallery");
+                        };
+
+                        const isHovered = (regName) => hoveredRegionMap === regName;
+
+                        return (
+                          <svg className="w-full h-auto max-h-[220px] overflow-visible" viewBox="0 0 600 220">
+                            {/* Sumatera Group */}
+                            <g
+                              onMouseEnter={() => setHoveredRegionMap("Sumatera")}
+                              onMouseLeave={() => setHoveredRegionMap(null)}
+                              onClick={() => handleRegionClick("Sumatera")}
+                              className="cursor-pointer group/region transition-all duration-300"
+                            >
+                              <path
+                                d="M 45,45 C 55,40 75,55 95,75 C 115,95 135,120 160,145 C 170,155 175,165 180,175 C 175,185 160,185 150,180 L 130,170 C 110,150 80,120 60,95 C 45,70 35,55 45,45 Z"
+                                fill={getRegionColor("Sumatera")}
+                                stroke={isHovered("Sumatera") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Sumatera") ? "2" : "1.2"}
+                                className="transition-all duration-300"
+                              />
+                            </g>
+
+                            {/* Jawa & Bali (Luar Jabodetabek) Group */}
+                            <g
+                              onMouseEnter={() => setHoveredRegionMap("Jawa & Bali (Luar Jabodetabek)")}
+                              onMouseLeave={() => setHoveredRegionMap(null)}
+                              onClick={() => handleRegionClick("Jawa & Bali (Luar Jabodetabek)")}
+                              className="cursor-pointer group/region transition-all duration-300"
+                            >
+                              {/* Java Main Path */}
+                              <path
+                                d="M 180,186 L 210,186 C 235,188 260,191 285,193 L 320,193 L 330,197 L 320,200 C 285,200 250,198 215,196 L 180,192 Z"
+                                fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")}
+                                stroke={isHovered("Jawa & Bali (Luar Jabodetabek)") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Jawa & Bali (Luar Jabodetabek)") ? "2" : "1.2"}
+                                className="transition-all duration-300"
+                              />
+                              {/* Bali, Lombok, Sumbawa, Flores, Timor Dots */}
+                              <circle cx="332" cy="198" r="2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="340" cy="199" r="2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="351" cy="199" r="3.2" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="378" cy="198" r="3.5" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="406" cy="201" r="4.5" fill={getRegionColor("Jawa & Bali (Luar Jabodetabek)")} stroke="#ffffff" strokeWidth="0.5" />
+                            </g>
+
+                            {/* Kalimantan & Sulawesi Group */}
+                            <g
+                              onMouseEnter={() => setHoveredRegionMap("Kalimantan & Sulawesi")}
+                              onMouseLeave={() => setHoveredRegionMap(null)}
+                              onClick={() => handleRegionClick("Kalimantan & Sulawesi")}
+                              className="cursor-pointer group/region transition-all duration-300"
+                            >
+                              {/* Kalimantan Path */}
+                              <path
+                                d="M 225,95 C 245,85 275,85 295,100 C 305,110 315,125 310,140 C 305,155 285,165 265,167 C 245,169 230,160 225,150 C 220,140 215,120 225,95 Z"
+                                fill={getRegionColor("Kalimantan & Sulawesi")}
+                                stroke={isHovered("Kalimantan & Sulawesi") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Kalimantan & Sulawesi") ? "2" : "1.2"}
+                                className="transition-all duration-300"
+                              />
+                              {/* Sulawesi Path */}
+                              <path
+                                d="M 330,105 C 335,95 355,95 360,105 L 360,125 C 375,120 390,120 395,125 L 375,133 C 370,135 365,140 365,150 C 375,155 385,160 390,165 L 380,170 C 370,165 360,157 355,150 C 350,157 340,165 330,170 L 335,155 C 340,145 340,140 335,135 C 325,130 315,130 310,125 Z"
+                                fill={getRegionColor("Kalimantan & Sulawesi")}
+                                stroke={isHovered("Kalimantan & Sulawesi") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Kalimantan & Sulawesi") ? "2" : "1.2"}
+                                className="transition-all duration-300"
+                              />
+                            </g>
+
+                            {/* Indonesia Timur & Lainnya Group */}
+                            <g
+                              onMouseEnter={() => setHoveredRegionMap("Indonesia Timur & Lainnya")}
+                              onMouseLeave={() => setHoveredRegionMap(null)}
+                              onClick={() => handleRegionClick("Indonesia Timur & Lainnya")}
+                              className="cursor-pointer group/region transition-all duration-300"
+                            >
+                              {/* Maluku Dots */}
+                              <circle cx="413" cy="103" r="3" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="427" cy="138" r="2.8" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
+                              <circle cx="410" cy="140" r="2" fill={getRegionColor("Indonesia Timur & Lainnya")} stroke="#ffffff" strokeWidth="0.5" />
+                              {/* Papua Path */}
+                              <path
+                                d="M 465,125 C 475,115 495,110 505,120 C 510,125 505,135 520,135 C 535,135 555,140 570,145 L 570,180 C 545,180 515,175 495,170 C 480,165 470,155 465,145 C 460,135 455,130 465,125 Z"
+                                fill={getRegionColor("Indonesia Timur & Lainnya")}
+                                stroke={isHovered("Indonesia Timur & Lainnya") ? "#1d7bb8" : "#ffffff"}
+                                strokeWidth={isHovered("Indonesia Timur & Lainnya") ? "2" : "1.2"}
+                                className="transition-all duration-300"
+                              />
+                            </g>
+
+                            {/* Jabodetabek Pulse (Placed on top of Java to override hover z-index) */}
+                            <g
+                              onMouseEnter={() => setHoveredRegionMap("Jabodetabek")}
+                              onMouseLeave={() => setHoveredRegionMap(null)}
+                              onClick={() => handleRegionClick("Jabodetabek")}
+                              className="cursor-pointer group/region"
+                            >
+                              <circle
+                                cx="195"
+                                cy="189"
+                                r="6"
+                                fill="#1d7bb8"
+                                className="opacity-40 animate-ping"
+                              />
+                              <circle
+                                cx="195"
+                                cy="189"
+                                r="3.5"
+                                fill="#1d7bb8"
+                                stroke="#ffffff"
+                                strokeWidth="0.8"
+                                className="group-hover/region:scale-125 transition-transform"
+                              />
+                            </g>
+                          </svg>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Interactive Legend & Details Panel */}
+                    <div className="w-full lg:w-1/3 border-t lg:border-t-0 lg:border-l border-[#edece9] pt-4 lg:pt-0 lg:pl-6 flex flex-col gap-4 self-stretch select-none">
+                      {(() => {
+                        const activeReg = hoveredRegionMap || selectedRegionMap || "Jabodetabek";
+                        const activeCount = analyticsData.regionalDistribution.find(x => x.name === activeReg)?.count || 0;
+                        const activeCities = analyticsData.regionCitiesSorted[activeReg] || [];
+                        const pct = analyticsData.regionalDistribution.find(x => x.name === activeReg)?.percentage || 0;
+
+                        return (
+                          <div className="flex flex-col justify-between h-full gap-4">
+                            <div className="flex flex-col gap-2.5">
+                              <div className="flex items-center justify-between border-b border-[#edece9] pb-2">
+                                <span className="font-bold text-[13px] text-[#37352f]">{activeReg}</span>
+                                <span className="text-[11px] font-extrabold text-[#1d7bb8] bg-[#e8f4fa] px-2 py-0.5 rounded-full">
+                                  {activeCount} Loker ({pct}%)
+                                </span>
+                              </div>
+
+                              <div className="flex flex-col gap-1.5 max-h-[140px] overflow-y-auto pr-1">
+                                {activeCities.length > 0 ? (
+                                  activeCities.slice(0, 6).map((ct, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-[11.5px] text-[#5a5a57]">
+                                      <span className="font-medium truncate max-w-[120px]">{ct.name}</span>
+                                      <span className="font-semibold text-[#8a8a86]">{ct.count} posisi</span>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <span className="text-[11px] text-[#8a8a86] italic">Tidak ada penempatan aktif</span>
+                                )}
+                                {activeCities.length > 6 && (
+                                  <span className="text-[9.5px] text-[#8a8a86] italic text-right">+ {activeCities.length - 6} kota lainnya</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Choropleth Kerapatan Legend */}
+                            <div className="flex flex-col gap-1 border-t border-[#edece9]/60 pt-2.5">
+                              <span className="text-[9.5px] font-bold text-[#8a8a86] uppercase tracking-wider">Kerapatan Posisi</span>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <div className="flex-1 h-2 rounded bg-gradient-to-r from-[#f4f4f5] via-[#93c5fd] to-[#1d7bb8]"></div>
+                              </div>
+                              <div className="flex justify-between text-[9px] text-[#8a8a86] font-medium mt-0.5">
+                                <span>Sikit (0-5)</span>
+                                <span>Ramai (6-25)</span>
+                                <span>Sangat Ramai (&gt;25)</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
 
