@@ -1024,12 +1024,12 @@ export default function App() {
       const city = (j.Kota || "").toLowerCase();
       if (city.includes("jakarta") || city.includes("bekasi") || city.includes("tangerang") || city.includes("depok") || city.includes("bogor")) {
         regionalCount["Jabodetabek"]++;
-      } else if (city.includes("bandung") || city.includes("semarang") || city.includes("surabaya") || city.includes("tasikmalaya") || city.includes("cilacap") || city.includes("cirebon") || city.includes("bali")) {
-        regionalCount["Jawa & Bali (Luar Jabodetabek)"]++;
-      } else if (city.includes("medan") || city.includes("palembang") || city.includes("dumai") || city.includes("lhokseumawe") || city.includes("indramayu") || city.includes("balongan") || city.includes("tanggamus") || city.includes("muara enim") || city.includes("sumatera") || city.includes("lampung")) {
-        regionalCount["Sumatera"]++;
-      } else if (city.includes("balikpapan") || city.includes("makassar") || city.includes("kalimantan") || city.includes("sulawesi") || city.includes("banjarmasin") || city.includes("samarinda")) {
+      } else if (city.includes("balikpapan") || city.includes("makassar") || city.includes("kalimantan") || city.includes("sulawesi") || city.includes("banjarmasin") || city.includes("samarinda") || city.includes("tomohon")) {
         regionalCount["Kalimantan & Sulawesi"]++;
+      } else if (city.includes("bandung") || city.includes("semarang") || city.includes("surabaya") || city.includes("tasikmalaya") || city.includes("cilacap") || city.includes("cirebon") || city.includes("bali") || city.includes("indramayu") || city.includes("balongan")) {
+        regionalCount["Jawa & Bali (Luar Jabodetabek)"]++;
+      } else if (city.includes("medan") || city.includes("palembang") || city.includes("dumai") || city.includes("lhokseumawe") || city.includes("tanggamus") || city.includes("muara enim") || city.includes("sumatera") || city.includes("lampung")) {
+        regionalCount["Sumatera"]++;
       } else {
         regionalCount["Indonesia Timur & Lainnya"]++;
       }
@@ -1179,12 +1179,12 @@ export default function App() {
       
       if (cityLower.includes("jakarta") || cityLower.includes("bekasi") || cityLower.includes("tangerang") || cityLower.includes("depok") || cityLower.includes("bogor")) {
         regionKey = "Jabodetabek";
-      } else if (cityLower.includes("bandung") || cityLower.includes("semarang") || cityLower.includes("surabaya") || cityLower.includes("tasikmalaya") || cityLower.includes("cilacap") || cityLower.includes("cirebon") || cityLower.includes("bali")) {
-        regionKey = "Jawa & Bali (Luar Jabodetabek)";
-      } else if (cityLower.includes("medan") || cityLower.includes("palembang") || cityLower.includes("dumai") || cityLower.includes("lhokseumawe") || cityLower.includes("indramayu") || cityLower.includes("balongan") || cityLower.includes("tanggamus") || cityLower.includes("muara enim") || cityLower.includes("sumatera") || cityLower.includes("lampung")) {
-        regionKey = "Sumatera";
-      } else if (cityLower.includes("balikpapan") || cityLower.includes("makassar") || cityLower.includes("kalimantan") || cityLower.includes("sulawesi") || cityLower.includes("banjarmasin") || cityLower.includes("samarinda")) {
+      } else if (cityLower.includes("balikpapan") || cityLower.includes("makassar") || cityLower.includes("kalimantan") || cityLower.includes("sulawesi") || cityLower.includes("banjarmasin") || cityLower.includes("samarinda") || cityLower.includes("tomohon")) {
         regionKey = "Kalimantan & Sulawesi";
+      } else if (cityLower.includes("bandung") || cityLower.includes("semarang") || cityLower.includes("surabaya") || cityLower.includes("tasikmalaya") || cityLower.includes("cilacap") || cityLower.includes("cirebon") || cityLower.includes("bali") || cityLower.includes("indramayu") || cityLower.includes("balongan")) {
+        regionKey = "Jawa & Bali (Luar Jabodetabek)";
+      } else if (cityLower.includes("medan") || cityLower.includes("palembang") || cityLower.includes("dumai") || cityLower.includes("lhokseumawe") || cityLower.includes("tanggamus") || cityLower.includes("muara enim") || cityLower.includes("sumatera") || cityLower.includes("lampung")) {
+        regionKey = "Sumatera";
       }
       
       mapRegionCities[regionKey][city] = (mapRegionCities[regionKey][city] || 0) + 1;
