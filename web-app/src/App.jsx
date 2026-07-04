@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Search,
   Table as TableIcon,
@@ -285,7 +285,8 @@ export default function App() {
   const [hoveredCityBar, setHoveredCityBar] = useState(null);
   const [hoveredRegionSlice, setHoveredRegionSlice] = useState(null);
   const [hoveredRegionMap, setHoveredRegionMap] = useState(null);
-  const [selectedRegionMap, setSelectedRegionMap] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchContainerRef = useRef(null);
 
   // Kelayakan Calculator States
   const [calcMajorDraft, setCalcMajorDraft] = useState("Semua Jurusan");
@@ -308,6 +309,19 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("karirenergi-saved-jobs", JSON.stringify(savedJobs));
   }, [savedJobs]);
+
+  // Handle click outside to close autocomplete suggestions dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
 
 
@@ -538,6 +552,17 @@ export default function App() {
     setSelectedSector(draftSector);
     setSidebarOpen(false);
     setFilterDrawerOpen(false);
+  };
+
+  const handleSelectSuggestion = (suggestion) => {
+    setDraftSearch(suggestion);
+    setSearch(suggestion);
+    setSelectedCompany(draftCompany);
+    setSelectedMajor(draftMajor);
+    setSelectedCity(draftCity);
+    setSelectedEdu(draftEdu);
+    setSelectedSector(draftSector);
+    setShowSuggestions(false);
   };
 
   // Countdown Timer State (Target: 5 July 2026 at 23:59 WIB)
@@ -772,6 +797,40 @@ export default function App() {
       majorCounts,
     };
   }, [listings]);
+
+  // Extract all unique suggestions dynamically
+  const searchSuggestions = useMemo(() => {
+    const titles = new Set();
+    listings.forEach((j) => {
+      if (j["Judul Lowongan"]) {
+        const cleanedTitle = j["Judul Lowongan"].replace(/^INTERNSHIP\s*\d*\s*[-–]?\s*/i, "").trim();
+        if (cleanedTitle.length > 2) {
+          titles.add(cleanedTitle);
+        }
+      }
+    });
+
+    const majorsList = filterOptions?.majors || [];
+    const allCandidates = Array.from(new Set([
+      ...Array.from(titles),
+      ...majorsList
+    ])).filter(item => item !== "Semua Jurusan");
+
+    if (!draftSearch.trim()) {
+      return [
+        "Teknik",
+        "Akuntansi",
+        "Hukum",
+        "HSE",
+        "Public Relations"
+      ].filter(item => allCandidates.some(c => c.toLowerCase().includes(item.toLowerCase())));
+    }
+
+    const query = draftSearch.toLowerCase().trim();
+    return allCandidates
+      .filter((item) => item.toLowerCase().includes(query))
+      .slice(0, 5);
+  }, [listings, filterOptions, draftSearch]);
 
   // Auto-open job modal if "?job=XXXX" query param is present on mount
   useEffect(() => {
@@ -1985,16 +2044,49 @@ export default function App() {
               {/* Search, Sort & Filters in One Line */}
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 {/* Search Bar - Always Visible */}
-                <div className="relative flex-grow sm:w-60 max-w-md">
+                <div 
+                  ref={searchContainerRef}
+                  className="relative flex-grow sm:w-60 max-w-md"
+                >
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
                   <input
                     type="text"
                     placeholder="Cari lowongan magang..."
                     value={draftSearch}
-                    onChange={(e) => setDraftSearch(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") handleApplyFilters(); }}
+                    onChange={(e) => {
+                      setDraftSearch(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleApplyFilters();
+                        setShowSuggestions(false);
+                      } else if (e.key === "Escape") {
+                        setShowSuggestions(false);
+                      }
+                    }}
                     className="w-full text-[12.5px] border border-[#edece9] bg-[#f7f7f5]/40 focus:bg-white rounded-md pl-8 pr-3 py-1.5 outline-none focus:border-[#dfdfde] transition-all"
                   />
+                  
+                  {/* Autocomplete Suggestions Menu */}
+                  {showSuggestions && searchSuggestions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[#edece9] shadow-lg rounded-xl z-50 overflow-hidden flex flex-col py-1 text-[12px] text-[#37352f] select-none animate-scale-in">
+                      <div className="px-3 py-1.5 text-[10px] font-bold text-[#8a8a86] tracking-wide uppercase bg-[#f7f7f5]/80 border-b border-[#edece9]/50">
+                        {!draftSearch.trim() ? "Rekomendasi Pencarian" : "Saran Kata Kunci"}
+                      </div>
+                      {searchSuggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSelectSuggestion(suggestion)}
+                          className="w-full text-left px-3 py-2 hover:bg-[#edece9]/50 hover:text-[#1d7bb8] transition-colors cursor-pointer flex items-center gap-2 font-medium"
+                        >
+                          <Search className="w-3 h-3 text-[#9b9a97]" />
+                          <span className="truncate">{suggestion}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Mobile Filter Button - only visible on mobile (under md) to open bottom sheet */}
