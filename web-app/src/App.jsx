@@ -1699,22 +1699,21 @@ export default function App() {
         </div>
 
         {/* Footer */}
-        <div className={`p-4 border-t border-[#edece9]/50 bg-[#fbfbfa] flex-shrink-0 ${sidebarOpen ? "block" : "hidden"}`}>
-          <div className="flex flex-col gap-2.5 bg-[#f2f1ee]/50 border border-[#edece9]/70 rounded-xl p-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-            <div className="text-[11px] font-extrabold text-[#37352f] select-none text-center">
-              <span>KarirEnergi &copy; 2026</span>
-            </div>
-
+        <div className={`p-4 border-t border-[#edece9]/50 bg-transparent flex-shrink-0 text-center flex flex-col gap-1.5 select-none ${sidebarOpen ? "block" : "hidden"}`}>
+          <span className="text-[10px] text-[#8a8a86] font-semibold leading-none">
+            KarirEnergi &copy; 2026
+          </span>
+          <span className="text-[10px] text-[#8a8a86] font-medium">
+            Support:{" "}
             <a
               href="https://saweria.co/mocitaz"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-extrabold text-[#c52447] bg-[#fdf2f4] hover:bg-[#fbdfe4] border border-[#c52447]/15 active:scale-[0.98] rounded-lg transition-all select-none cursor-pointer"
+              className="text-[#1d7bb8] hover:underline font-bold"
             >
-              <span>Support Creator</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#c52447]" />
+              saweria.co/mocitaz
             </a>
-          </div>
+          </span>
         </div>
       </aside>
 
