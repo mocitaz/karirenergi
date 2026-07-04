@@ -349,7 +349,7 @@
                     industri = industri.replace(/[\s\-\•\.\,]+$/, '').trim();
                     sektor = sektor.replace(/[\s\-\•\.\,]+$/, '').trim();
 
-                    const matchPendidikan = fullText.match(/(?:Tingkat\s+)?Pendidikan\s*:\s*([^\n\r]+)/i);
+                    const matchPendidikan = fullText.match(/(?:Tingkat\s+)?Pendidikan[^\n\r:]*:\s*([^\n\r]+)/i);
                     if (matchPendidikan) {
                         let val = matchPendidikan[1].trim();
                         const indexJur = val.toLowerCase().indexOf("jurusan");
