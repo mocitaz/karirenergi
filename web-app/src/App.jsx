@@ -2458,7 +2458,7 @@ export default function App() {
                         const slices = sectors.map((s, idx) => {
                           const percentage = total > 0 ? (s.count / total) * 100 : 0;
                           const dashLength = (percentage / 100) * circ;
-                          const dashOffset = circ - ((accumulatedPercent / 100) * circ);
+                          const dashOffset = -((accumulatedPercent / 100) * circ);
                           accumulatedPercent += percentage;
                           
                           return {
