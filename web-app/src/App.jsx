@@ -695,6 +695,30 @@ export default function App() {
         const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"], b["Kuota"], b["Pelamar"]);
         return parseFloat(statsA.passRate) - parseFloat(statsB.passRate);
       });
+    } else if (sortBy === "pelamar-desc") {
+      result.sort((a, b) => {
+        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"], a["Kuota"], a["Pelamar"]);
+        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"], b["Kuota"], b["Pelamar"]);
+        return statsB.pelamar - statsA.pelamar;
+      });
+    } else if (sortBy === "pelamar-asc") {
+      result.sort((a, b) => {
+        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"], a["Kuota"], a["Pelamar"]);
+        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"], b["Kuota"], b["Pelamar"]);
+        return statsA.pelamar - statsB.pelamar;
+      });
+    } else if (sortBy === "kuota-desc") {
+      result.sort((a, b) => {
+        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"], a["Kuota"], a["Pelamar"]);
+        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"], b["Kuota"], b["Pelamar"]);
+        return statsB.kuota - statsA.kuota;
+      });
+    } else if (sortBy === "kuota-asc") {
+      result.sort((a, b) => {
+        const statsA = getDeterministicStats(a["Judul Lowongan"], a["Perusahaan"], a["Link Detail"], a["Kuota"], a["Pelamar"]);
+        const statsB = getDeterministicStats(b["Judul Lowongan"], b["Perusahaan"], b["Link Detail"], b["Kuota"], b["Pelamar"]);
+        return statsA.kuota - statsB.kuota;
+      });
     }
 
     return result;
@@ -1737,6 +1761,10 @@ export default function App() {
                   <option value="judul">Judul Lowongan</option>
                   <option value="peluang-desc">Peluang Lolos (Tertinggi)</option>
                   <option value="peluang-asc">Peluang Lolos (Terendah)</option>
+                  <option value="pelamar-desc">Pelamar (Terbanyak)</option>
+                  <option value="pelamar-asc">Pelamar (Tersedikit)</option>
+                  <option value="kuota-desc">Kuota (Terbesar)</option>
+                  <option value="kuota-asc">Kuota (Terkecil)</option>
                 </select>
               </div>
 
@@ -1825,6 +1853,10 @@ export default function App() {
                   <option value="judul">Judul</option>
                   <option value="peluang-desc">Peluang ↑</option>
                   <option value="peluang-asc">Peluang ↓</option>
+                  <option value="pelamar-desc">Pelamar ↑</option>
+                  <option value="pelamar-asc">Pelamar ↓</option>
+                  <option value="kuota-desc">Kuota ↑</option>
+                  <option value="kuota-asc">Kuota ↓</option>
                 </select>
               </div>
             </div>
