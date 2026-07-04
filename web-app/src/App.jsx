@@ -285,6 +285,7 @@ export default function App() {
   const [hoveredCityBar, setHoveredCityBar] = useState(null);
   const [hoveredRegionSlice, setHoveredRegionSlice] = useState(null);
   const [hoveredRegionMap, setHoveredRegionMap] = useState(null);
+  const [selectedRegionMap, setSelectedRegionMap] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchContainerRef = useRef(null);
 
