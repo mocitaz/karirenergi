@@ -1701,33 +1701,18 @@ export default function App() {
         {/* Footer */}
         <div className={`p-4 border-t border-[#edece9]/50 bg-[#fbfbfa] flex-shrink-0 ${sidebarOpen ? "block" : "hidden"}`}>
           <div className="flex flex-col gap-2.5 bg-[#f2f1ee]/50 border border-[#edece9]/70 rounded-xl p-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
-            <div className="flex items-center justify-between text-[11px] font-extrabold text-[#37352f] select-none">
+            <div className="text-[11px] font-extrabold text-[#37352f] select-none text-center">
               <span>KarirEnergi &copy; 2026</span>
-              <span className="text-[9px] font-bold bg-[#1d7bb8]/8 text-[#1d7bb8] px-1.5 py-0.5 rounded border border-[#1d7bb8]/15 tracking-wide uppercase">
-                Non-Official
-              </span>
-            </div>
-
-            <p className="text-[10.5px] text-[#5a5a57] leading-relaxed">
-              Katalog independen. Semua data diperoleh dari rekrutmen resmi Pertamina. Karya ini bersifat gratis & tidak boleh diperjualbelikan.
-            </p>
-
-            <div className="flex items-center gap-2 text-[10.5px] text-[#43873e] bg-[#edf6ec]/50 border border-[#43873e]/10 py-1 px-2.5 rounded-lg font-bold select-none w-fit">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#43873e] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#43873e]"></span>
-              </span>
-              <span>{liveVisitors} orang sedang memantau</span>
             </div>
 
             <a
-              href="https://www.threads.net/@mocitaz"
+              href="https://saweria.co/mocitaz"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 w-full flex items-center justify-center gap-1.5 py-2 text-[10.5px] font-extrabold text-white bg-[#121212] hover:bg-[#2c2c2c] active:scale-[0.98] rounded-lg transition-all shadow-sm select-none cursor-pointer"
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-extrabold text-[#c52447] bg-[#fdf2f4] hover:bg-[#fbdfe4] border border-[#c52447]/15 active:scale-[0.98] rounded-lg transition-all select-none cursor-pointer"
             >
-              <span>Follow Threads @mocitaz</span>
-              <ArrowUpRight className="w-3 h-3 text-[#edece9]" />
+              <span>Support Creator</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#c52447]" />
             </a>
           </div>
         </div>
