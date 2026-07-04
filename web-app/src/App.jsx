@@ -2549,8 +2549,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Row 7: Sektor & Keahlian Analisis (4-Column Row, Forced side-by-side) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:col-span-2">
+                  {/* Row 7-8: Sektor, Korelasi & Keahlian Analisis (Standard 2-Column Grid Items) */}
                     
                     {/* Card 13: Rata-Rata Kuota per Lowongan (Sektor) */}
                     <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
@@ -2734,8 +2733,6 @@ export default function App() {
                         ))}
                       </div>
                     </div>
-
-                  </div>
                 </div>
               </div>
             )}
