@@ -1966,19 +1966,42 @@ export default function App() {
             {/* Compact Monospace Countdown - Collapse when scrolled */}
             {!timeLeft.isExpired && (
               <div className={`transition-all duration-300 ease-in-out ${
-                isScrolled ? "h-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none" : "flex items-center bg-[#f1f1ef]/60 border border-[#edece9] text-[#37352f] px-3.5 py-1.5 rounded-lg text-[12px] w-fit shadow-3xs self-start sm:self-center"
+                isScrolled 
+                  ? "h-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none" 
+                  : `flex items-center text-[12px] w-fit shadow-3xs self-start sm:self-center px-3.5 py-1.5 rounded-lg border transition-all ${
+                      timeLeft.days === 0 
+                        ? "bg-[#fdf2f2] border-[#fca5a5] text-[#9b1c1c] animate-pulse" 
+                        : "bg-[#f1f1ef]/60 border-[#edece9] text-[#37352f]"
+                    }`
               }`}>
-                <Timer className="w-3.5 h-3.5 mr-2 text-[#5a5a57] flex-shrink-0" />
+                {timeLeft.days === 0 ? (
+                  <span className="relative flex h-2 w-2 mr-2.5 flex-shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e53e3e] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#e53e3e]"></span>
+                  </span>
+                ) : (
+                  <Timer className="w-3.5 h-3.5 mr-2 text-[#5a5a57] flex-shrink-0" />
+                )}
                 <div className="flex flex-col">
-                  <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-[#8a8a86] leading-none mb-0.5">Batas Registrasi</span>
-                  <span className="font-mono font-bold leading-none select-none flex items-center gap-0.5 text-[#37352f]">
-                    <span>{timeLeft.days}<span className="text-[8.5px] font-sans font-semibold text-[#8a8a86] ml-0.5">d</span></span>
-                    <span className="text-[#8a8a86]/50 font-sans mx-1">:</span>
-                    <span>{String(timeLeft.hours).padStart(2, "0")}<span className="text-[8.5px] font-sans font-semibold text-[#8a8a86] ml-0.5">h</span></span>
-                    <span className="text-[#8a8a86]/50 font-sans mx-1">:</span>
-                    <span>{String(timeLeft.minutes).padStart(2, "0")}<span className="text-[8.5px] font-sans font-semibold text-[#8a8a86] ml-0.5">m</span></span>
-                    <span className="text-[#8a8a86]/50 font-sans mx-1">:</span>
-                    <span>{String(timeLeft.seconds).padStart(2, "0")}<span className="text-[8.5px] font-sans font-semibold text-[#8a8a86] ml-0.5">s</span></span>
+                  <span className={`text-[9.5px] font-extrabold uppercase tracking-wider leading-none mb-0.5 ${
+                    timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"
+                  }`}>
+                    {timeLeft.days === 0 ? "⚠️ PENDAFTARAN SEGERA DITUTUP!" : "Batas Registrasi"}
+                  </span>
+                  <span className={`font-mono font-bold leading-none select-none flex items-center gap-0.5 ${
+                    timeLeft.days === 0 ? "text-[#c53030]" : "text-[#37352f]"
+                  }`}>
+                    {timeLeft.days > 0 && (
+                      <>
+                        <span>{timeLeft.days}<span className="text-[8.5px] font-sans font-semibold text-[#8a8a86] ml-0.5">d</span></span>
+                        <span className="text-[#8a8a86]/50 font-sans mx-1">:</span>
+                      </>
+                    )}
+                    <span>{String(timeLeft.hours).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>h</span></span>
+                    <span className={`font-sans mx-1 ${timeLeft.days === 0 ? "text-[#fca5a5]" : "text-[#8a8a86]/50"}`}>:</span>
+                    <span>{String(timeLeft.minutes).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>m</span></span>
+                    <span className={`font-sans mx-1 ${timeLeft.days === 0 ? "text-[#fca5a5]" : "text-[#8a8a86]/50"}`}>:</span>
+                    <span>{String(timeLeft.seconds).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>s</span></span>
                   </span>
                 </div>
               </div>
