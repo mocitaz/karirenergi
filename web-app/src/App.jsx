@@ -287,37 +287,7 @@ export default function App() {
     localStorage.setItem("karirenergi-saved-jobs", JSON.stringify(savedJobs));
   }, [savedJobs]);
 
-  // Auto-open job modal if "?job=XXXX" query param is present on mount
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const jobId = params.get("job");
-    if (jobId && listings && listings.length > 0) {
-      const match = listings.find((j) => getJobId(j["Link Detail"]) === jobId);
-      if (match) {
-        setSelectedJob(match);
-      }
-    }
-  }, [listings]);
 
-  // Sync selectedJob state to the address bar query params
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (selectedJob) {
-      const currentJobId = getJobId(selectedJob["Link Detail"]);
-      if (params.get("job") !== currentJobId) {
-        params.set("job", currentJobId);
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-        window.history.pushState(null, "", newUrl);
-      }
-    } else {
-      if (params.has("job")) {
-        params.delete("job");
-        const cleanQuery = params.toString();
-        const newUrl = cleanQuery ? `${window.location.pathname}?${cleanQuery}` : window.location.pathname;
-        window.history.replaceState(null, "", newUrl);
-      }
-    }
-  }, [selectedJob]);
 
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [pendingBookmark, setPendingBookmark] = useState(null);
@@ -780,6 +750,38 @@ export default function App() {
       majorCounts,
     };
   }, [listings]);
+
+  // Auto-open job modal if "?job=XXXX" query param is present on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get("job");
+    if (jobId && listings && listings.length > 0) {
+      const match = listings.find((j) => getJobId(j["Link Detail"]) === jobId);
+      if (match) {
+        setSelectedJob(match);
+      }
+    }
+  }, [listings]);
+
+  // Sync selectedJob state to the address bar query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (selectedJob) {
+      const currentJobId = getJobId(selectedJob["Link Detail"]);
+      if (params.get("job") !== currentJobId) {
+        params.set("job", currentJobId);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.pushState(null, "", newUrl);
+      }
+    } else {
+      if (params.has("job")) {
+        params.delete("job");
+        const cleanQuery = params.toString();
+        const newUrl = cleanQuery ? `${window.location.pathname}?${cleanQuery}` : window.location.pathname;
+        window.history.replaceState(null, "", newUrl);
+      }
+    }
+  }, [selectedJob]);
 
   // Apply filters and sorting
   const filteredListings = useMemo(() => {
