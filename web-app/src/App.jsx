@@ -636,9 +636,24 @@ export default function App() {
         });
         seenMajors.forEach((m) => {
           majors.add(m);
-          majorCounts[m] = (majorCounts[m] || 0) + 1;
         });
       }
+    });
+
+    const sortedMajors = Array.from(majors).sort();
+    
+    // Count general "Semua Jurusan" vacancies
+    const generalCount = listings.filter(j => 
+      (j["Jurusan"] || "").toLowerCase().includes("semua jurusan")
+    ).length;
+    majorCounts["Semua Jurusan"] = generalCount;
+
+    // Count specific major eligible vacancies (specific + semua jurusan)
+    sortedMajors.forEach(m => {
+      majorCounts[m] = listings.filter(j => {
+        const jur = (j["Jurusan"] || "").toLowerCase();
+        return jur.includes(m.toLowerCase()) || jur.includes("semua jurusan");
+      }).length;
     });
 
     return {
@@ -646,7 +661,7 @@ export default function App() {
       cities: Array.from(cities).sort(),
       educations: Array.from(educations).sort(),
       sectors: Array.from(sectors).sort(),
-      majors: Array.from(majors).sort(),
+      majors: ["Semua Jurusan", ...sortedMajors],
       companyCounts,
       cityCounts,
       educationCounts,
@@ -660,7 +675,15 @@ export default function App() {
     // 1. Initial base filtering (all filters except search query)
     let result = listings.filter((job) => {
       const matchCompany = !selectedCompany || job["Perusahaan"] === selectedCompany;
-      const matchMajor = !selectedMajor || job["Jurusan"].toLowerCase().includes(selectedMajor.toLowerCase());
+      let matchMajor = true;
+      if (selectedMajor) {
+        if (selectedMajor === "Semua Jurusan") {
+          matchMajor = job["Jurusan"].toLowerCase().includes("semua jurusan");
+        } else {
+          matchMajor = job["Jurusan"].toLowerCase().includes(selectedMajor.toLowerCase()) || 
+                       job["Jurusan"].toLowerCase().includes("semua jurusan");
+        }
+      }
       const matchCity = !selectedCity || job["Kota"] === selectedCity;
       const matchEdu = !selectedEdu || job["Pendidikan"] === selectedEdu;
       const matchSector = !selectedSector || job["Sektor"] === selectedSector;
@@ -1480,9 +1503,9 @@ export default function App() {
                       onChange={(e) => setDraftMajor(e.target.value)}
                       className="w-full text-[12px] border border-[#edece9] rounded-lg px-2.5 py-1.5 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                     >
-                      <option value="">Semua Jurusan</option>
+                      <option value="">Seluruh Jurusan (No Filter)</option>
                       {filterOptions.majors.map((m) => (
-                        <option key={m} value={m}>{m}</option>
+                        <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
                       ))}
                     </select>
                   </div>
@@ -1855,9 +1878,9 @@ export default function App() {
                 onChange={(e) => setDraftMajor(e.target.value)}
                 className="text-[12px] bg-[#f1f1ef]/60 hover:bg-[#edece9]/80 text-[#5a5a57] font-medium border-none rounded-md px-2.5 py-1.5 outline-none cursor-pointer transition-all flex-grow max-w-[155px] notion-select"
               >
-                <option value="">Semua Jurusan</option>
+                <option value="">Seluruh Jurusan (No Filter)</option>
                 {filterOptions.majors.map((m) => (
-                  <option key={m} value={m}>{m}</option>
+                  <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
                 ))}
               </select>
 
@@ -4256,9 +4279,9 @@ export default function App() {
                   onChange={(e) => setDraftMajor(e.target.value)}
                   className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                 >
-                  <option value="">Semua Jurusan</option>
+                  <option value="">Seluruh Jurusan (No Filter)</option>
                   {filterOptions.majors.map((m) => (
-                    <option key={m} value={m}>{m}</option>
+                    <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
                   ))}
                 </select>
               </div>
