@@ -23,7 +23,8 @@ import {
   Timer,
   Sun,
   Moon,
-  Share2
+  Share2,
+  Award
 } from "lucide-react";
 import lokerData from "./data/loker_data.json";
 import Fuse from "fuse.js";
@@ -256,6 +257,11 @@ export default function App() {
   const [hoveredRegionSlice, setHoveredRegionSlice] = useState(null);
   const [hoveredRegionMap, setHoveredRegionMap] = useState(null);
   const [selectedRegionMap, setSelectedRegionMap] = useState(null);
+
+  // Kelayakan Calculator States
+  const [calcMajor, setCalcMajor] = useState("Semua Jurusan");
+  const [calcCity, setCalcCity] = useState("");
+  const [calcEdu, setCalcEdu] = useState("");
 
   // Bookmarking / Saved Jobs State
   const [savedJobs, setSavedJobs] = useState(() => {
@@ -825,6 +831,62 @@ export default function App() {
 
     return result;
   }, [listings, search, selectedCompany, selectedMajor, selectedCity, selectedEdu, selectedSector, sortBy, showSavedOnly, savedJobs]);
+
+  // Calculate Kelayakan matching data
+  const calcResults = useMemo(() => {
+    const totalCount = listings.length;
+    if (totalCount === 0) return { eligibleJobs: [], percentage: 0, topCompany: "-", avgPeluang: 0 };
+    
+    const eligibleJobs = listings.filter((job) => {
+      if (calcEdu && job["Pendidikan"] !== calcEdu) return false;
+      if (calcCity && job["Kota"] !== calcCity) return false;
+      if (calcMajor) {
+        const req = (job["Jurusan"] || "").toLowerCase();
+        if (calcMajor === "Semua Jurusan") {
+          return req.includes("semua jurusan");
+        } else {
+          return req.includes(calcMajor.toLowerCase()) || req.includes("semua jurusan");
+        }
+      }
+      return true;
+    });
+
+    const percentage = totalCount > 0 ? Math.round((eligibleJobs.length / totalCount) * 100) : 0;
+
+    const eligibleJobsWithStats = eligibleJobs.map(job => {
+      const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"], job["Kuota"], job["Pelamar"]);
+      return { ...job, stats };
+    });
+
+    eligibleJobsWithStats.sort((a, b) => parseFloat(b.stats.passRate) - parseFloat(a.stats.passRate));
+
+    const companyCounts = {};
+    eligibleJobs.forEach(job => {
+      const co = job["Perusahaan"];
+      companyCounts[co] = (companyCounts[co] || 0) + 1;
+    });
+    let topCompany = "-";
+    let maxCompanyCount = 0;
+    Object.keys(companyCounts).forEach(co => {
+      if (companyCounts[co] > maxCompanyCount) {
+        maxCompanyCount = companyCounts[co];
+        topCompany = co;
+      }
+    });
+
+    let totalPassRate = 0;
+    eligibleJobsWithStats.forEach(job => {
+      totalPassRate += parseFloat(job.stats.passRate);
+    });
+    const avgPeluang = eligibleJobsWithStats.length > 0 ? (totalPassRate / eligibleJobsWithStats.length).toFixed(1) : 0;
+
+    return {
+      eligibleJobs: eligibleJobsWithStats,
+      percentage,
+      topCompany,
+      avgPeluang
+    };
+  }, [listings, calcMajor, calcCity, calcEdu]);
 
   // Previous and Next job navigation in Detail Modal
   const currentIdx = useMemo(() => {
@@ -1842,6 +1904,17 @@ export default function App() {
                 >
                   <TrendingUp className="w-3.5 h-3.5" />
                   Analisis
+                </button>
+                <button
+                  onClick={() => setViewTab("kelayakan")}
+                  className={`flex items-center gap-1.5 px-3 py-1.25 rounded-md text-[12px] transition-all cursor-pointer ${
+                    viewTab === "kelayakan"
+                      ? "bg-white text-[#37352f] font-bold shadow-xs"
+                      : "text-[#5a5a57] hover:text-[#37352f]"
+                  }`}
+                >
+                  <Award className="w-3.5 h-3.5" />
+                  Kelayakan
                 </button>
               </div>
 
@@ -3938,6 +4011,201 @@ export default function App() {
                         ))}
                       </div>
                     </div>
+                </div>
+              </div>
+            )}
+
+            {/* Kelayakan View */}
+            {viewTab === "kelayakan" && (
+              <div className="flex flex-col lg:flex-row gap-6 animate-fade-in select-none">
+                {/* Kolom Kiri: Input Profil & Progress Ring */}
+                <div className="w-full lg:w-5/12 flex flex-col gap-5">
+                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-3xs">
+                    <h3 className="font-bold text-[15px] text-[#37352f] mb-4 flex items-center gap-2">
+                      <Award className="w-4 h-4 text-[#1d7bb8]" />
+                      Profil Pelamar
+                    </h3>
+                    
+                    <div className="flex flex-col gap-4">
+                      {/* Dropdown Jurusan */}
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-bold text-[#8a8a86] uppercase tracking-wider">Jurusan Anda</label>
+                        <select
+                          value={calcMajor}
+                          onChange={(e) => setCalcMajor(e.target.value)}
+                          className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                        >
+                          {filterOptions.majors.map((m) => (
+                            <option key={m} value={m}>{m} ({filterOptions.majorCounts[m] || 0})</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Dropdown Jenjang */}
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-bold text-[#8a8a86] uppercase tracking-wider">Jenjang Pendidikan</label>
+                        <select
+                          value={calcEdu}
+                          onChange={(e) => setCalcEdu(e.target.value)}
+                          className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                        >
+                          <option value="">Semua Jenjang (Pendidikan)</option>
+                          {filterOptions.educations.map((ed) => (
+                            <option key={ed} value={ed}>{ed} ({filterOptions.educationCounts[ed] || 0})</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Dropdown Lokasi */}
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[10px] font-bold text-[#8a8a86] uppercase tracking-wider">Preferensi Lokasi</label>
+                        <select
+                          value={calcCity}
+                          onChange={(e) => setCalcCity(e.target.value)}
+                          className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
+                        >
+                          <option value="">Semua Lokasi (Kota)</option>
+                          {filterOptions.cities.map((ct) => (
+                            <option key={ct} value={ct}>{ct} ({filterOptions.cityCounts[ct] || 0})</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ringkasan Ring Progress */}
+                  <div className="bg-white border border-[#edece9] rounded-xl p-5 shadow-3xs flex flex-col items-center text-center gap-4">
+                    <h4 className="font-semibold text-[13.5px] text-[#5a5a57]">Statistik Kelayakan Loker</h4>
+                    
+                    {/* SVG Circular Progress Meter */}
+                    <div className="relative w-36 h-36 flex items-center justify-center">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                        {/* Background Ring */}
+                        <circle cx="50" cy="50" r="40" stroke="#edece9" strokeWidth="8" fill="transparent" />
+                        {/* Foreground Ring with Gradient */}
+                        <circle 
+                          cx="50" 
+                          cy="50" 
+                          r="40" 
+                          stroke="url(#calcGrad)" 
+                          strokeWidth="8" 
+                          fill="transparent" 
+                          strokeDasharray={2 * Math.PI * 40}
+                          strokeDashoffset={2 * Math.PI * 40 * (1 - calcResults.percentage / 100)}
+                          strokeLinecap="round"
+                          className="transition-all duration-700 ease-out"
+                        />
+                        <defs>
+                          <linearGradient id="calcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#1d7bb8" />
+                            <stop offset="100%" stopColor="#00e5ff" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      {/* Percent Center Label */}
+                      <div className="absolute flex flex-col items-center">
+                        <span className="text-[24px] font-extrabold text-[#37352f] leading-none">{calcResults.percentage}%</span>
+                        <span className="text-[9px] text-[#8a8a86] font-bold uppercase mt-1">Kesesuaian</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <p className="text-[12px] text-[#37352f] leading-relaxed">
+                        Anda memenuhi syarat kelayakan untuk <strong>{calcResults.eligibleJobs.length}</strong> posisi dari total {listings.length} lowongan aktif magang.
+                      </p>
+                      
+                      {calcResults.eligibleJobs.length > 0 && (
+                        <div className="mt-2 p-3 bg-[#e8f4fa] text-[#1d7bb8] rounded-lg text-[11px] font-semibold text-left flex flex-col gap-1 border border-[#1d7bb8]/10 w-full">
+                          <div>📍 Fokus Terbanyak: <span className="underline">{calcResults.topCompany}</span></div>
+                          <div>📈 Rata-Rata Peluang Lolos: <span className="underline">{calcResults.avgPeluang}%</span></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kolom Kanan: Rekomendasi Lowongan */}
+                <div className="w-full lg:w-7/12 flex flex-col gap-4">
+                  <div className="flex justify-between items-center pb-2 border-b border-[#edece9]">
+                    <h3 className="font-bold text-[14.5px] text-[#37352f]">Rekomendasi Lowongan Teratas</h3>
+                    <span className="text-[11px] text-[#8a8a86] font-semibold">
+                      Diurutkan berdasarkan Peluang Lolos Tertinggi
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-3.5 max-h-[680px] overflow-y-auto pr-1">
+                    {calcResults.eligibleJobs.length > 0 ? (
+                      calcResults.eligibleJobs.slice(0, 8).map((job) => {
+                        const pass = parseFloat(job.stats.passRate);
+                        const isHighChance = pass > 15;
+                        const isLowChance = pass < 3;
+                        
+                        return (
+                          <div 
+                            key={job["Link Detail"]}
+                            className="bg-white border border-[#edece9] rounded-xl p-4 hover:border-[#dfdfde] hover:shadow-2xs transition-all duration-300 flex flex-col justify-between gap-3 relative group"
+                          >
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex flex-col gap-1">
+                                <h4 className="font-bold text-[13px] text-[#37352f] group-hover:text-[#1d7bb8] transition-colors leading-tight">
+                                  {job["Judul Lowongan"]}
+                                </h4>
+                                <span className="text-[11px] font-semibold text-[#8a8a86]">{job["Perusahaan"]}</span>
+                              </div>
+
+                              <span className={`text-[10px] font-extrabold px-2.5 py-0.75 rounded-full whitespace-nowrap flex-shrink-0 ${
+                                isHighChance 
+                                  ? "bg-[#e2f5ec] text-[#15803d]" 
+                                  : isLowChance 
+                                    ? "bg-[#fde8e8] text-[#9b1c1c]" 
+                                    : "bg-[#fef9c3] text-[#854d0e]"
+                              }`}>
+                                Peluang: {job.stats.passRate}%
+                              </span>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 text-[10.5px] text-[#5a5a57] select-none">
+                              <span className="bg-[#edece9]/50 border border-[#edece9] rounded px-1.5 py-0.5 font-medium flex items-center gap-1">
+                                <MapPin className="w-3 h-3 text-[#8a8a86]" />
+                                {job["Kota"]}
+                              </span>
+                              <span className="bg-[#edece9]/50 border border-[#edece9] rounded px-1.5 py-0.5 font-medium flex items-center gap-1">
+                                <GraduationCap className="w-3 h-3 text-[#8a8a86]" />
+                                {job["Pendidikan"]}
+                              </span>
+                              <span className="bg-[#edece9]/50 border border-[#edece9] rounded px-1.5 py-0.5 font-medium">
+                                Kuota: {job.stats.kuota}
+                              </span>
+                              <span className="bg-[#edece9]/50 border border-[#edece9] rounded px-1.5 py-0.5 font-medium">
+                                Pelamar: {job.stats.pelamar}
+                              </span>
+                            </div>
+
+                            <div className="flex justify-between items-center border-t border-[#edece9]/60 pt-2 mt-1 select-none">
+                              <span className="text-[10px] text-[#8a8a86] italic truncate max-w-[220px]" title={job["Jurusan"]}>
+                                Kualifikasi: {job["Jurusan"]}
+                              </span>
+                              <button
+                                onClick={() => setSelectedJob(job)}
+                                className="bg-[#f1f1ef] hover:bg-[#edece9] text-[#37352f] text-[11px] font-bold px-3 py-1.25 rounded-md transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                Lihat Detail
+                                <ArrowUpRight className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="bg-[#f7f7f5] rounded-xl p-10 border border-dashed border-[#edece9] text-center flex flex-col items-center justify-center gap-2">
+                        <HelpCircle className="w-8 h-8 text-[#8a8a86]" />
+                        <span className="font-bold text-[13px] text-[#37352f]">Tidak Ada Lowongan yang Cocok</span>
+                        <span className="text-[11.5px] text-[#8a8a86] max-w-xs">
+                          Coba ganti jurusan, perluas lokasi, atau turunkan kualifikasi jenjang pendidikan untuk mendapatkan rekomendasi lowongan.
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
