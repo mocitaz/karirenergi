@@ -1901,13 +1901,13 @@ export default function App() {
                           {job["Perusahaan"]}
                         </div>
 
-                        {/* Majors & Education list */}
-                        <div className="flex flex-wrap gap-1.5 mt-1">
+                        {/* Majors & Education list (Forced single line) */}
+                        <div className="flex flex-nowrap overflow-hidden gap-1.5 mt-1 w-full">
                           <span className="text-[10px] bg-[#edece9]/50 text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm font-semibold flex-shrink-0 select-none">
                             {job["Pendidikan"]}
                           </span>
                           {majorTags.map((tag, idx) => (
-                            <span key={idx} className="text-[10px] bg-[#f7f7f5] text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm truncate max-w-[105px]">
+                            <span key={idx} className="text-[10px] bg-[#f7f7f5] text-[#5a5a57] border border-[#edece9]/80 px-1.5 py-0.5 rounded-sm truncate max-w-[105px] flex-shrink-0" title={tag}>
                               {tag}
                             </span>
                           ))}
@@ -1976,6 +1976,7 @@ export default function App() {
                   <table className="w-full text-left text-[12.5px] border-collapse min-w-[700px]">
                     <thead>
                       <tr className="bg-[#f7f7f5] border-b border-[#edece9] text-[#5a5a57] font-semibold">
+                        <th className="p-3 border-r border-[#edece9] w-12 text-center">No.</th>
                         <th className="p-3 border-r border-[#edece9] w-10 text-center"></th>
                         <th className="p-3 border-r border-[#edece9]">Perusahaan</th>
                         <th className="p-3 border-r border-[#edece9]">Judul Lowongan</th>
@@ -1995,6 +1996,7 @@ export default function App() {
                             onClick={() => setSelectedJob(job)}
                             className="border-b border-[#edece9] hover:bg-[#f7f7f5]/40 cursor-pointer transition-colors"
                           >
+                            <td className="p-3 border-r border-[#edece9] text-center text-[#8a8a86] font-semibold">{idx + 1}</td>
                             <td className="p-3 border-r border-[#edece9] text-center" onClick={(e) => e.stopPropagation()}>
                               <button
                                 onClick={(e) => toggleSaveJob(job["Link Detail"], e)}
