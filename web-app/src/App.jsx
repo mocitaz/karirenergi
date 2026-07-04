@@ -1548,7 +1548,7 @@ export default function App() {
                   Pelacak independen program magang resmi Pertamina.
                 </p>
                 <div className="text-[10.5px] text-[#9b9a97] mt-0.5 flex items-center gap-2.5 flex-wrap">
-                  <span>Terakhir Diupdate: 4 Juli 2026, 00:20 WIB</span>
+                  <span>Terakhir Diupdate: 4 Juli 2026, 08:15 WIB</span>
                   <span className="text-[#edece9] select-none">•</span>
                   <div className="flex items-center gap-1.5 text-[#43873e] font-extrabold select-none">
                     <span className="relative flex h-1.5 w-1.5">
@@ -2165,31 +2165,42 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Row 2: Top 5 Posisi Paling Kompetitif vs Top 5 Peluang Lolos Tertinggi */}
-                  {/* Card 3: Top 5 Posisi Paling Kompetitif */}
+                  {/* Row 2: Top 5 Posisi Paling Kompetitif vs To                  {/* Card 3: Top 5 Posisi Paling Kompetitif */}
                   <div className="bg-white border border-[#edece9] rounded-lg p-5 shadow-3xs hover:shadow-2xs transition-all duration-300 flex flex-col justify-between h-full">
                     <div className="flex flex-col gap-1">
                       <h3 className="font-bold text-[14px] text-[#37352f]">Top 5 Posisi Paling Kompetitif</h3>
-                      <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio jumlah pelamar per kuota kursi tertinggi (Klik untuk buka detail)</p>
+                      <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio jumlah pelamar per kuota kursi tertinggi (Klik untuk detail)</p>
                     </div>
 
-                    <div className="flex flex-col divide-y divide-[#edece9]/60 mt-4 flex-grow justify-center">
-                      {analyticsData.competitiveJobs.map((job, idx) => (
-                        <div 
-                          key={idx} 
-                          onClick={() => setSelectedJob(job)}
-                          className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 cursor-pointer group hover:bg-[#c52447]/5 rounded-md transition-colors px-1.5"
-                        >
-                          <div className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-[12.5px] font-bold text-[#1d7bb8] group-hover:underline truncate">{job["Judul Lowongan"]}</span>
-                            <span className="text-[10px] text-[#8a8a86]">{job["Perusahaan"]}</span>
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.competitiveJobs.map((job, idx) => {
+                        const maxRatio = analyticsData.competitiveJobs[0]?.ratio || 1;
+                        const pct = (job.ratio / maxRatio) * 100;
+                        return (
+                          <div 
+                            key={idx} 
+                            onClick={() => setSelectedJob(job)}
+                            className="flex flex-col gap-1.5 cursor-pointer group/item hover:opacity-95 transition-all"
+                            title={`Klik untuk detail: ${job["Judul Lowongan"]}`}
+                          >
+                            <div className="flex justify-between items-start gap-3 text-[12px]">
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-bold text-[#1d7bb8] truncate group-hover/item:underline">{job["Judul Lowongan"]}</span>
+                                <span className="text-[10px] text-[#8a8a86] truncate">{job["Perusahaan"]}</span>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <span className="font-extrabold text-[#c52447]">1 : {job.ratio}</span>
+                              </div>
+                            </div>
+                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#c52447] h-full rounded-full transition-all duration-500 group-hover/item:brightness-110" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
                           </div>
-                          <div className="flex flex-col items-end flex-shrink-0 text-right">
-                            <span className="text-[11.5px] font-extrabold text-[#c52447]">1 : {job.ratio}</span>
-                            <span className="text-[9.5px] text-[#8a8a86] font-medium">({job["Kuota"]} kuota / {job["Pelamar"]} pelamar)</span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -2200,23 +2211,34 @@ export default function App() {
                       <p className="text-[11px] text-[#8a8a86]">Lowongan dengan rasio persaingan terendah (Paling ramah pelamar - Klik untuk detail)</p>
                     </div>
 
-                    <div className="flex flex-col divide-y divide-[#edece9]/60 mt-4 flex-grow justify-center">
-                      {analyticsData.userFriendlyJobs.map((job, idx) => (
-                        <div 
-                          key={idx} 
-                          onClick={() => setSelectedJob(job)}
-                          className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 cursor-pointer group hover:bg-[#16a34a]/5 rounded-md transition-colors px-1.5"
-                        >
-                          <div className="flex flex-col gap-0.5 min-w-0">
-                            <span className="text-[12.5px] font-bold text-[#16a34a] group-hover:underline truncate">{job["Judul Lowongan"]}</span>
-                            <span className="text-[10px] text-[#8a8a86]">{job["Perusahaan"]}</span>
+                    <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
+                      {analyticsData.userFriendlyJobs.map((job, idx) => {
+                        const pct = job.passRate;
+                        return (
+                          <div 
+                            key={idx} 
+                            onClick={() => setSelectedJob(job)}
+                            className="flex flex-col gap-1.5 cursor-pointer group/item hover:opacity-95 transition-all"
+                            title={`Klik untuk detail: ${job["Judul Lowongan"]}`}
+                          >
+                            <div className="flex justify-between items-start gap-3 text-[12px]">
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-bold text-[#16a34a] truncate group-hover/item:underline">{job["Judul Lowongan"]}</span>
+                                <span className="text-[10px] text-[#8a8a86] truncate">{job["Perusahaan"]}</span>
+                              </div>
+                              <div className="text-right flex-shrink-0">
+                                <span className="font-extrabold text-[#16a34a]">{job.passRate}% Lolos</span>
+                              </div>
+                            </div>
+                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#16a34a] h-full rounded-full transition-all duration-500 group-hover/item:brightness-110" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
                           </div>
-                          <div className="flex flex-col items-end flex-shrink-0 text-right">
-                            <span className="text-[11.5px] font-extrabold text-[#16a34a]">{job.passRate}% Lolos</span>
-                            <span className="text-[9.5px] text-[#8a8a86] font-medium">(Rasio 1:{job.ratio})</span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -2229,18 +2251,37 @@ export default function App() {
                     </div>
 
                     <div className="flex flex-col gap-4 mt-4 flex-grow justify-center">
-                      {analyticsData.heatClassification.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between gap-4 p-2.5 rounded-lg border border-[#edece9]/50 hover:scale-[1.01] transition-transform duration-200 cursor-default" style={{ backgroundColor: item.bg }}>
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-[12px] font-bold" style={{ color: item.color }}>{item.label}</span>
-                            <span className="text-[10.5px] text-[#5a5a57]">{item.count} Posisi Loker ({item.percentage}%)</span>
+                      {/* Stacked Distribution Bar */}
+                      <div className="w-full bg-[#edece9]/40 h-4.5 rounded-full overflow-hidden flex border border-[#edece9] shadow-3xs">
+                        {analyticsData.heatClassification.map((item, idx) => {
+                          if (item.percentage <= 0) return null;
+                          return (
+                            <div 
+                              key={idx}
+                              style={{ 
+                                width: `${item.percentage}%`,
+                                backgroundColor: item.color 
+                              }}
+                              className="h-full first:rounded-l-full last:rounded-r-full hover:brightness-95 transition-all cursor-help opacity-90 hover:opacity-100"
+                              title={`${item.label}: ${item.count} Posisi (${item.percentage}%)`}
+                            />
+                          );
+                        })}
+                      </div>
+
+                      {/* Legend Grid */}
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                        {analyticsData.heatClassification.map((item, idx) => (
+                          <div 
+                            key={idx} 
+                            className="flex flex-col p-2.5 rounded border border-[#edece9]/50 hover:scale-[1.02] transition-transform duration-200 cursor-default" 
+                            style={{ backgroundColor: item.bg }}
+                          >
+                            <span className="text-[11px] font-bold" style={{ color: item.color }}>{item.label}</span>
+                            <span className="text-[10px] text-[#8a8a86] font-medium mt-0.5">{item.count} Posisi ({item.percentage}%)</span>
                           </div>
-                          
-                          <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-[11px] border-2 flex-shrink-0 shadow-3xs" style={{ borderColor: item.color, color: item.color, backgroundColor: 'white' }}>
-                            {item.percentage}%
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -2252,14 +2293,31 @@ export default function App() {
                     </div>
 
                     <div className="flex flex-col gap-3.5 mt-4 flex-grow justify-center">
-                      {analyticsData.avgPassRateByCompany.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between gap-2.5 hover:bg-[#edece9]/20 p-1.5 rounded transition-all">
-                          <span className="text-[12px] font-bold text-[#37352f] truncate max-w-[240px]">{idx + 1}. {item.name}</span>
-                          <span className="text-[11.5px] font-extrabold text-[#16a34a] bg-[#dcfce7] border border-[#bbf7d0] px-2 py-0.5 rounded flex-shrink-0 shadow-3xs">
-                            {item.avgRate}% Lolos
-                          </span>
-                        </div>
-                      ))}
+                      {analyticsData.avgPassRateByCompany.map((item, idx) => {
+                        const maxRate = analyticsData.avgPassRateByCompany[0]?.avgRate || 100;
+                        const pct = (item.avgRate / maxRate) * 100;
+                        return (
+                          <div 
+                            key={idx} 
+                            onClick={() => handleCompanyChartClick(item.name)}
+                            className="flex flex-col gap-1.5 cursor-pointer group/bar hover:opacity-90 transition-all"
+                            title={`Klik untuk filter: ${item.name}`}
+                          >
+                            <div className="flex justify-between items-center text-[12px]">
+                              <span className="font-semibold text-[#37352f] group-hover/bar:text-[#1d7bb8] transition-colors truncate max-w-[220px]">{idx + 1}. {item.name}</span>
+                              <span className="text-[#16a34a] font-extrabold text-[11px] bg-[#dcfce7] border border-[#bbf7d0] px-2 py-0.2 rounded flex-shrink-0">
+                                {item.avgRate}% Lolos
+                              </span>
+                            </div>
+                            <div className="w-full bg-[#edece9]/50 h-1.5 rounded-full overflow-hidden">
+                              <div 
+                                className="bg-[#16a34a] h-full rounded-full transition-all duration-500 group-hover/bar:brightness-110" 
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
