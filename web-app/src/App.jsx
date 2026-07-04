@@ -2047,7 +2047,7 @@ export default function App() {
                 {/* Search Bar - Always Visible */}
                 <div 
                   ref={searchContainerRef}
-                  className="relative flex-grow sm:w-60 max-w-md"
+                  className="relative w-full sm:w-60 flex-shrink-0"
                 >
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9b9a97]" />
                   <input
