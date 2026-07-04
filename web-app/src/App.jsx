@@ -2157,13 +2157,32 @@ export default function App() {
                         const maxVal = Math.max(...analyticsData.companyLeaderboard.map(d => d.vacancies), 1);
                         const width = 340;
                         const height = 210;
-                        const paddingLeft = 140;
+                        const paddingLeft = 120;
                         const paddingRight = 15;
                         const paddingTop = 10;
                         const paddingBottom = 20;
                         
                         const chartW = width - paddingLeft - paddingRight;
                         const chartH = height - paddingTop - paddingBottom;
+                        
+                        const getShortCompanyName = (name) => {
+                          const n = name.toLowerCase();
+                          if (n.includes("persero")) return "Pertamina Holding";
+                          if (n.includes("patra niaga")) return "Patra Niaga";
+                          if (n.includes("geothermal")) return "PGE (Geothermal)";
+                          if (n.includes("hulu energi") || n.includes("phe")) return "PHE (Hulu)";
+                          if (n.includes("shipping") || n.includes("pis")) return "PIS (Shipping)";
+                          if (n.includes("permata graha") || n.includes("pgn mas")) return "PGN Mas";
+                          if (n.includes("gas") || n.includes("pgn")) return "PGN (Gas)";
+                          if (n.includes("kilang") || n.includes("kpi")) return "KPI (Kilang)";
+                          if (n.includes("lubricants")) return "Pertamina Lubricants";
+                          if (n.includes("retail")) return "Pertamina Retail";
+                          if (n.includes("training") || n.includes("ptc")) return "PTC (Training)";
+                          if (n.includes("patra jasa")) return "Patra Jasa";
+                          if (n.includes("elnusa")) return "Elnusa";
+                          if (n.includes("tugu")) return "Tugu Insurance";
+                          return name.replace("PT Pertamina ", "").replace("Tbk", "").trim();
+                        };
                         
                         return (
                           <div className="w-full relative flex flex-col items-center select-none">
@@ -2184,8 +2203,7 @@ export default function App() {
                                 const y = paddingTop + spacing + idx * (barH + spacing);
                                 const barW = (item.vacancies / maxVal) * chartW;
                                 
-                                // Shorten names for display on left if too long
-                                const displayName = item.name.replace("PT Pertamina ", "").replace("Tbk", "").trim();
+                                const displayName = getShortCompanyName(item.name);
                                 
                                 return (
                                   <g 
@@ -2206,10 +2224,10 @@ export default function App() {
                                     
                                     {/* Company Label */}
                                     <text 
-                                      x={paddingLeft - 8} 
+                                      x={paddingLeft - 6} 
                                       y={y + barH / 2 + 3} 
                                       textAnchor="end" 
-                                      className={`text-[8.5px] font-bold transition-colors ${hoveredCompanyBar === idx ? 'fill-[#1d7bb8]' : 'fill-[#37352f]'}`}
+                                      className={`text-[8px] font-semibold transition-colors ${hoveredCompanyBar === idx ? 'fill-[#1d7bb8]' : 'fill-[#5a5a57]'}`}
                                     >
                                       {displayName}
                                     </text>
@@ -2278,7 +2296,7 @@ export default function App() {
                         const paddingLeft = 30;
                         const paddingRight = 10;
                         const paddingTop = 15;
-                        const paddingBottom = 30;
+                        const paddingBottom = 35;
                         
                         const chartW = width - paddingLeft - paddingRight;
                         const chartH = height - paddingTop - paddingBottom;
@@ -2358,9 +2376,10 @@ export default function App() {
                                     {/* X Axis label */}
                                     <text 
                                       x={x + barW / 2} 
-                                      y={paddingTop + chartH + 12} 
-                                      textAnchor="middle" 
-                                      className={`text-[8.5px] font-bold transition-colors ${hoveredMajorBar === idx ? 'fill-[#1d7bb8]' : 'fill-[#5a5a57]'}`}
+                                      y={paddingTop + chartH + 8} 
+                                      transform={`rotate(-25, ${x + barW / 2}, ${paddingTop + chartH + 8})`}
+                                      textAnchor="end" 
+                                      className={`text-[8px] font-bold transition-colors ${hoveredMajorBar === idx ? 'fill-[#1d7bb8]' : 'fill-[#5a5a57]'}`}
                                     >
                                       {label}
                                     </text>
@@ -2560,11 +2579,11 @@ export default function App() {
                       {(() => {
                         const maxVal = Math.max(...analyticsData.topCities.map(d => d.count), 1);
                         const width = 300;
-                        const height = 140;
+                        const height = 145;
                         const paddingLeft = 35;
                         const paddingRight = 15;
                         const paddingTop = 15;
-                        const paddingBottom = 25;
+                        const paddingBottom = 35;
                         
                         const chartW = width - paddingLeft - paddingRight;
                         const chartH = height - paddingTop - paddingBottom;
@@ -2644,9 +2663,10 @@ export default function App() {
                                     {/* X Axis Label */}
                                     <text 
                                       x={x + barW / 2} 
-                                      y={paddingTop + chartH + 14} 
-                                      textAnchor="middle" 
-                                      className={`text-[8.5px] font-bold transition-colors ${hoveredCityBar === idx ? 'fill-[#c26100]' : 'fill-[#5a5a57]'}`}
+                                      y={paddingTop + chartH + 8} 
+                                      transform={`rotate(-25, ${x + barW / 2}, ${paddingTop + chartH + 8})`}
+                                      textAnchor="end" 
+                                      className={`text-[8px] font-bold transition-colors ${hoveredCityBar === idx ? 'fill-[#c26100]' : 'fill-[#5a5a57]'}`}
                                     >
                                       {label}
                                     </text>
