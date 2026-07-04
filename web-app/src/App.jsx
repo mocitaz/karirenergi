@@ -590,6 +590,60 @@ export default function App() {
 
   // Extract filter dimensions dynamically
   const filterOptions = useMemo(() => {
+    const cleanMajorName = (str) => {
+      let name = str.trim();
+      const lower = name.toLowerCase();
+      
+      // Exclude generic fallbacks and placeholder values
+      if (
+        lower === "all" ||
+        lower.includes("tidak tertera") ||
+        lower.includes("semua jurusan") ||
+        lower.includes("jurusan lain") ||
+        lower.includes("jurusan relevan") ||
+        lower.includes("atau lainnya") ||
+        lower.includes("seluruh teknik") ||
+        lower.includes("sarjana sains") ||
+        lower.includes("sarjana teknik")
+      ) {
+        return null;
+      }
+      
+      // Fix known typos
+      if (lower === "business anaytics") return "Business Analytics";
+      if (lower === "bussines administration") return "Business Administration";
+      
+      // Smart Title Case / Capitalization
+      const words = name.split(/\s+/);
+      const formattedWords = words.map(word => {
+        let cleanWord = word.replace(/[()]/g, '');
+        const cleanWordLower = cleanWord.toLowerCase();
+        
+        // Known acronyms to keep completely uppercase
+        const abbreviations = ["it", "sdm", "dkv", "tkj", "rpl", "k3", "k3u", "hr", "psdk", "stem"];
+        if (abbreviations.includes(cleanWordLower)) {
+          return word.toUpperCase();
+        }
+        
+        // General title casing
+        if (word.startsWith("(")) {
+          if (word.length > 2) {
+            return "(" + word.charAt(1).toUpperCase() + word.slice(2).toLowerCase();
+          }
+          return word.toUpperCase();
+        }
+        if (word.endsWith(")")) {
+          if (word.length > 2) {
+            return word.charAt(0).toUpperCase() + word.slice(1, -1).toLowerCase() + ")";
+          }
+          return word.toUpperCase();
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      });
+      
+      return formattedWords.join(" ");
+    };
+
     const companies = new Set();
     const cities = new Set();
     const educations = new Set();
@@ -624,14 +678,9 @@ export default function App() {
         const parts = job["Jurusan"].split(",");
         const seenMajors = new Set();
         parts.forEach((p) => {
-          const trimmed = p.trim();
-          if (
-            trimmed &&
-            trimmed.length > 2 &&
-            !trimmed.toLowerCase().includes("tidak tertera") &&
-            !trimmed.toLowerCase().includes("semua jurusan")
-          ) {
-            seenMajors.add(trimmed);
+          const cleaned = cleanMajorName(p);
+          if (cleaned && cleaned.length > 2) {
+            seenMajors.add(cleaned);
           }
         });
         seenMajors.forEach((m) => {
