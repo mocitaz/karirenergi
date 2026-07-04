@@ -259,6 +259,9 @@ export default function App() {
   const [selectedRegionMap, setSelectedRegionMap] = useState(null);
 
   // Kelayakan Calculator States
+  const [calcMajorDraft, setCalcMajorDraft] = useState("Semua Jurusan");
+  const [calcCityDraft, setCalcCityDraft] = useState("");
+  const [calcEduDraft, setCalcEduDraft] = useState("");
   const [calcMajor, setCalcMajor] = useState("Semua Jurusan");
   const [calcCity, setCalcCity] = useState("");
   const [calcEdu, setCalcEdu] = useState("");
@@ -4031,8 +4034,8 @@ export default function App() {
                       <div className="flex flex-col gap-1.5">
                         <label className="text-[10px] font-bold text-[#8a8a86] uppercase tracking-wider">Jurusan Anda</label>
                         <select
-                          value={calcMajor}
-                          onChange={(e) => setCalcMajor(e.target.value)}
+                          value={calcMajorDraft}
+                          onChange={(e) => setCalcMajorDraft(e.target.value)}
                           className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                         >
                           {filterOptions.majors.map((m) => (
@@ -4045,8 +4048,8 @@ export default function App() {
                       <div className="flex flex-col gap-1.5">
                         <label className="text-[10px] font-bold text-[#8a8a86] uppercase tracking-wider">Jenjang Pendidikan</label>
                         <select
-                          value={calcEdu}
-                          onChange={(e) => setCalcEdu(e.target.value)}
+                          value={calcEduDraft}
+                          onChange={(e) => setCalcEduDraft(e.target.value)}
                           className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                         >
                           <option value="">Semua Jenjang (Pendidikan)</option>
@@ -4060,8 +4063,8 @@ export default function App() {
                       <div className="flex flex-col gap-1.5">
                         <label className="text-[10px] font-bold text-[#8a8a86] uppercase tracking-wider">Preferensi Lokasi</label>
                         <select
-                          value={calcCity}
-                          onChange={(e) => setCalcCity(e.target.value)}
+                          value={calcCityDraft}
+                          onChange={(e) => setCalcCityDraft(e.target.value)}
                           className="w-full text-[13px] border border-[#edece9] rounded-lg px-3 py-2 bg-white outline-none cursor-pointer focus:border-[#c4c4c2] transition-all notion-select"
                         >
                           <option value="">Semua Lokasi (Kota)</option>
@@ -4070,6 +4073,19 @@ export default function App() {
                           ))}
                         </select>
                       </div>
+
+                      {/* Button Search */}
+                      <button
+                        onClick={() => {
+                          setCalcMajor(calcMajorDraft);
+                          setCalcCity(calcCityDraft);
+                          setCalcEdu(calcEduDraft);
+                        }}
+                        className="w-full bg-[#1d7bb8] text-white hover:bg-[#155a8a] py-2 rounded-lg text-[12.5px] font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer mt-2 active:scale-[0.98]"
+                      >
+                        <Search className="w-3.5 h-3.5" />
+                        Cari Lowongan Sesuai Profil
+                      </button>
                     </div>
                   </div>
 
