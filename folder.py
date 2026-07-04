@@ -321,14 +321,15 @@
                         sektor = iconSector.parentElement.innerText.trim();
                     }
 
-                    // Fallback Kota, Industri, Sektor dari baris text
+                    // Fallback Kota, Industri, Sektor dari baris text (Clean bullet/emoji prefixes)
                     let indexKota = -1;
                     for (let j = 0; j < lines.length; j++) {
                         const line = lines[j];
-                        const lowerLine = line.toLowerCase();
-                        if (lowerLine.startsWith("kota ") || lowerLine.startsWith("kab. ") || lowerLine.startsWith("kabupaten ")) {
+                        const cleanLine = line.replace(/^[^\w\s]+/, '').trim();
+                        const lowerClean = cleanLine.toLowerCase();
+                        if (lowerClean.startsWith("kota ") || lowerClean.startsWith("kab. ") || lowerClean.startsWith("kabupaten ") || lowerClean.startsWith("kab ")) {
                             if (kota === "Tidak tertera") {
-                                kota = line;
+                                kota = cleanLine;
                             }
                             indexKota = j;
                             break; 
@@ -359,7 +360,7 @@
                         pendidikan = val.replace(/[\s:-]+$/, '').trim();
                     }
 
-                    const matchJurusan = fullText.match(/Jurusan\s*:\s*([^\n\r]+)/i);
+                    const matchJurusan = fullText.match(/Jurusan[^\n\r:]*:\s*([^\n\r]+)/i);
                     if (matchJurusan) {
                         let val = matchJurusan[1].trim();
                         const indexReq = val.toLowerCase().indexOf("requirements");
