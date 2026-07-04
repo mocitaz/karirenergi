@@ -4132,8 +4132,8 @@ export default function App() {
                       
                       {calcResults.eligibleJobs.length > 0 && (
                         <div className="mt-2 p-3 bg-[#e8f4fa] text-[#1d7bb8] rounded-lg text-[11px] font-semibold text-left flex flex-col gap-1 border border-[#1d7bb8]/10 w-full">
-                          <div>📍 Fokus Terbanyak: <span className="underline">{calcResults.topCompany}</span></div>
-                          <div>📈 Rata-Rata Peluang Lolos: <span className="underline">{calcResults.avgPeluang}%</span></div>
+                          <div>Fokus Terbanyak: <span className="underline">{calcResults.topCompany}</span></div>
+                          <div>Rata-Rata Peluang Lolos: <span className="underline">{calcResults.avgPeluang}%</span></div>
                         </div>
                       )}
                     </div>
