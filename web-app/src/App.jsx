@@ -2003,20 +2003,20 @@ export default function App() {
 
             {/* Table View */}
             {viewTab === "table" && (
-              <div className="border border-[#edece9] rounded-lg overflow-hidden animate-fade-in">
+              <div className="border border-[#edece9] rounded-lg overflow-hidden bg-white shadow-sm animate-fade-in">
                 <div className="overflow-x-auto w-full">
-                  <table className="w-full text-left text-[12.5px] border-collapse min-w-[700px]">
+                  <table className="w-full text-left text-[12.5px] border-collapse min-w-[800px]">
                     <thead>
-                      <tr className="bg-[#f7f7f5] border-b border-[#edece9] text-[#5a5a57] font-semibold">
-                        <th className="p-3 border-r border-[#edece9] w-12 text-center">No.</th>
-                        <th className="p-3 border-r border-[#edece9] w-10 text-center"></th>
-                        <th className="p-3 border-r border-[#edece9]">Perusahaan</th>
-                        <th className="p-3 border-r border-[#edece9]">Judul Lowongan</th>
-                        <th className="p-3 border-r border-[#edece9]">Lokasi / Kota</th>
-                        <th className="p-3 border-r border-[#edece9] text-center w-24">Pendidikan</th>
-                        <th className="p-3 border-r border-[#edece9]">Kuota & Pelamar</th>
-                        <th className="p-3 border-r border-[#edece9]">Peluang Lolos</th>
-                        <th className="p-3">Jurusan</th>
+                      <tr className="bg-[#f7f7f5]/80 border-b border-[#edece9] text-[#8a8a86] text-[10.5px] font-bold uppercase tracking-wider select-none">
+                        <th className="px-4 py-3 w-12 text-center">No.</th>
+                        <th className="px-2 py-3 w-10 text-center"></th>
+                        <th className="px-4 py-3">Perusahaan</th>
+                        <th className="px-4 py-3">Judul Lowongan</th>
+                        <th className="px-4 py-3">Lokasi</th>
+                        <th className="px-4 py-3 text-center w-24">Jenjang</th>
+                        <th className="px-4 py-3 w-28">Kuota</th>
+                        <th className="px-4 py-3 w-32">Peluang Lolos</th>
+                        <th className="px-4 py-3">Jurusan</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2026,43 +2026,55 @@ export default function App() {
                           <tr
                             key={idx}
                             onClick={() => setSelectedJob(job)}
-                            className="border-b border-[#edece9] hover:bg-[#f7f7f5]/40 cursor-pointer transition-colors"
+                            className="border-b border-[#edece9]/50 hover:bg-[#f7f7f5]/60 cursor-pointer transition-colors"
                           >
-                            <td className="p-3 border-r border-[#edece9] text-center text-[#8a8a86] font-semibold">{idx + 1}</td>
-                            <td className="p-3 border-r border-[#edece9] text-center" onClick={(e) => e.stopPropagation()}>
+                            <td className="px-4 py-3.5 text-center text-[#8a8a86] font-semibold">{idx + 1}</td>
+                            <td className="px-2 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
                               <button
                                 onClick={(e) => toggleSaveJob(job["Link Detail"], e)}
-                                className="p-1 rounded-full hover:bg-[#edece9] text-[#9b9a97] hover:text-[#b78103] transition-colors cursor-pointer"
+                                className="p-1.5 rounded-md hover:bg-[#edece9]/60 text-[#9b9a97] hover:text-[#b78103] transition-colors cursor-pointer"
                                 title={savedJobs.includes(job["Link Detail"]) ? "Hapus dari Tersimpan" : "Simpan Lowongan"}
                               >
                                 <Bookmark className={`w-3.5 h-3.5 ${savedJobs.includes(job["Link Detail"]) ? "fill-[#b78103] text-[#b78103]" : ""}`} />
                               </button>
                             </td>
-                            <td className="p-3 border-r border-[#edece9] font-medium max-w-[180px] truncate" title={job["Perusahaan"]}>{job["Perusahaan"]}</td>
-                            <td className="p-3 border-r border-[#edece9] font-semibold text-[#1d7bb8] max-w-[240px] truncate" title={job["Judul Lowongan"]}>
+                            <td className="px-4 py-3.5 font-medium text-[#5a5a57] max-w-[160px] truncate" title={job["Perusahaan"]}>
+                              {job["Perusahaan"]}
+                            </td>
+                            <td className="px-4 py-3.5 font-semibold text-[#1d7bb8] hover:text-[#155a8a] max-w-[260px] truncate transition-colors" title={job["Judul Lowongan"]}>
                               {job["Judul Lowongan"]}
                             </td>
-
-                            <td className="p-3 border-r border-[#edece9] max-w-[140px] truncate">{job["Kota"]}</td>
-                            <td className="p-3 border-r border-[#edece9] font-bold text-[#9041a8] text-center">{job["Pendidikan"]}</td>
-                            <td className="p-3 border-r border-[#edece9] text-[#5a5a57]">
-                              <span className="font-semibold text-[#37352f]">{stats.kuota}</span>
-                              <span className="text-[#9b9a97] text-[11.5px]"> / {stats.pelamar} pelamar</span>
+                            <td className="px-4 py-3.5 text-[#5a5a57] max-w-[130px] truncate" title={job["Kota"]}>
+                              {job["Kota"]}
                             </td>
-                            <td className="p-3 border-r border-[#edece9] font-bold text-[#c52447]">
-                              <div className="flex items-center justify-between gap-1.5">
-                                <span>{stats.passRate}%</span>
+                            <td className="px-4 py-3.5 text-center">
+                              <span className="px-2 py-0.5 rounded text-[10.5px] font-bold bg-[#f3ebf7] text-[#6b21a8] inline-block select-none">
+                                {job["Pendidikan"]}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3.5">
+                              <div className="flex flex-col leading-normal">
+                                <span className="font-semibold text-[#37352f]">{stats.kuota} Kuota</span>
+                                <span className="text-[#9b9a97] text-[11px]">{stats.pelamar} Pelamar</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3.5">
+                              <div className="flex flex-col leading-normal">
+                                <span className="font-bold text-[#c52447]">{stats.passRate}%</span>
                                 {(() => {
                                   const comp = getCompetitionLevel(stats.passRate);
+                                  const label = comp.label.replace("Persaingan ", "");
                                   return (
-                                    <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded flex-shrink-0 ${comp.bg} ${comp.text}`}>
-                                      {comp.label}
+                                    <span className={`text-[10px] font-bold mt-0.5 leading-tight ${comp.text}`}>
+                                      {label}
                                     </span>
                                   );
                                 })()}
                               </div>
                             </td>
-                            <td className="p-3 max-w-[180px] truncate text-[#5a5a57]">{job["Jurusan"]}</td>
+                            <td className="px-4 py-3.5 max-w-[220px] truncate text-[#5a5a57]" title={job["Jurusan"]}>
+                              {job["Jurusan"]}
+                            </td>
                           </tr>
                         );
                       })}
