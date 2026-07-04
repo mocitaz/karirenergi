@@ -92,12 +92,16 @@ export function getRelativeUpdateTime() {
   const diffMs = new Date() - lastUpdated;
   if (diffMs < 0) return "baru saja";
   
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  if (diffMins < 1) return "baru saja";
-  if (diffMins < 60) return `${diffMins} menit yang lalu`;
+  const diffMinsTotal = Math.floor(diffMs / (1000 * 60));
+  if (diffMinsTotal < 1) return "baru saja";
+  if (diffMinsTotal < 60) return `${diffMinsTotal} menit yang lalu`;
   
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  if (diffHours < 24) return `${diffHours} jam yang lalu`;
+  const diffHours = Math.floor(diffMinsTotal / 60);
+  if (diffHours < 24) {
+    const mins = diffMinsTotal % 60;
+    if (mins === 0) return `${diffHours} jam yang lalu`;
+    return `${diffHours} jam ${mins} menit yang lalu`;
+  }
   
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   if (diffDays === 1) return "kemarin";
