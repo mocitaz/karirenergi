@@ -607,7 +607,7 @@ export default function App() {
       return trimmed === "" || trimmed === "-" || trimmed.toLowerCase() === "null" || trimmed.toLowerCase() === "tidak tertera" ? fallback : trimmed;
     };
 
-    return lokerData.map((job) => {
+    const mapped = lokerData.map((job) => {
       const cleanTitle = formatTitle(clean(job["Judul Lowongan"]));
       const cleanCompany = clean(job["Perusahaan"], "PT Pertamina");
       
@@ -664,6 +664,30 @@ export default function App() {
         "Sektor": cleanSektor,
         "Pendidikan": cleanEdu,
         "Jurusan": cleanMajor,
+      };
+    });
+
+    // Rank listings based on competition level (passRate ascending = lowest pass rate is most competitive/ketat rank 1)
+    const sortedByCompetition = [...mapped].map(job => {
+      const stats = getDeterministicStats(job["Judul Lowongan"], job["Perusahaan"], job["Link Detail"], job["Kuota"], job["Pelamar"]);
+      return {
+        jobLink: job["Link Detail"],
+        passRate: parseFloat(stats.passRate),
+        pelamar: stats.pelamar
+      };
+    }).sort((a, b) => {
+      if (a.passRate !== b.passRate) {
+        return a.passRate - b.passRate; // lower pass rate is rank 1
+      }
+      return b.pelamar - a.pelamar; // if pass rate is same, more applicants is rank 1
+    });
+
+    return mapped.map(job => {
+      const rankIndex = sortedByCompetition.findIndex(item => item.jobLink === job["Link Detail"]);
+      return {
+        ...job,
+        competitionRank: rankIndex !== -1 ? rankIndex + 1 : null,
+        totalJobsCount: sortedByCompetition.length
       };
     });
   }, []);
@@ -4569,6 +4593,15 @@ export default function App() {
                           </span>
                         );
                       })()}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11.5px] border-t border-[#edece9]/50 pt-2 mt-1">
+                      <span className="text-[#9b9a97] font-semibold flex items-center gap-1">
+                        🏆 Keketatan Rank
+                      </span>
+                      <span className="text-[#1d7bb8] bg-[#e8f4fd] px-2 py-0.5 rounded font-extrabold text-[11.5px]">
+                        #{selectedJob.competitionRank} dari {selectedJob.totalJobsCount} Loker
+                      </span>
                     </div>
                   </div>
                 </div>
