@@ -1892,7 +1892,7 @@ export default function App() {
                       <div className="flex flex-col gap-2 flex-grow">
 
                         {/* Title */}
-                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors line-clamp-2">
+                        <h3 className="font-bold text-[13.5px] text-[#37352f] leading-snug group-hover:text-[#1d7bb8] transition-colors truncate" title={job["Judul Lowongan"]}>
                           {job["Judul Lowongan"]}
                         </h3>
 
