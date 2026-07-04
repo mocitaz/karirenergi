@@ -182,13 +182,31 @@
             break;
         }
 
+        // Get the current first card ID before clicking next to prevent stale DOM recycling
+        const firstCardBefore = document.querySelector('.job-item, .card, tr, [class*="card"]');
+        const firstCardIdBefore = firstCardBefore ? (firstCardBefore.outerHTML.match(vacancyRegex) || [])[1] : null;
+
         console.log(`Pindah ke halaman ${pageNum + 1}...`);
         nextBtn.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
         nextBtn.click();
         pageNum++;
         
-        await new Promise(resolve => setTimeout(resolve, 2500));
+        // Wait until first card ID changes (polling up to 4500ms)
+        const transitionStart = Date.now();
+        let transitioned = false;
+        while (Date.now() - transitionStart < 4500) {
+            await new Promise(resolve => setTimeout(resolve, 150));
+            const newFirstCard = document.querySelector('.job-item, .card, tr, [class*="card"]');
+            const newFirstCardId = newFirstCard ? (newFirstCard.outerHTML.match(vacancyRegex) || [])[1] : null;
+            if (newFirstCardId && newFirstCardId !== firstCardIdBefore) {
+                transitioned = true;
+                break;
+            }
+        }
+        
+        // Sleep extra 1200ms to guarantee applicant numbers are fully bound to DOM by Pertamina APIs
+        await new Promise(resolve => setTimeout(resolve, transitioned ? 1200 : 3000));
     }
 
     // --- PHASE 2: PARALEL DETAILS FETCH (5 CONCURRENT IFRAMES) ---
