@@ -385,7 +385,21 @@ async def scrape_detail_worker(context, job_queue, results_list, progress_tracke
         
         job_queue.task_done()
         
-    await page.close()
+async def wait_for_loading_overlay(page):
+    # Wait for the loading modal to be hidden or removed from the DOM
+    try:
+        for _ in range(60): # 60 * 500ms = 30s max wait
+            overlay_visible = await page.evaluate("""() => {
+                const overlay = document.querySelector('.modal__loading, .loading-modal, [class*="modal__loading"], [class*="loading-backdrop"]');
+                if (!overlay) return false;
+                const style = window.getComputedStyle(overlay);
+                return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+            }""")
+            if not overlay_visible:
+                break
+            await page.wait_for_timeout(500)
+    except Exception:
+        pass
 
 
 async def main():
@@ -519,6 +533,9 @@ async def main():
         while True:
             print(f"    - Memindai halaman {page_num}...")
             
+            # Wait for loading overlay to disappear
+            await wait_for_loading_overlay(page)
+            
             # Fetch current items in listing
             job_elements = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
             current_page_ids = set()
@@ -579,6 +596,9 @@ async def main():
             success_transition = False
             for retry in range(3):
                 try:
+                    # Wait for loading overlay to disappear
+                    await wait_for_loading_overlay(page)
+                    
                     # Evaluate next page button in page context dynamically on each retry
                     next_btn_handle = await page.evaluate_handle("""() => {
                         const isDisabled = (el) => {
@@ -657,6 +677,10 @@ async def main():
                         else:
                             raise click_ex
                     
+                    # Wait for any dynamic loading overlay to initiate and disappear
+                    await page.wait_for_timeout(500)
+                    await wait_for_loading_overlay(page)
+                    
                     # Wait up to 5 seconds for immediate click transition
                     has_transitioned = False
                     target_page_str = str(page_num + 1)
@@ -708,6 +732,10 @@ async def main():
                         except Exception as nav_ex:
                             print(f"    {C_RED}[!] Gagal navigasi langsung: {nav_ex}{C_RESET}")
                             
+                        # Wait for loading overlay to complete transition
+                        await page.wait_for_timeout(500)
+                        await wait_for_loading_overlay(page)
+                        
                         # Wait remaining 25 seconds for navigation to settle
                         for w in range(50): # 50 * 500ms = 25s
                             try:
