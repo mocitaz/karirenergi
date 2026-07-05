@@ -499,10 +499,13 @@ async def main():
             # Wait up to 15 seconds for job list matching VACANCY_REGEX in page content
             has_jobs = False
             for _ in range(30):
-                content = await page.content()
-                if VACANCY_REGEX.search(content):
-                    has_jobs = True
-                    break
+                try:
+                    content = await page.content()
+                    if VACANCY_REGEX.search(content):
+                        has_jobs = True
+                        break
+                except Exception:
+                    pass
                 await page.wait_for_timeout(500)
             if not has_jobs:
                 print(f"{C_RED}[!] Peringatan: Tidak dapat mendeteksi lowongan magang setelah mengarahkan halaman.{C_RESET}")
@@ -585,12 +588,16 @@ async def main():
                             return false;
                         };
 
-                        // 1. Try standard next button selectors
-                        let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
+                        // Select the pagination container to scope all selections accurately
+                        const container = document.querySelector('.pagination, [class*="pagination"], [class*="page-list"], .ngx-pagination');
+                        if (!container) return null;
+
+                        // 1. Try standard next button selectors inside pagination container
+                        let btn = container.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next, [class*="pagination-next"]');
                         if (btn && !isDisabled(btn)) return btn;
                         
-                        // 2. Try text matching on buttons/links
-                        const elements = Array.from(document.querySelectorAll('a, button, li, span'));
+                        // 2. Try text matching inside pagination container
+                        const elements = Array.from(container.querySelectorAll('a, button, li, span'));
                         for (let el of elements) {
                             const txt = el.innerText.trim().toLowerCase();
                             if (txt === 'next' || txt === 'selanjutnya' || txt === '>' || txt === '»') {
@@ -598,27 +605,23 @@ async def main():
                             }
                         }
 
-                        // 3. Fallback: Sibling active page number link
-                        const activeEl = document.querySelector('.active, .current, [class*="active"], [class*="current"]');
+                        // 3. Fallback: Sibling active page number link inside pagination container
+                        const activeEl = container.querySelector('.active, .current, [class*="active"], [class*="current"]');
                         if (activeEl) {
-                            const container = activeEl.closest('.pagination, [class*="pagination"], [class*="page-list"]');
-                            if (container) {
-                                // Find only top-level pagination items to avoid duplicate parent/child matches
-                                let items = Array.from(container.querySelectorAll('li'));
-                                if (items.length > 0) {
-                                    const activeIdx = items.findIndex(item => item === activeEl || item.contains(activeEl));
-                                    if (activeIdx !== -1 && items[activeIdx + 1]) {
-                                        const nextItem = items[activeIdx + 1];
-                                        const clickable = nextItem.querySelector('a, button') || nextItem;
-                                        if (clickable && !isDisabled(clickable)) return clickable;
-                                    }
-                                } else {
-                                    let siblings = Array.from(container.querySelectorAll('a, button'));
-                                    const activeIdx = siblings.findIndex(item => item === activeEl || item.contains(activeEl));
-                                    if (activeIdx !== -1 && siblings[activeIdx + 1]) {
-                                        const nextLink = siblings[activeIdx + 1];
-                                        if (nextLink && !isDisabled(nextLink)) return nextLink;
-                                    }
+                            let items = Array.from(container.querySelectorAll('li'));
+                            if (items.length > 0) {
+                                const activeIdx = items.findIndex(item => item === activeEl || item.contains(activeEl));
+                                if (activeIdx !== -1 && items[activeIdx + 1]) {
+                                    const nextItem = items[activeIdx + 1];
+                                    const clickable = nextItem.querySelector('a, button') || nextItem;
+                                    if (clickable && !isDisabled(clickable)) return clickable;
+                                }
+                            } else {
+                                let siblings = Array.from(container.querySelectorAll('a, button'));
+                                const activeIdx = siblings.findIndex(item => item === activeEl || item.contains(activeEl));
+                                if (activeIdx !== -1 && siblings[activeIdx + 1]) {
+                                    const nextLink = siblings[activeIdx + 1];
+                                    if (nextLink && !isDisabled(nextLink)) return nextLink;
                                 }
                             }
                         }
