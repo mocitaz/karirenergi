@@ -602,6 +602,11 @@ async def main():
             
             if not current_page_ids:
                 print(f"    {C_YELLOW}- Tidak ditemukan lowongan di halaman ini. Selesai memindai daftar.{C_RESET}")
+                if os.path.exists(checkpoint_file):
+                    try:
+                        os.remove(checkpoint_file)
+                    except:
+                        pass
                 break
                 
             if current_page_ids == previous_page_ids:
@@ -668,12 +673,22 @@ async def main():
                     
                     next_btn = next_btn_handle.as_element()
                     if not next_btn:
+                        if os.path.exists(checkpoint_file):
+                            try:
+                                os.remove(checkpoint_file)
+                            except:
+                                pass
                         break
                         
                     is_disabled = await next_btn.evaluate("el => el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')")
                     if is_disabled:
                         if retry == 0:
                             print(f"    {C_GREEN}- Sudah di halaman terakhir (tombol disabled).{C_RESET}")
+                            if os.path.exists(checkpoint_file):
+                                try:
+                                    os.remove(checkpoint_file)
+                                except:
+                                    pass
                         break
                         
                     # Debug next button details
@@ -881,12 +896,8 @@ async def main():
         await asyncio.gather(*workers)
         end_time = time.time()
         
-        # Delete checkpoint when scraping is completely finished
-        if os.path.exists(checkpoint_file):
-            try:
-                os.remove(checkpoint_file)
-            except:
-                pass
+        # Checkpoint is kept until we explicitly hit the last page
+        pass
                 
         await browser.close()
         
