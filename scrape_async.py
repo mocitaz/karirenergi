@@ -558,18 +558,35 @@ async def main():
             
             # Evaluate next page button in page context
             next_btn_handle = await page.evaluate_handle("""() => {
-                let btn = document.querySelector('[aria-label=\"Next\"], [aria-label=\"Next Page\"], .next-page, .next, .pagination-next');
-                if (btn && !btn.disabled && !btn.hasAttribute('disabled') && !btn.classList.contains('disabled')) {
-                    if (btn.parentElement && btn.parentElement.classList.contains('disabled')) return null;
-                    return btn;
-                }
+                const isDisabled = (el) => {
+                    if (!el) return true;
+                    if (el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')) return true;
+                    if (el.parentElement && el.parentElement.classList.contains('disabled')) return true;
+                    return false;
+                };
+
+                let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
+                if (btn && !isDisabled(btn)) return btn;
                 
                 const elements = Array.from(document.querySelectorAll('a, button, li, span'));
                 for (let el of elements) {
                     const txt = el.innerText.trim().toLowerCase();
                     if (txt === 'next' || txt === 'selanjutnya' || txt === '>' || txt === '»') {
-                        const isD = el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled') || (el.parentElement && el.parentElement.classList.contains('disabled'));
-                        if (!isD) return el;
+                        if (!isDisabled(el)) return el;
+                    }
+                }
+
+                // Sibling fallback for page number links
+                const activeEl = document.querySelector('.active, .current, [class*="active"], [class*="current"]');
+                if (activeEl) {
+                    const container = activeEl.closest('.pagination, [class*="pagination"], [class*="page-list"]');
+                    if (container) {
+                        const links = Array.from(container.querySelectorAll('a, button, li'));
+                        const activeIndex = links.indexOf(activeEl) !== -1 ? links.indexOf(activeEl) : links.findIndex(l => l.contains(activeEl));
+                        if (activeIndex !== -1 && links[activeIndex + 1]) {
+                            const nextLink = links[activeIndex + 1].querySelector('a, button') || links[activeIndex + 1];
+                            if (nextLink && !isDisabled(nextLink)) return nextLink;
+                        }
                     }
                 }
                 return null;
