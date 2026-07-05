@@ -422,6 +422,11 @@ async def main():
             print(f"{C_GREEN}[*] Resume Mode: Terdeteksi data kemajuan scraping lama. Memuat {len(resume_dict)} lowongan.{C_RESET}")
         except Exception as e:
             print(f"{C_YELLOW}[!] Gagal memuat data lama (mulai baru): {e}{C_RESET}")
+            
+    start_page = (len(resume_dict) // 9) + 1
+    target_url = f"{START_URL}&page={start_page}"
+    if start_page > 1:
+        print(f"{C_GREEN}[*] Resume Mode: Lompat langsung ke Halaman {start_page} ({len(resume_dict)} lowongan sudah lengkap)...{C_RESET}")
 
     async with async_playwright() as p:
         has_session = os.path.exists(session_file)
@@ -435,8 +440,8 @@ async def main():
             context = await browser.new_context()
             page = await context.new_page()
             
-            print(f"[*] Menghubungi {START_URL} ...")
-            await page.goto(START_URL, timeout=60000)
+            print(f"[*] Menghubungi {target_url} ...")
+            await page.goto(target_url, timeout=60000)
             
             print(f"\n{C_BOLD}{C_YELLOW}[!] TINDAKAN DIPERLUKAN:{C_RESET}")
             print("    1. Silakan login ke akun Pertamina Anda pada jendela browser.")
@@ -452,9 +457,9 @@ async def main():
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context(storage_state=session_file)
             page = await context.new_page()
-            print(f"{C_BLUE}[*] Menghubungi {START_URL} ...{C_RESET}")
+            print(f"{C_BLUE}[*] Menghubungi {target_url} ...{C_RESET}")
             try:
-                await page.goto(START_URL, timeout=60000, wait_until="domcontentloaded")
+                await page.goto(target_url, timeout=60000, wait_until="domcontentloaded")
                 
                 # Check for expiration redirects
                 current_url = page.url
@@ -509,7 +514,7 @@ async def main():
         # Ensure we are on the correct internship search listing widget page before scanning
         if "bf1c31dc-9341-47ff-ac76-0fa9a30065ac" not in page.url:
             print(f"{C_BLUE}[*] Mengarahkan kembali ke halaman daftar lowongan magang...{C_RESET}")
-            await page.goto(START_URL, timeout=60000, wait_until="domcontentloaded")
+            await page.goto(target_url, timeout=60000, wait_until="domcontentloaded")
             try:
                 await page.wait_for_selector(".job-item, .card, tr, [class*='card']", timeout=45000)
                 await wait_for_loading_overlay(page)
@@ -517,7 +522,7 @@ async def main():
                 print(f"{C_RED}[!] Peringatan: Tidak dapat mendeteksi lowongan magang setelah mengarahkan halaman.{C_RESET}")
             
         unique_jobs = []
-        page_num = 1
+        page_num = start_page
         previous_page_ids = set()
         
         print(f"\n{C_BOLD}{C_BLUE}[*] Memulai pemindaian halaman daftar loker...{C_RESET}")
