@@ -437,8 +437,8 @@ async def main():
             context = await browser.new_context(storage_state=session_file)
             page = await context.new_page()
             print("[*] Menghubungi https://recruitment.pertamina.com ...")
-            await page.goto("https://recruitment.pertamina.com", timeout=60000)
-            await page.wait_for_timeout(5000)
+            await page.goto("https://recruitment.pertamina.com", timeout=60000, wait_until="domcontentloaded")
+            await page.wait_for_timeout(7000)
             
         # Clear cookies/consent modals
         try:
