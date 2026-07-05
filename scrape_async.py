@@ -438,10 +438,14 @@ async def main():
                 start_page = int(f.read().strip())
         except:
             pass
+    else:
+        if len(resume_dict) > 0:
+            start_page = (len(resume_dict) // 9) + 1
             
     target_url = f"{START_URL}&page={start_page}"
     if start_page > 1:
-        print(f"{C_GREEN}[*] Resume Mode: Lompat langsung ke Halaman {start_page} berdasarkan checkpoint terakhir...{C_RESET}")
+        source_type = "checkpoint terakhir" if os.path.exists(checkpoint_file) else "kalkulasi data lama"
+        print(f"{C_GREEN}[*] Resume Mode: Lompat langsung ke Halaman {start_page} berdasarkan {source_type}...{C_RESET}")
 
     async with async_playwright() as p:
         has_session = os.path.exists(session_file)
