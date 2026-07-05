@@ -638,6 +638,15 @@ async def main():
                             print(f"    {C_GREEN}- Sudah di halaman terakhir (tombol disabled).{C_RESET}")
                         break
                         
+                    # Debug next button details
+                    try:
+                        tag = await next_btn.evaluate("el => el.tagName")
+                        text = (await next_btn.evaluate("el => el.innerText") or "").strip()
+                        html = await next_btn.evaluate("el => el.outerHTML")
+                        print(f"    - Debug: Menemukan tombol next: <{tag}> dengan teks '{text}' (HTML: {html[:100]}...)")
+                    except Exception as dbg_ex:
+                        print(f"    - Debug: Gagal membaca properti tombol next ({dbg_ex})")
+                        
                     # Click the next button
                     await next_btn.click(timeout=15000)
                     
