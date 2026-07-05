@@ -258,9 +258,21 @@
                 }
 
                 try {
-                    iframe.src = job.detailUrl;
+                    // Optimization: Fetch raw HTML, inject base URL to resolve relative scripts, and strip heavy stylesheets & images
+                    const resHtml = await fetch(job.detailUrl);
+                    let htmlText = await resHtml.text();
                     
-                    // Tunggu event load dari iframe
+                    // Inject <base> tag to resolve relative asset paths inside srcdoc
+                    htmlText = htmlText.replace('<head>', '<head><base href="https://recruitment.pertamina.com/">');
+                    
+                    // Strip heavy assets and trackers to speed up load time
+                    htmlText = htmlText.replace(/<link[^>]*rel=["']stylesheet["'][^>]*>/gi, '');
+                    htmlText = htmlText.replace(/<img[^>]*>/gi, '');
+                    htmlText = htmlText.replace(/<script[^>]*src=["'][^"']*(?:gtm|google|analytics|facebook|hotjar)[^"']*["'][^>]*><\/script>/gi, '');
+                    
+                    iframe.srcdoc = htmlText;
+                    
+                    // Wait for iframe load event
                     await new Promise((resolve) => {
                         iframe.onload = resolve;
                     });
