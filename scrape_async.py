@@ -32,6 +32,7 @@ except ImportError:
 
 # Configuration & UUIDs
 WIDGET_DETAIL_UUID = "845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2"
+START_URL = "https://recruitment.pertamina.com/object/page/135901b0-ec27-48d4-9dda-9516fc506970#!/object/widget/bf1c31dc-9341-47ff-ac76-0fa9a30065ac/?search=true&recruitmentTypeId=a670eeb5-ad29-4d2f-90f9-a3dc26128084&isInternship=true&filter=true"
 VACANCY_REGEX = re.compile(
     r"845abfe1-3f9d-4b3a-bda5-0a9f2f9083c2/\?id=([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})",
     re.IGNORECASE
@@ -410,7 +411,6 @@ async def main():
 
     async with async_playwright() as p:
         has_session = os.path.exists(session_file)
-        
         if not has_session:
             print("\n============================================================")
             print(f"{C_BOLD}{C_CYAN}                 INISIALISASI LOGIN PERTAMINA{C_RESET}")
@@ -421,12 +421,12 @@ async def main():
             context = await browser.new_context()
             page = await context.new_page()
             
-            print("[*] Menghubungi https://recruitment.pertamina.com ...")
-            await page.goto("https://recruitment.pertamina.com", timeout=60000)
+            print(f"[*] Menghubungi {START_URL} ...")
+            await page.goto(START_URL, timeout=60000)
             
             print(f"\n{C_BOLD}{C_YELLOW}[!] TINDAKAN DIPERLUKAN:{C_RESET}")
             print("    1. Silakan login ke akun Pertamina Anda pada jendela browser.")
-            print("    2. Buka halaman daftar lowongan/magang.")
+            print("    2. Masuk ke halaman daftar lowongan/magang.")
             print("    3. Tekan [ENTER] di terminal ini untuk menyimpan sesi & mulai scraping.")
             
             await asyncio.get_event_loop().run_in_executor(None, input, "\nTekan [ENTER] setelah siap...")
@@ -438,9 +438,9 @@ async def main():
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context(storage_state=session_file)
             page = await context.new_page()
-            print(f"{C_BLUE}[*] Menghubungi https://recruitment.pertamina.com ...{C_RESET}")
+            print(f"{C_BLUE}[*] Menghubungi {START_URL} ...{C_RESET}")
             try:
-                await page.goto("https://recruitment.pertamina.com", timeout=60000, wait_until="domcontentloaded")
+                await page.goto(START_URL, timeout=60000, wait_until="domcontentloaded")
                 
                 # Check for expiration redirects
                 current_url = page.url
@@ -449,12 +449,14 @@ async def main():
                 if is_login_page:
                     raise Exception("Redirected to login screen")
                 
-                # Wait up to 15 seconds for job cards to render
+                # Wait up to 15 seconds for job list matching VACANCY_REGEX in page content
                 has_jobs = False
                 for _ in range(30):
-                    if await page.query_selector(".job-item, .card, tr, [class*='card']"):
+                    content = await page.content()
+                    if VACANCY_REGEX.search(content):
                         has_jobs = True
                         break
+                    # Break early if we redirected to login during wait
                     if "login" in page.url.lower():
                         break
                     await page.wait_for_timeout(500)
@@ -471,6 +473,7 @@ async def main():
                         os.remove(session_file)
                     except:
                         pass
+                # Recursive call to trigger interactive login
                 return await main()
             
         # Clear cookies/consent modals
