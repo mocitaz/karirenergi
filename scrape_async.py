@@ -423,10 +423,25 @@ async def main():
         except Exception as e:
             print(f"{C_YELLOW}[!] Gagal memuat data lama (mulai baru): {e}{C_RESET}")
             
-    start_page = (len(resume_dict) // 9) + 1
+    checkpoint_file = "scraped_page_checkpoint.txt"
+    if not os.path.exists(output_path):
+        if os.path.exists(checkpoint_file):
+            try:
+                os.remove(checkpoint_file)
+            except:
+                pass
+                
+    start_page = 1
+    if os.path.exists(checkpoint_file):
+        try:
+            with open(checkpoint_file, "r") as f:
+                start_page = int(f.read().strip())
+        except:
+            pass
+            
     target_url = f"{START_URL}&page={start_page}"
     if start_page > 1:
-        print(f"{C_GREEN}[*] Resume Mode: Lompat langsung ke Halaman {start_page} ({len(resume_dict)} lowongan sudah lengkap)...{C_RESET}")
+        print(f"{C_GREEN}[*] Resume Mode: Lompat langsung ke Halaman {start_page} berdasarkan checkpoint terakhir...{C_RESET}")
 
     async with async_playwright() as p:
         has_session = os.path.exists(session_file)
@@ -773,6 +788,11 @@ async def main():
                             
                     if has_transitioned:
                         page_num += 1
+                        try:
+                            with open(checkpoint_file, "w") as cp:
+                                cp.write(str(page_num))
+                        except:
+                            pass
                         success_transition = True
                         break
                     else:
@@ -793,6 +813,11 @@ async def main():
                             }""")
                             if active_page_num == target_page_str:
                                 page_num += 1
+                                try:
+                                    with open(checkpoint_file, "w") as cp:
+                                        cp.write(str(page_num))
+                                except:
+                                    pass
                                 success_transition = True
                                 break
                         except Exception:
@@ -856,6 +881,13 @@ async def main():
         await asyncio.gather(*workers)
         end_time = time.time()
         
+        # Delete checkpoint when scraping is completely finished
+        if os.path.exists(checkpoint_file):
+            try:
+                os.remove(checkpoint_file)
+            except:
+                pass
+                
         await browser.close()
         
         duration = end_time - start_time
