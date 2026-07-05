@@ -7,18 +7,27 @@ import re
 import difflib
 import asyncio
 
-# ASCII Art Header
-print("=" * 60)
-print("         KARIRENERGI HIGH-SPEED ASYNC PLAYWRIGHT SCRAPER")
-print("=" * 60)
+# ANSI Colors for premium dashboard output
+C_BLUE = '\033[94m'
+C_GREEN = '\033[92m'
+C_YELLOW = '\033[93m'
+C_RED = '\033[91m'
+C_CYAN = '\033[96m'
+C_MAGENTA = '\033[95m'
+C_RESET = '\033[0m'
+C_BOLD = '\033[1m'
+
+print("=" * 65)
+print(f"{C_BOLD}{C_CYAN}    KARIRENERGI RESILIENT HIGH-SPEED ASYNC PLAYWRIGHT SCRAPER{C_RESET}")
+print("=" * 65)
 
 try:
     from playwright.async_api import async_playwright
 except ImportError:
-    print("\n[!] ERROR: Playwright is not installed.")
+    print(f"\n{C_RED}[!] ERROR: Playwright is not installed.{C_RESET}")
     print("    Silakan pasang dengan menjalankan perintah berikut di terminal Anda:")
     print("    pip install playwright && playwright install")
-    print("=" * 60)
+    print("=" * 65)
     sys.exit(1)
 
 # Configuration & UUIDs
@@ -50,45 +59,16 @@ REQUIREMENT_KEYWORDS = [
 ]
 
 STANDARDIZED_MAJORS = [
-    "Teknik Informatika",
-    "Sistem Informasi",
-    "Ilmu Komputer",
-    "Teknologi Informasi",
-    "Rekayasa Perangkat Lunak",
-    "Informatika",
-    "Ilmu Komunikasi",
-    "Hubungan Internasional",
-    "Desain Komunikasi Visual",
-    "Desain Grafis",
-    "Akuntansi",
-    "Manajemen",
-    "Administrasi Bisnis",
-    "Administrasi Publik",
-    "Psikologi",
-    "Hukum",
-    "Statistika",
-    "Matematika",
-    "Fisika",
-    "Kimia",
-    "Biologi",
-    "Bioteknologi",
-    "Sastra Inggris",
-    "Hubungan Masyarakat",
-    "Kesehatan & Keselamatan Kerja (K3)",
-    "Teknik Industri",
-    "Teknik Elektro",
-    "Teknik Mesin",
-    "Teknik Kimia",
-    "Teknik Sipil",
-    "Teknik Perminyakan",
-    "Teknik Pertambangan",
-    "Teknik Geologi",
-    "Teknik Geofisika",
-    "Teknik Kelautan",
-    "Teknik Lingkungan",
-    "Teknik Fisika",
-    "Teknik Metalurgi",
-    "Teknik Perkapalan"
+    "Teknik Informatika", "Sistem Informasi", "Ilmu Komputer", "Teknologi Informasi",
+    "Rekayasa Perangkat Lunak", "Informatika", "Ilmu Komunikasi", "Hubungan Internasional",
+    "Desain Komunikasi Visual", "Desain Grafis", "Akuntansi", "Manajemen",
+    "Administrasi Bisnis", "Administrasi Publik", "Psikologi", "Hukum",
+    "Statistika", "Matematika", "Fisika", "Kimia", "Biologi", "Bioteknologi",
+    "Sastra Inggris", "Hubungan Masyarakat", "Kesehatan & Keselamatan Kerja (K3)",
+    "Teknik Industri", "Teknik Elektro", "Teknik Mesin", "Teknik Kimia",
+    "Teknik Sipil", "Teknik Perminyakan", "Teknik Pertambangan", "Teknik Geologi",
+    "Teknik Geofisika", "Teknik Kelautan", "Teknik Lingkungan", "Teknik Fisika",
+    "Teknik Metalurgi", "Teknik Perkapalan"
 ]
 
 def clean_jurusan(jurusan_str):
@@ -101,7 +81,6 @@ def clean_jurusan(jurusan_str):
         jurusan_str = jurusan_str[:idx]
         
     cleaned = re.sub(r'([a-z])([A-Z])', r'\1, \2', jurusan_str)
-    
     cleaned = re.sub(r'keselamatan\s+dan\s+kesehatan\s+kerja(?:\s*\(k3\))?', 'Kesehatan & Keselamatan Kerja (K3)', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'keselamatan\s+kesehatan\s+kerja(?:\s*\(k3\))?', 'Kesehatan & Keselamatan Kerja (K3)', cleaned, flags=re.IGNORECASE)
     
@@ -238,12 +217,10 @@ async def block_resources(route):
     req_type = route.request.resource_type
     url = route.request.url.lower()
     
-    # Block static resources
     if req_type in ["image", "stylesheet", "font", "media"]:
         await route.abort()
         return
         
-    # Block trackers, analytics, & ads
     trackers = [
         "google-analytics", "googletagmanager", "doubleclick", 
         "facebook.net", "hotjar", "ads", "analytics"
@@ -255,10 +232,25 @@ async def block_resources(route):
     await route.continue_()
 
 
-async def scrape_detail_worker(context, job_queue, results_list, progress_tracker):
-    """Worker task that processes job detail pages from queue concurrently"""
+# Shared lock for safe progress writing
+file_write_lock = asyncio.Lock()
+
+async def save_progress(output_path, data_list):
+    """Writes list safely using temporary swap file to prevent corruption"""
+    async with file_write_lock:
+        temp_path = output_path + ".tmp"
+        try:
+            with open(temp_path, "w", encoding="utf-8") as f:
+                json.dump(data_list, f, indent=4, ensure_ascii=False)
+            os.replace(temp_path, output_path)
+        except Exception as e:
+            # Silent fallback to avoid worker crash
+            pass
+
+
+async def scrape_detail_worker(context, job_queue, results_list, progress_tracker, output_path):
+    """Worker task that processes job detail pages concurrently with 30s timeouts and auto-retry"""
     page = await context.new_page()
-    # Apply resource blocking route
     await page.route("**/*", block_resources)
     
     while True:
@@ -269,48 +261,41 @@ async def scrape_detail_worker(context, job_queue, results_list, progress_tracke
 
         idx = progress_tracker["current"]
         progress_tracker["current"] += 1
-        print(f"    [{idx + 1}/{progress_tracker['total']}] Fetching detail: {job['judul']}...")
+        print(f"    {C_CYAN}[Worker]{C_RESET} [{idx + 1}/{progress_tracker['total']}] Memproses: {job['judul']}...")
         
         success = False
         retries = 2
         
         while retries >= 0 and not success:
             try:
-                # 30s timeout because server is slow, but resources are blocked to minimize load
+                # 30s timeout to survive server heavy load
                 await page.goto(job["detailUrl"], timeout=30000, wait_until="commit")
                 
-                # Dynamic wait for Location tag or specific text in body (max 3s)
+                # Dynamic wait for Location tag (max 3s)
                 try:
                     await page.wait_for_selector(".icon--location, .icon-location, i[class*='location']", timeout=3000)
                 except:
-                    # Fallback text load
                     await page.wait_for_timeout(1000)
                 
-                # Fetch page content text
                 full_text = await page.evaluate("() => document.body.innerText")
                 lines = [l.strip() for l in full_text.split('\n') if l.strip()]
                 
-                # Extract locations, tags, and briefcase categories
                 kota = "Tidak tertera"
                 industri = "Tidak tertera"
                 sektor = "Energy"
                 
-                # Location element
                 loc_el = await page.query_selector(".icon--location, .icon-location, i[class*='location']")
                 if loc_el:
                     kota = (await loc_el.evaluate("el => el.parentElement.innerText")).strip()
                 
-                # Industry element
                 ind_el = await page.query_selector(".icon--tag, .icon-tag, i[class*='tag'], i[class*='industry']")
                 if ind_el:
                     industri = (await ind_el.evaluate("el => el.parentElement.innerText")).strip()
                 
-                # Sector element
                 sec_el = await page.query_selector(".icon--briefcase, .icon-briefcase, .icon--bag, .icon-bag, i[class*='briefcase']")
                 if sec_el:
                     sektor = (await sec_el.evaluate("el => el.parentElement.innerText")).strip()
                 
-                # Fallback parser from text lines
                 index_kota = -1
                 for j, line in enumerate(lines):
                     lower_line = line.lower()
@@ -330,7 +315,6 @@ async def scrape_detail_worker(context, job_queue, results_list, progress_tracke
                         if "job description" not in nxt_sektor.lower() and "requirements" not in nxt_sektor.lower() and "-" not in nxt_sektor:
                             sektor = nxt_sektor
                 
-                # Sanitize extracted values
                 kota = re.sub(r'[\s\-\•\.\,]+$', '', kota).strip()
                 industri = re.sub(r'[\s\-\•\.\,]+$', '', industri).strip()
                 sektor = re.sub(r'[\s\-\•\.\,]+$', '', sektor).strip()
@@ -390,12 +374,13 @@ async def scrape_detail_worker(context, job_queue, results_list, progress_tracke
                     "Persyaratan": requirements
                 })
                 success = True
+                await save_progress(output_path, results_list)
             except Exception as e:
                 retries -= 1
                 if retries < 0:
-                    print(f"      [!] Gagal memproses {job['judul']} setelah beberapa percobaan: {e}")
+                    print(f"    {C_RED}[Worker] [✘] Gagal memproses {job['judul']} setelah 3 percobaan: {e}{C_RESET}")
                 else:
-                    await page.wait_for_timeout(1000)
+                    await page.wait_for_timeout(2000)
         
         job_queue.task_done()
         
@@ -404,13 +389,31 @@ async def scrape_detail_worker(context, job_queue, results_list, progress_tracke
 
 async def main():
     session_file = "pertamina_session.json"
+    output_dir = "JSON BARU"
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, "loker_data_scraped.json")
     
+    # Load existing progress (Resume Mode)
+    resume_dict = {}
+    if os.path.exists(output_path):
+        try:
+            with open(output_path, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+                if isinstance(loaded, list):
+                    for item in loaded:
+                        link = item.get("Link Detail")
+                        if link:
+                            resume_dict[link] = item
+            print(f"{C_GREEN}[*] Resume Mode: Terdeteksi data kemajuan scraping lama. Memuat {len(resume_dict)} lowongan.{C_RESET}")
+        except Exception as e:
+            print(f"{C_YELLOW}[!] Gagal memuat data lama (mulai baru): {e}{C_RESET}")
+
     async with async_playwright() as p:
         has_session = os.path.exists(session_file)
         
         if not has_session:
             print("\n============================================================")
-            print("                 INISIALISASI LOGIN PERTAMINA")
+            print(f"{C_BOLD}{C_CYAN}                 INISIALISASI LOGIN PERTAMINA{C_RESET}")
             print("============================================================")
             print("[*] Sesi login tidak ditemukan. Membuka browser visual...")
             
@@ -421,26 +424,25 @@ async def main():
             print("[*] Menghubungi https://recruitment.pertamina.com ...")
             await page.goto("https://recruitment.pertamina.com", timeout=60000)
             
-            print("\n[!] TINDAKAN DIPERLUKAN:")
+            print(f"\n{C_BOLD}{C_YELLOW}[!] TINDAKAN DIPERLUKAN:{C_RESET}")
             print("    1. Silakan login ke akun Pertamina Anda pada jendela browser.")
             print("    2. Buka halaman daftar lowongan/magang.")
             print("    3. Tekan [ENTER] di terminal ini untuk menyimpan sesi & mulai scraping.")
             
-            # Run in executor to not block async loop
             await asyncio.get_event_loop().run_in_executor(None, input, "\nTekan [ENTER] setelah siap...")
             
             await context.storage_state(path=session_file)
-            print(f"[+] Sesi login sukses disimpan ke '{session_file}'!")
+            print(f"{C_GREEN}[+] Sesi login sukses disimpan ke '{session_file}'!{C_RESET}")
         else:
-            print("[*] Menggunakan sesi login tersimpan...")
+            print(f"{C_BLUE}[*] Menggunakan sesi login tersimpan...{C_RESET}")
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context(storage_state=session_file)
             page = await context.new_page()
-            print("[*] Menghubungi https://recruitment.pertamina.com ...")
+            print(f"{C_BLUE}[*] Menghubungi https://recruitment.pertamina.com ...{C_RESET}")
             try:
                 await page.goto("https://recruitment.pertamina.com", timeout=60000, wait_until="domcontentloaded")
                 
-                # Verify session validity by checking URL or elements
+                # Check for expiration redirects
                 current_url = page.url
                 is_login_page = "login" in current_url.lower() or await page.query_selector("input[type='password']") or await page.query_selector("button:has-text('Login'), :text('Login'), button:has-text('Masuk'), :text('Masuk')")
                 
@@ -453,16 +455,15 @@ async def main():
                     if await page.query_selector(".job-item, .card, tr, [class*='card']"):
                         has_jobs = True
                         break
-                    # Break early if we redirected to login during wait
                     if "login" in page.url.lower():
                         break
                     await page.wait_for_timeout(500)
                 
                 if not has_jobs:
-                    raise Exception("No jobs rendered within timeout (possibly unauthorized or expired session)")
+                    raise Exception("No jobs rendered within timeout (session expired)")
                     
             except Exception as e:
-                print(f"\n[!] Sesi login kedaluwarsa atau tidak valid ({e})! Menghapus sesi lama...")
+                print(f"\n{C_RED}[!] Sesi login kedaluwarsa atau tidak valid ({e})! Menghapus sesi lama...{C_RESET}")
                 await page.close()
                 await browser.close()
                 if os.path.exists(session_file):
@@ -470,7 +471,6 @@ async def main():
                         os.remove(session_file)
                     except:
                         pass
-                # Recursive call to trigger interactive login
                 return await main()
             
         # Clear cookies/consent modals
@@ -494,7 +494,7 @@ async def main():
         page_num = 1
         previous_page_ids = set()
         
-        print("[*] Memulai pemindaian halaman daftar loker...")
+        print(f"\n{C_BOLD}{C_BLUE}[*] Memulai pemindaian halaman daftar loker...{C_RESET}")
         
         while True:
             print(f"    - Memindai halaman {page_num}...")
@@ -545,13 +545,12 @@ async def main():
                         "pelamar": pelamar
                     })
             
-            # Prevent infinite pagination loops (e.g., if page didn't load or loop-clicked a static button/carousel next button)
             if not current_page_ids:
-                print("    - Tidak ditemukan lowongan di halaman ini. Selesai memindai daftar.")
+                print(f"    {C_YELLOW}- Tidak ditemukan lowongan di halaman ini. Selesai memindai daftar.{C_RESET}")
                 break
                 
             if current_page_ids == previous_page_ids:
-                print("    - Halaman stagnan (tidak berpindah). Selesai memindai daftar.")
+                print(f"    {C_GREEN}- Halaman stagnan (tidak berpindah). Selesai memindai daftar.{C_RESET}")
                 break
                 
             previous_page_ids = current_page_ids
@@ -596,47 +595,122 @@ async def main():
             if next_btn:
                 is_disabled = await next_btn.evaluate("el => el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')")
                 if is_disabled:
-                    print("    - Sudah di halaman terakhir (tombol disabled).")
+                    print(f"    {C_GREEN}- Sudah di halaman terakhir (tombol disabled).{C_RESET}")
                     break
                 
-                try:
-                    await next_btn.click()
-                    page_num += 1
-                    await page.wait_for_timeout(2500)
-                except Exception as e:
-                    print(f"    - Gagal pindah ke halaman berikutnya: {e}")
+                # Resilient page transition retry loop (up to 3 times with reloads if page stalls)
+                success_transition = False
+                for retry in range(3):
+                    try:
+                        await next_btn.click(timeout=15000)
+                        page_num += 1
+                        
+                        # Wait up to 10 seconds for new page cards to render
+                        has_rendered = False
+                        for _ in range(20):
+                            new_cards = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
+                            if new_cards:
+                                new_ids = set()
+                                for c in new_cards:
+                                    html = await c.inner_html()
+                                    match = VACANCY_REGEX.search(html)
+                                    if match:
+                                        new_ids.add(match.group(1))
+                                if new_ids and new_ids != previous_page_ids:
+                                    has_rendered = True
+                                    break
+                            await page.wait_for_timeout(500)
+                            
+                        if has_rendered:
+                            success_transition = True
+                            break
+                        else:
+                            print(f"    {C_YELLOW}[!] Halaman baru belum ter-render sempurna. Memuat ulang (Percobaan {retry+1}/3)...{C_RESET}")
+                            await page.reload(timeout=30000, wait_until="domcontentloaded")
+                            # Wait and re-find next button
+                            await page.wait_for_timeout(5000)
+                            next_btn_handle = await page.evaluate_handle("""() => {
+                                const isDisabled = (el) => {
+                                    if (!el) return true;
+                                    if (el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')) return true;
+                                    if (el.parentElement && el.parentElement.classList.contains('disabled')) return true;
+                                    return false;
+                                };
+                                let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
+                                if (btn && !isDisabled(btn)) return btn;
+                                
+                                const activeEl = document.querySelector('.active, .current, [class*="active"], [class*="current"]');
+                                if (activeEl) {
+                                    const container = activeEl.closest('.pagination, [class*="pagination"], [class*="page-list"]');
+                                    if (container) {
+                                        const links = Array.from(container.querySelectorAll('a, button, li'));
+                                        const activeIndex = links.indexOf(activeEl) !== -1 ? links.indexOf(activeEl) : links.findIndex(l => l.contains(activeEl));
+                                        if (activeIndex !== -1 && links[activeIndex + 1]) {
+                                            const nextLink = links[activeIndex + 1].querySelector('a, button') || links[activeIndex + 1];
+                                            if (nextLink && !isDisabled(nextLink)) return nextLink;
+                                        }
+                                    }
+                                }
+                                return null;
+                            }""")
+                            next_btn = next_btn_handle.as_element()
+                            if not next_btn:
+                                break
+                    except Exception as ex:
+                        print(f"    {C_RED}[!] Gagal transisi ke halaman {page_num} ({ex}). Mencoba kembali...{C_RESET}")
+                        await page.wait_for_timeout(3000)
+                
+                if not success_transition:
+                    print(f"{C_RED}[✘] Gagal memindahkan halaman setelah 3 percobaan. Menghentikan pemindaian...{C_RESET}")
                     break
             else:
-                print("    - Tidak ditemukan tombol selanjutnya.")
+                print(f"    {C_YELLOW}- Tidak ditemukan tombol selanjutnya.{C_RESET}")
                 break
                 
-        print(f"\n[+] Sukses mendeteksi {len(unique_jobs)} lowongan magang.")
+        print(f"\n{C_GREEN}[+] Sukses mendeteksi total {len(unique_jobs)} lowongan magang.{C_RESET}")
         await page.close()
         
         if not unique_jobs:
-            print("[!] Peringatan: Tidak ada lowongan yang ditemukan. Mematikan skraper...")
+            print(f"{C_RED}[!] Peringatan: Tidak ada lowongan yang ditemukan. Mematikan skraper...{C_RESET}")
             await browser.close()
             return
             
-        print("\n[*] Memulai Fase 2: Mengambil detail lowongan secara paralel (concurrency=10)...")
+        print(f"\n{C_BOLD}{C_BLUE}[*] Memulai Fase 2: Mengambil detail lowongan secara paralel (concurrency=8)...{C_RESET}")
         hasil_scraping = []
         
-        # Build queue
+        # Load and queue only items that haven't been scraped yet
         job_queue = asyncio.Queue()
+        skipped_count = 0
+        
         for job in unique_jobs:
-            await job_queue.put(job)
+            if job["detailUrl"] in resume_dict:
+                hasil_scraping.append(resume_dict[job["detailUrl"]])
+                skipped_count += 1
+            else:
+                await job_queue.put(job)
+                
+        if skipped_count > 0:
+            print(f"{C_GREEN}[+] Resume Mode: Melewati {skipped_count} lowongan yang sudah di-scrape sebelumnya.{C_RESET}")
+            # Save the loaded items to progress file immediately
+            await save_progress(output_path, hasil_scraping)
+            
+        remaining_count = len(unique_jobs) - skipped_count
+        if remaining_count == 0:
+            print(f"{C_BOLD}{C_GREEN}[+] Seluruh lowongan sudah ter-scrape sebelumnya! Proses selesai.{C_RESET}")
+            await browser.close()
+            return
             
         progress_tracker = {
-            "current": 0,
+            "current": skipped_count,
             "total": len(unique_jobs)
         }
         
-        # We will use 10 concurrent worker tasks
-        concurrency = 10
+        # We will use 8 concurrent worker tasks (gentler on slow servers, but super fast)
+        concurrency = 8
         workers = []
         for i in range(concurrency):
             task = asyncio.create_task(
-                scrape_detail_worker(context, job_queue, hasil_scraping, progress_tracker)
+                scrape_detail_worker(context, job_queue, hasil_scraping, progress_tracker, output_path)
             )
             workers.append(task)
             
@@ -646,19 +720,12 @@ async def main():
         
         await browser.close()
         
-        # Save output to JSON BARU
-        os.makedirs("JSON BARU", exist_ok=True)
-        output_path = "JSON BARU/loker_data_scraped.json"
-        
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(hasil_scraping, f, indent=4, ensure_ascii=False)
-            
         duration = end_time - start_time
-        print("=" * 60)
-        print(f"[+] SELESAI: Sukses memindai {len(hasil_scraping)} lowongan dalam {duration:.1f} detik.")
-        print(f"[+] Rata-rata: {duration/max(1, len(hasil_scraping)):.2f} detik per lowongan.")
-        print(f"[+] Output disimpan di: {output_path}")
-        print("=" * 60)
+        print("=" * 65)
+        print(f"{C_BOLD}{C_GREEN}[+] SELESAI: Sukses memproses {len(hasil_scraping)} lowongan dalam {duration:.1f} detik.{C_RESET}")
+        print(f"{C_BOLD}{C_GREEN}[+] Rata-rata: {duration/max(1, remaining_count):.2f} detik per lowongan baru.{C_RESET}")
+        print(f"{C_BOLD}{C_GREEN}[+] Output final disimpan di: {output_path}{C_RESET}")
+        print("=" * 65)
 
 if __name__ == "__main__":
     asyncio.run(main())
