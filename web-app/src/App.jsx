@@ -90,7 +90,7 @@ export function getJobId(linkDetail) {
 
 // Compute relative time for last updated label
 export function getRelativeUpdateTime() {
-  const lastUpdated = new Date("2026-07-05T17:20:00+07:00");
+  const lastUpdated = new Date("2026-07-05T22:56:00+07:00");
   const diffMs = new Date() - lastUpdated;
   if (diffMs < 0) return "baru saja";
   
