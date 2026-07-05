@@ -657,11 +657,11 @@ async def main():
                         else:
                             raise click_ex
                     
-                    # Wait up to 30 seconds for the page transition to complete
+                    # Wait up to 5 seconds for immediate click transition
                     has_transitioned = False
                     target_page_str = str(page_num + 1)
                     
-                    for w in range(60): # 60 * 500ms = 30s
+                    for w in range(10): # 10 * 500ms = 5s
                         try:
                             # Check Method 1: Pagination Active Element
                             active_page_num = await page.evaluate("""() => {
@@ -670,7 +670,6 @@ async def main():
                                 const match = activeEl.innerText.match(/\\d+/);
                                 return match ? match[0] : null;
                             }""")
-                            
                             if active_page_num == target_page_str:
                                 has_transitioned = True
                                 break
@@ -690,13 +689,57 @@ async def main():
                         except Exception as eval_ex:
                             eval_msg = str(eval_ex).lower()
                             if "context was destroyed" in eval_msg or "navigating" in eval_msg:
-                                # Context destroyed means the browser is mid-navigation, which is a good sign
                                 pass
                             else:
                                 raise eval_ex
-                                
                         await page.wait_for_timeout(500)
                         
+                    # Direct Navigation Fallback if click transition didn't happen in 5s
+                    if not has_transitioned:
+                        try:
+                            href = await next_btn.evaluate("el => el.getAttribute('href')")
+                            if href:
+                                print(f"    {C_YELLOW}[!] Klik standar lambat/gagal. Menggunakan navigasi langsung ke href: {href[:80]}...{C_RESET}")
+                                if href.startswith("#"):
+                                    await page.evaluate("h => { window.location.hash = h; }", href)
+                                else:
+                                    full_href = href if href.startswith("http") else "https://recruitment.pertamina.com" + href
+                                    await page.goto(full_href, timeout=30000, wait_until="domcontentloaded")
+                        except Exception as nav_ex:
+                            print(f"    {C_RED}[!] Gagal navigasi langsung: {nav_ex}{C_RESET}")
+                            
+                        # Wait remaining 25 seconds for navigation to settle
+                        for w in range(50): # 50 * 500ms = 25s
+                            try:
+                                active_page_num = await page.evaluate("""() => {
+                                    const activeEl = document.querySelector('.pagination .active, .pagination .current, [class*="pagination"] [class*="active"], [class*="pagination"] [class*="current"], .ngx-pagination .current');
+                                    if (!activeEl) return null;
+                                    const match = activeEl.innerText.match(/\\d+/);
+                                    return match ? match[0] : null;
+                                }""")
+                                if active_page_num == target_page_str:
+                                    has_transitioned = True
+                                    break
+                                    
+                                new_cards = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
+                                if new_cards:
+                                    new_ids = set()
+                                    for c in new_cards:
+                                        html = await c.inner_html()
+                                        match = VACANCY_REGEX.search(html)
+                                        if match:
+                                            new_ids.add(match.group(1))
+                                    if new_ids and new_ids != previous_page_ids:
+                                        has_transitioned = True
+                                        break
+                            except Exception as eval_ex:
+                                eval_msg = str(eval_ex).lower()
+                                if "context was destroyed" in eval_msg or "navigating" in eval_msg:
+                                    pass
+                                else:
+                                    raise eval_ex
+                            await page.wait_for_timeout(500)
+                            
                     if has_transitioned:
                         page_num += 1
                         success_transition = True
