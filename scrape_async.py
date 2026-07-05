@@ -638,9 +638,24 @@ async def main():
                     # Click the next button
                     await next_btn.click(timeout=15000)
                     
-                    # Wait up to 10 seconds for new page cards to render
-                    has_rendered = False
-                    for _ in range(20):
+                    # Wait up to 30 seconds for the page transition to complete
+                    has_transitioned = False
+                    target_page_str = str(page_num + 1)
+                    
+                    for w in range(60): # 60 * 500ms = 30s
+                        # Check Method 1: Pagination Active Element
+                        active_page_num = await page.evaluate("""() => {
+                            const activeEl = document.querySelector('.pagination .active, .pagination .current, [class*="pagination"] [class*="active"], [class*="pagination"] [class*="current"], .ngx-pagination .current');
+                            if (!activeEl) return null;
+                            const match = activeEl.innerText.match(/\\d+/);
+                            return match ? match[0] : null;
+                        }""")
+                        
+                        if active_page_num == target_page_str:
+                            has_transitioned = True
+                            break
+                            
+                        # Check Method 2: Card ID Changes
                         new_cards = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
                         if new_cards:
                             new_ids = set()
@@ -650,11 +665,12 @@ async def main():
                                 if match:
                                     new_ids.add(match.group(1))
                             if new_ids and new_ids != previous_page_ids:
-                                has_rendered = True
+                                has_transitioned = True
                                 break
+                                
                         await page.wait_for_timeout(500)
                         
-                    if has_rendered:
+                    if has_transitioned:
                         page_num += 1
                         success_transition = True
                         break
