@@ -648,37 +648,52 @@ async def main():
                         print(f"    - Debug: Gagal membaca properti tombol next ({dbg_ex})")
                         
                     # Click the next button
-                    await next_btn.click(timeout=15000)
+                    try:
+                        await next_btn.click(timeout=15000)
+                    except Exception as click_ex:
+                        click_msg = str(click_ex).lower()
+                        if "context was destroyed" in click_msg or "detached" in click_msg:
+                            print(f"    {C_YELLOW}[!] Klik memicu perubahan DOM/Navigasi. Menunggu...{C_RESET}")
+                        else:
+                            raise click_ex
                     
                     # Wait up to 30 seconds for the page transition to complete
                     has_transitioned = False
                     target_page_str = str(page_num + 1)
                     
                     for w in range(60): # 60 * 500ms = 30s
-                        # Check Method 1: Pagination Active Element
-                        active_page_num = await page.evaluate("""() => {
-                            const activeEl = document.querySelector('.pagination .active, .pagination .current, [class*="pagination"] [class*="active"], [class*="pagination"] [class*="current"], .ngx-pagination .current');
-                            if (!activeEl) return null;
-                            const match = activeEl.innerText.match(/\\d+/);
-                            return match ? match[0] : null;
-                        }""")
-                        
-                        if active_page_num == target_page_str:
-                            has_transitioned = True
-                            break
+                        try:
+                            # Check Method 1: Pagination Active Element
+                            active_page_num = await page.evaluate("""() => {
+                                const activeEl = document.querySelector('.pagination .active, .pagination .current, [class*="pagination"] [class*="active"], [class*="pagination"] [class*="current"], .ngx-pagination .current');
+                                if (!activeEl) return null;
+                                const match = activeEl.innerText.match(/\\d+/);
+                                return match ? match[0] : null;
+                            }""")
                             
-                        # Check Method 2: Card ID Changes
-                        new_cards = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
-                        if new_cards:
-                            new_ids = set()
-                            for c in new_cards:
-                                html = await c.inner_html()
-                                match = VACANCY_REGEX.search(html)
-                                if match:
-                                    new_ids.add(match.group(1))
-                            if new_ids and new_ids != previous_page_ids:
+                            if active_page_num == target_page_str:
                                 has_transitioned = True
                                 break
+                                
+                            # Check Method 2: Card ID Changes
+                            new_cards = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
+                            if new_cards:
+                                new_ids = set()
+                                for c in new_cards:
+                                    html = await c.inner_html()
+                                    match = VACANCY_REGEX.search(html)
+                                    if match:
+                                        new_ids.add(match.group(1))
+                                if new_ids and new_ids != previous_page_ids:
+                                    has_transitioned = True
+                                    break
+                        except Exception as eval_ex:
+                            eval_msg = str(eval_ex).lower()
+                            if "context was destroyed" in eval_msg or "navigating" in eval_msg:
+                                # Context destroyed means the browser is mid-navigation, which is a good sign
+                                pass
+                            else:
+                                raise eval_ex
                                 
                         await page.wait_for_timeout(500)
                         
@@ -690,7 +705,26 @@ async def main():
                         print(f"    {C_YELLOW}[!] Transisi ke halaman {page_num + 1} belum ter-render (Mencoba klik ulang {retry+1}/3)...{C_RESET}")
                         await page.wait_for_timeout(3000)
                 except Exception as ex:
-                    print(f"    {C_RED}[!] Gagal transisi ke halaman {page_num + 1} ({ex}). Mencoba klik ulang...{C_RESET}")
+                    ex_msg = str(ex).lower()
+                    if "context was destroyed" in ex_msg or "navigating" in ex_msg:
+                        print(f"    {C_YELLOW}[!] Navigasi terdeteksi (konteks berubah), menunggu halaman stabil...{C_RESET}")
+                        try:
+                            await page.wait_for_load_state("domcontentloaded", timeout=15000)
+                            # Verify if we reached the target page after stabilizing
+                            active_page_num = await page.evaluate("""() => {
+                                const activeEl = document.querySelector('.pagination .active, .pagination .current, [class*="pagination"] [class*="active"], [class*="pagination"] [class*="current"], .ngx-pagination .current');
+                                if (!activeEl) return null;
+                                const match = activeEl.innerText.match(/\\d+/);
+                                return match ? match[0] : null;
+                            }""")
+                            if active_page_num == target_page_str:
+                                page_num += 1
+                                success_transition = True
+                                break
+                        except Exception:
+                            pass
+                    else:
+                        print(f"    {C_RED}[!] Gagal transisi ke halaman {page_num + 1} ({ex}). Mencoba klik ulang...{C_RESET}")
                     await page.wait_for_timeout(3000)
             
             if not success_transition:
