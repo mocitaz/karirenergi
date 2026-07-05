@@ -419,7 +419,7 @@ async def main():
             page = await context.new_page()
             
             print("[*] Menghubungi https://recruitment.pertamina.com ...")
-            await page.goto("https://recruitment.pertamina.com")
+            await page.goto("https://recruitment.pertamina.com", timeout=60000)
             
             print("\n[!] TINDAKAN DIPERLUKAN:")
             print("    1. Silakan login ke akun Pertamina Anda pada jendela browser.")
@@ -436,8 +436,10 @@ async def main():
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context(storage_state=session_file)
             page = await context.new_page()
+            # Enable resource blocking for the listing page too to speed up loading
+            await page.route("**/*", block_resources)
             print("[*] Menghubungi https://recruitment.pertamina.com ...")
-            await page.goto("https://recruitment.pertamina.com")
+            await page.goto("https://recruitment.pertamina.com", timeout=60000, wait_until="domcontentloaded")
             await page.wait_for_timeout(5000)
             
         # Clear cookies/consent modals
