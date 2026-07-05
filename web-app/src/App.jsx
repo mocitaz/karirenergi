@@ -5058,7 +5058,7 @@ export default function App() {
               {/* Body Content */}
               <div className="text-[13px] text-[#37352f] html.dark:text-[#a0a0a0] leading-relaxed flex flex-col gap-3 px-0.5">
                 <p>
-                  Pendaftaran program <strong>Magang Bakti Pertamina 2026</strong> telah resmi berakhir.
+                  Pendaftaran program <strong>Magang Pertamina</strong> telah resmi berakhir.
                 </p>
                 <p>
                   Terima kasih telah menggunakan platform <strong>KarirEnergi</strong> untuk memantau lowongan magang Anda.
