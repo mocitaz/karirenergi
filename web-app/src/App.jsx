@@ -333,6 +333,22 @@ export default function App() {
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  const [showClosureModal, setShowClosureModal] = useState(() => {
+    try {
+      const saved = localStorage.getItem("karirenergi-closure-notified");
+      return saved === null;
+    } catch (e) {
+      return true;
+    }
+  });
+
+  const handleCloseClosureModal = () => {
+    setShowClosureModal(false);
+    try {
+      localStorage.setItem("karirenergi-closure-notified", "true");
+    } catch (e) {}
+  };
+
   // Dark Mode State
   const [darkMode, setDarkMode] = useState(() => {
     try {
@@ -2062,45 +2078,51 @@ export default function App() {
             </div>
 
             {/* Compact Monospace Countdown - Collapse when scrolled */}
-            {!timeLeft.isExpired && (
-              <div className={`transition-all duration-300 ease-in-out ${
-                isScrolled 
-                  ? "h-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none" 
-                  : `flex items-center text-[12px] w-fit shadow-3xs self-start sm:self-center px-3.5 py-1.5 rounded-lg border transition-all ${
-                      timeLeft.days === 0 
+            <div className={`transition-all duration-300 ease-in-out ${
+              isScrolled 
+                ? "h-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none" 
+                : `flex items-center text-[12px] w-fit shadow-3xs self-start sm:self-center px-3.5 py-1.5 rounded-lg border transition-all ${
+                    timeLeft.isExpired
+                      ? "bg-red-50/80 border-red-200 text-red-700 html.dark:bg-red-950/20 html.dark:border-red-900/40 html.dark:text-red-400"
+                      : timeLeft.days === 0 
                         ? "bg-[#fdf2f2] border-[#fca5a5] text-[#9b1c1c] animate-pulse" 
                         : "bg-[#f1f1ef]/60 border-[#edece9] text-[#37352f]"
-                    }`
-              }`}>
-                {timeLeft.days === 0 ? (
-                  <AlertCircle className="w-3.5 h-3.5 mr-2 text-[#e53e3e] flex-shrink-0 animate-pulse" />
-                ) : (
-                  <Timer className="w-3.5 h-3.5 mr-2 text-[#5a5a57] flex-shrink-0" />
-                )}
-                <div className="flex flex-col">
-                  <span className={`text-[9.5px] font-extrabold uppercase tracking-wider leading-none mb-0.5 ${
-                    timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"
-                  }`}>
-                    {timeLeft.days === 0 ? "PENDAFTARAN SEGERA DITUTUP!" : "Batas Registrasi"}
-                  </span>
-                  <span className={`font-mono font-bold leading-none select-none flex items-center gap-0.5 ${
-                    timeLeft.days === 0 ? "text-[#c53030]" : "text-[#37352f]"
-                  }`}>
-                    {timeLeft.days > 0 && (
-                      <>
-                        <span>{timeLeft.days}<span className="text-[8.5px] font-sans font-semibold text-[#8a8a86] ml-0.5">d</span></span>
-                        <span className="text-[#8a8a86]/50 font-sans mx-1">:</span>
-                      </>
-                    )}
-                    <span>{String(timeLeft.hours).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>h</span></span>
-                    <span className={`font-sans mx-1 ${timeLeft.days === 0 ? "text-[#fca5a5]" : "text-[#8a8a86]/50"}`}>:</span>
-                    <span>{String(timeLeft.minutes).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>m</span></span>
-                    <span className={`font-sans mx-1 ${timeLeft.days === 0 ? "text-[#fca5a5]" : "text-[#8a8a86]/50"}`}>:</span>
-                    <span>{String(timeLeft.seconds).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>s</span></span>
-                  </span>
-                </div>
+                  }`
+            }`}>
+              {timeLeft.isExpired || timeLeft.days === 0 ? (
+                <AlertCircle className="w-3.5 h-3.5 mr-2 text-[#e53e3e] flex-shrink-0" />
+              ) : (
+                <Timer className="w-3.5 h-3.5 mr-2 text-[#5a5a57] flex-shrink-0" />
+              )}
+              <div className="flex flex-col">
+                <span className={`text-[9.5px] font-extrabold uppercase tracking-wider leading-none mb-0.5 ${
+                  timeLeft.isExpired || timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"
+                }`}>
+                  {timeLeft.isExpired ? "PENDAFTARAN DITUTUP!" : timeLeft.days === 0 ? "PENDAFTARAN SEGERA DITUTUP!" : "Batas Registrasi"}
+                </span>
+                <span className={`font-sans font-bold leading-none select-none flex items-center gap-0.5 ${
+                  timeLeft.isExpired ? "text-red-600 html.dark:text-red-400" : timeLeft.days === 0 ? "text-[#c53030]" : "text-[#37352f]"
+                }`}>
+                  {timeLeft.isExpired ? (
+                    "Pendaftaran Resmi Ditutup"
+                  ) : (
+                    <>
+                      {timeLeft.days > 0 && (
+                        <>
+                          <span>{timeLeft.days}<span className="text-[8.5px] font-sans font-semibold text-[#8a8a86] ml-0.5">d</span></span>
+                          <span className="text-[#8a8a86]/50 font-sans mx-1">:</span>
+                        </>
+                      )}
+                      <span>{String(timeLeft.hours).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>h</span></span>
+                      <span className={`font-sans mx-1 ${timeLeft.days === 0 ? "text-[#fca5a5]" : "text-[#8a8a86]/50"}`}>:</span>
+                      <span>{String(timeLeft.minutes).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>m</span></span>
+                      <span className={`font-sans mx-1 ${timeLeft.days === 0 ? "text-[#fca5a5]" : "text-[#8a8a86]/50"}`}>:</span>
+                      <span>{String(timeLeft.seconds).padStart(2, "0")}<span className={`text-[8.5px] font-sans font-semibold ml-0.5 ${timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"}`}>s</span></span>
+                    </>
+                  )}
+                </span>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -5000,6 +5022,66 @@ export default function App() {
         </>
       )}
 
+
+      {/* Pendaftaran Ditutup / Apresiasi Modal */}
+      {showClosureModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
+          <div className="bg-white html.dark:bg-[#1a1a1a] rounded-2xl max-w-md w-full border border-[#edece9] html.dark:border-[#2e2e2e] shadow-2xl overflow-hidden animate-scale-in flex flex-col relative">
+            {/* Top accent gradient bar */}
+            <div className="h-1.5 bg-gradient-to-r from-red-500 via-amber-500 to-green-500" />
+            
+            <div className="p-6 md:p-8 flex flex-col gap-5 relative bg-white html.dark:bg-[#191919]">
+              {/* Close Button */}
+              <button
+                onClick={handleCloseClosureModal}
+                className="absolute top-4 right-4 p-1.5 text-[#5a5a57] hover:bg-[#edece9] html.dark:text-[#a0a0a0] html.dark:hover:bg-[#2c2c2c] rounded-lg transition-colors cursor-pointer"
+                title="Tutup"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Icon & Title */}
+              <div className="flex flex-col items-center text-center gap-3.5 mt-2">
+                <span className="w-14 h-14 rounded-full bg-red-50 html.dark:bg-red-950/20 flex items-center justify-center text-red-600 html.dark:text-red-400 animate-pulse">
+                  <AlertCircle className="w-7 h-7" />
+                </span>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-red-600 html.dark:text-red-400 bg-red-50 html.dark:bg-red-950/20 px-2.5 py-0.5 rounded-full self-center">
+                    PENDAFTARAN RESMI DITUTUP!
+                  </span>
+                  <h3 className="font-extrabold text-[18px] md:text-[20px] text-[#37352f] html.dark:text-[#e3e3e2] leading-tight">
+                    Terima Kasih Banyak dari KarirEnergi!
+                  </h3>
+                </div>
+              </div>
+
+              {/* Body Content */}
+              <div className="text-[12.5px] text-[#5a5a57] html.dark:text-[#a0a0a0] leading-relaxed flex flex-col gap-3 text-center px-1">
+                <p>
+                  Pendaftaran program <strong>Magang Bakti Pertamina 2026</strong> telah resmi ditutup pada hari Minggu, 5 Juli 2026 pukul 23:59 WIB.
+                </p>
+                <p>
+                  Terima kasih banyak telah menggunakan platform <strong>KarirEnergi</strong> dalam perjalanan perjuangan pencarian magang Anda di Pertamina Group.
+                </p>
+                <div className="font-medium text-[#37352f] html.dark:text-[#e3e3e2] bg-[#f7f7f5] html.dark:bg-[#202020] p-3.5 rounded-xl border border-[#edece9] html.dark:border-[#2e2e2e] italic mt-1">
+                  "Tetap semangat, pantang menyerah, dan semoga sukses! Semoga Anda mendapatkan hasil terbaik."
+                </div>
+                <div className="text-[11.5px] text-[#8a8a86] html.dark:text-[#707070] mt-2">
+                  Ikuti terus update & karya inspiratif lainnya di <a href="https://github.com/mocitaz" target="_blank" rel="noopener noreferrer" className="text-[#1d7bb8] html.dark:text-[#38bdf8] font-bold hover:underline">@mocitaz</a>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button
+                onClick={handleCloseClosureModal}
+                className="w-full py-2.5 bg-[#37352f] html.dark:bg-[#e3e3e2] text-white html.dark:text-[#1a1a1a] hover:bg-[#4d4b47] html.dark:hover:bg-white text-[13px] font-bold rounded-lg transition-all cursor-pointer shadow-sm active:scale-98 select-none text-center"
+              >
+                Aamiin, Terima Kasih!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {toastMessage && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#121212] text-white px-4 py-2.5 rounded-xl text-[12.5px] font-bold shadow-lg z-[9999] flex items-center gap-2 border border-white/10 animate-fade-in select-none">
