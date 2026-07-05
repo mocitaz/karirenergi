@@ -276,12 +276,12 @@ async def scrape_detail_worker(context, job_queue, results_list, progress_tracke
         
         while retries >= 0 and not success:
             try:
-                # 15s timeout because resources are blocked, should load instantly
-                await page.goto(job["detailUrl"], timeout=15000, wait_until="commit")
+                # 30s timeout because server is slow, but resources are blocked to minimize load
+                await page.goto(job["detailUrl"], timeout=30000, wait_until="commit")
                 
-                # Dynamic wait for Location tag or specific text in body (max 2s)
+                # Dynamic wait for Location tag or specific text in body (max 3s)
                 try:
-                    await page.wait_for_selector(".icon--location, .icon-location, i[class*='location']", timeout=2000)
+                    await page.wait_for_selector(".icon--location, .icon-location, i[class*='location']", timeout=3000)
                 except:
                     # Fallback text load
                     await page.wait_for_timeout(1000)
