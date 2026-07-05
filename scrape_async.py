@@ -463,9 +463,9 @@ async def main():
                 if is_login_page:
                     raise Exception("Redirected to login screen")
                 
-                # Wait up to 15 seconds for job list matching VACANCY_REGEX in page content
+                # Wait up to 45 seconds for job list matching VACANCY_REGEX in page content
                 has_jobs = False
-                for _ in range(30):
+                for _ in range(90):
                     content = await page.content()
                     if VACANCY_REGEX.search(content):
                         has_jobs = True
@@ -510,18 +510,10 @@ async def main():
         if "bf1c31dc-9341-47ff-ac76-0fa9a30065ac" not in page.url:
             print(f"{C_BLUE}[*] Mengarahkan kembali ke halaman daftar lowongan magang...{C_RESET}")
             await page.goto(START_URL, timeout=60000, wait_until="domcontentloaded")
-            # Wait up to 15 seconds for job list matching VACANCY_REGEX in page content
-            has_jobs = False
-            for _ in range(30):
-                try:
-                    content = await page.content()
-                    if VACANCY_REGEX.search(content):
-                        has_jobs = True
-                        break
-                except Exception:
-                    pass
-                await page.wait_for_timeout(500)
-            if not has_jobs:
+            try:
+                await page.wait_for_selector(".job-item, .card, tr, [class*='card']", timeout=45000)
+                await wait_for_loading_overlay(page)
+            except Exception:
                 print(f"{C_RED}[!] Peringatan: Tidak dapat mendeteksi lowongan magang setelah mengarahkan halaman.{C_RESET}")
             
         unique_jobs = []
@@ -533,6 +525,12 @@ async def main():
         while True:
             print(f"    - Memindai halaman {page_num}...")
             
+            # Wait for at least one job card to appear to guarantee the app has bootstrapped/rendered
+            try:
+                await page.wait_for_selector(".job-item, .card, tr, [class*='card']", timeout=45000)
+            except Exception:
+                pass
+                
             # Wait for loading overlay to disappear
             await wait_for_loading_overlay(page)
             
