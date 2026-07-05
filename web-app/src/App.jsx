@@ -25,7 +25,8 @@ import {
   Moon,
   Share2,
   Award,
-  AlertCircle
+  AlertCircle,
+  Download
 } from "lucide-react";
 import lokerData from "./data/loker_data.json";
 import Fuse from "fuse.js";
@@ -1053,11 +1054,91 @@ export default function App() {
     };
   }, [listings, calcMajor, calcCity, calcEdu]);
 
-  // Previous and Next job navigation in Detail Modal
   const currentIdx = useMemo(() => {
     if (!selectedJob) return -1;
     return filteredListings.findIndex((j) => j["Link Detail"] === selectedJob["Link Detail"]);
   }, [selectedJob, filteredListings]);
+
+  // CSV Download handler with UTF-8 BOM and correct escaping for neat alignment
+  const handleDownloadCSV = () => {
+    if (!filteredListings || filteredListings.length === 0) {
+      showToast("Tidak ada data lowongan yang bisa diunduh.");
+      return;
+    }
+
+    const headers = [
+      "No",
+      "Judul Lowongan",
+      "Perusahaan",
+      "Sektor",
+      "Industri",
+      "Pendidikan",
+      "Jurusan",
+      "Kota",
+      "Kuota",
+      "Pelamar",
+      "Peluang Lolos",
+      "Tingkat Persaingan",
+      "Keketatan Rank",
+      "Link Detail"
+    ];
+
+    const rows = filteredListings.map((job, index) => {
+      const stats = getDeterministicStats(
+        job["Judul Lowongan"],
+        job["Perusahaan"],
+        job["Link Detail"],
+        job["Kuota"],
+        job["Pelamar"]
+      );
+      const comp = getCompetitionLevel(stats.passRate);
+
+      return [
+        index + 1,
+        job["Judul Lowongan"],
+        job["Perusahaan"],
+        job["Sektor"],
+        job["Industri"],
+        job["Pendidikan"],
+        job["Jurusan"],
+        job["Kota"],
+        stats.kuota,
+        stats.pelamar,
+        `${stats.passRate}%`,
+        comp.label,
+        `Peringkat ${job.competitionRank}`,
+        job["Link Detail"]
+      ];
+    });
+
+    const escapeCSVValue = (val) => {
+      if (val === null || val === undefined) return "";
+      const str = String(val);
+      if (str.includes('"') || str.includes(',') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(escapeCSVValue).join(","))
+    ].join("\n");
+
+    try {
+      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `loker_magang_pertamina_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Berhasil mengunduh file CSV lowongan!");
+    } catch (err) {
+      showToast("Gagal mengunduh file CSV.");
+    }
+  };
 
   const selectedJobStats = useMemo(() => {
     if (!selectedJob) return null;
@@ -1720,6 +1801,15 @@ export default function App() {
                 <ArrowUpRight className="w-4 h-4 flex-shrink-0" />
                 {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in group-hover:translate-x-0.5 transition-transform">Portal Resmi</span>}
               </a>
+
+              <button
+                onClick={handleDownloadCSV}
+                className={`flex items-center w-full px-2.5 py-2 rounded-lg text-[13px] hover:bg-[#edece9]/50 text-[#5a5a57] hover:text-[#37352f] transition-all cursor-pointer group ${sidebarOpen ? "justify-start" : "justify-center"}`}
+                title="Ekspor CSV"
+              >
+                <Download className="w-4 h-4 flex-shrink-0 text-[#1d7bb8]" />
+                {sidebarOpen && <span className="ml-2.5 truncate animate-fade-in group-hover:translate-x-0.5 transition-transform font-semibold text-[#1d7bb8]">Ekspor CSV</span>}
+              </button>
             </nav>
           </div>
 
@@ -1961,6 +2051,13 @@ export default function App() {
                 >
                   Portal Resmi <ArrowUpRight className="w-3.5 h-3.5" />
                 </a>
+                <button
+                  onClick={handleDownloadCSV}
+                  className="font-semibold text-[#1d7bb8] flex items-center gap-1 hover:text-[#155a8a] pb-1 cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Ekspor CSV
+                </button>
               </div>
             </div>
 
