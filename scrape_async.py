@@ -572,116 +572,101 @@ async def main():
                 
             previous_page_ids = current_page_ids
             
-            # Evaluate next page button in page context
-            next_btn_handle = await page.evaluate_handle("""() => {
-                const isDisabled = (el) => {
-                    if (!el) return true;
-                    if (el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')) return true;
-                    if (el.parentElement && el.parentElement.classList.contains('disabled')) return true;
-                    return false;
-                };
+            # Resilient page transition retry loop (up to 3 times, DOM-only without full reloads)
+            success_transition = False
+            for retry in range(3):
+                try:
+                    # Evaluate next page button in page context dynamically on each retry
+                    next_btn_handle = await page.evaluate_handle("""() => {
+                        const isDisabled = (el) => {
+                            if (!el) return true;
+                            if (el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')) return true;
+                            if (el.parentElement && el.parentElement.classList.contains('disabled')) return true;
+                            return false;
+                        };
 
-                let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
-                if (btn && !isDisabled(btn)) return btn;
-                
-                const elements = Array.from(document.querySelectorAll('a, button, li, span'));
-                for (let el of elements) {
-                    const txt = el.innerText.trim().toLowerCase();
-                    if (txt === 'next' || txt === 'selanjutnya' || txt === '>' || txt === '»') {
-                        if (!isDisabled(el)) return el;
-                    }
-                }
-
-                // Sibling fallback for page number links
-                const activeEl = document.querySelector('.active, .current, [class*="active"], [class*="current"]');
-                if (activeEl) {
-                    const container = activeEl.closest('.pagination, [class*="pagination"], [class*="page-list"]');
-                    if (container) {
-                        const links = Array.from(container.querySelectorAll('a, button, li'));
-                        const activeIndex = links.indexOf(activeEl) !== -1 ? links.indexOf(activeEl) : links.findIndex(l => l.contains(activeEl));
-                        if (activeIndex !== -1 && links[activeIndex + 1]) {
-                            const nextLink = links[activeIndex + 1].querySelector('a, button') || links[activeIndex + 1];
-                            if (nextLink && !isDisabled(nextLink)) return nextLink;
-                        }
-                    }
-                }
-                return null;
-            }""")
-            
-            next_btn = next_btn_handle.as_element()
-            if next_btn:
-                is_disabled = await next_btn.evaluate("el => el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')")
-                if is_disabled:
-                    print(f"    {C_GREEN}- Sudah di halaman terakhir (tombol disabled).{C_RESET}")
-                    break
-                
-                # Resilient page transition retry loop (up to 3 times with reloads if page stalls)
-                success_transition = False
-                for retry in range(3):
-                    try:
-                        await next_btn.click(timeout=15000)
-                        page_num += 1
+                        // 1. Try standard next button selectors
+                        let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
+                        if (btn && !isDisabled(btn)) return btn;
                         
-                        # Wait up to 10 seconds for new page cards to render
-                        has_rendered = False
-                        for _ in range(20):
-                            new_cards = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
-                            if new_cards:
-                                new_ids = set()
-                                for c in new_cards:
-                                    html = await c.inner_html()
-                                    match = VACANCY_REGEX.search(html)
-                                    if match:
-                                        new_ids.add(match.group(1))
-                                if new_ids and new_ids != previous_page_ids:
-                                    has_rendered = True
-                                    break
-                            await page.wait_for_timeout(500)
-                            
-                        if has_rendered:
-                            success_transition = True
-                            break
-                        else:
-                            print(f"    {C_YELLOW}[!] Halaman baru belum ter-render sempurna. Memuat ulang (Percobaan {retry+1}/3)...{C_RESET}")
-                            await page.reload(timeout=30000, wait_until="domcontentloaded")
-                            # Wait and re-find next button
-                            await page.wait_for_timeout(5000)
-                            next_btn_handle = await page.evaluate_handle("""() => {
-                                const isDisabled = (el) => {
-                                    if (!el) return true;
-                                    if (el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')) return true;
-                                    if (el.parentElement && el.parentElement.classList.contains('disabled')) return true;
-                                    return false;
-                                };
-                                let btn = document.querySelector('[aria-label="Next"], [aria-label="Next Page"], .next-page, .next, .pagination-next');
-                                if (btn && !isDisabled(btn)) return btn;
-                                
-                                const activeEl = document.querySelector('.active, .current, [class*="active"], [class*="current"]');
-                                if (activeEl) {
-                                    const container = activeEl.closest('.pagination, [class*="pagination"], [class*="page-list"]');
-                                    if (container) {
-                                        const links = Array.from(container.querySelectorAll('a, button, li'));
-                                        const activeIndex = links.indexOf(activeEl) !== -1 ? links.indexOf(activeEl) : links.findIndex(l => l.contains(activeEl));
-                                        if (activeIndex !== -1 && links[activeIndex + 1]) {
-                                            const nextLink = links[activeIndex + 1].querySelector('a, button') || links[activeIndex + 1];
-                                            if (nextLink && !isDisabled(nextLink)) return nextLink;
-                                        }
+                        // 2. Try text matching on buttons/links
+                        const elements = Array.from(document.querySelectorAll('a, button, li, span'));
+                        for (let el of elements) {
+                            const txt = el.innerText.trim().toLowerCase();
+                            if (txt === 'next' || txt === 'selanjutnya' || txt === '>' || txt === '»') {
+                                if (!isDisabled(el)) return el;
+                            }
+                        }
+
+                        // 3. Fallback: Sibling active page number link
+                        const activeEl = document.querySelector('.active, .current, [class*="active"], [class*="current"]');
+                        if (activeEl) {
+                            const container = activeEl.closest('.pagination, [class*="pagination"], [class*="page-list"]');
+                            if (container) {
+                                // Find only top-level pagination items to avoid duplicate parent/child matches
+                                let items = Array.from(container.querySelectorAll('li'));
+                                if (items.length > 0) {
+                                    const activeIdx = items.findIndex(item => item === activeEl || item.contains(activeEl));
+                                    if (activeIdx !== -1 && items[activeIdx + 1]) {
+                                        const nextItem = items[activeIdx + 1];
+                                        const clickable = nextItem.querySelector('a, button') || nextItem;
+                                        if (clickable && !isDisabled(clickable)) return clickable;
+                                    }
+                                } else {
+                                    let siblings = Array.from(container.querySelectorAll('a, button'));
+                                    const activeIdx = siblings.findIndex(item => item === activeEl || item.contains(activeEl));
+                                    if (activeIdx !== -1 && siblings[activeIdx + 1]) {
+                                        const nextLink = siblings[activeIdx + 1];
+                                        if (nextLink && !isDisabled(nextLink)) return nextLink;
                                     }
                                 }
-                                return null;
-                            }""")
-                            next_btn = next_btn_handle.as_element()
-                            if not next_btn:
+                            }
+                        }
+                        return null;
+                    }""")
+                    
+                    next_btn = next_btn_handle.as_element()
+                    if not next_btn:
+                        break
+                        
+                    is_disabled = await next_btn.evaluate("el => el.disabled || el.hasAttribute('disabled') || el.classList.contains('disabled')")
+                    if is_disabled:
+                        if retry == 0:
+                            print(f"    {C_GREEN}- Sudah di halaman terakhir (tombol disabled).{C_RESET}")
+                        break
+                        
+                    # Click the next button
+                    await next_btn.click(timeout=15000)
+                    
+                    # Wait up to 10 seconds for new page cards to render
+                    has_rendered = False
+                    for _ in range(20):
+                        new_cards = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
+                        if new_cards:
+                            new_ids = set()
+                            for c in new_cards:
+                                html = await c.inner_html()
+                                match = VACANCY_REGEX.search(html)
+                                if match:
+                                    new_ids.add(match.group(1))
+                            if new_ids and new_ids != previous_page_ids:
+                                has_rendered = True
                                 break
-                    except Exception as ex:
-                        print(f"    {C_RED}[!] Gagal transisi ke halaman {page_num} ({ex}). Mencoba kembali...{C_RESET}")
+                        await page.wait_for_timeout(500)
+                        
+                    if has_rendered:
+                        page_num += 1
+                        success_transition = True
+                        break
+                    else:
+                        print(f"    {C_YELLOW}[!] Transisi ke halaman {page_num + 1} belum ter-render (Mencoba klik ulang {retry+1}/3)...{C_RESET}")
                         await page.wait_for_timeout(3000)
-                
-                if not success_transition:
-                    print(f"{C_RED}[✘] Gagal memindahkan halaman setelah 3 percobaan. Menghentikan pemindaian...{C_RESET}")
-                    break
-            else:
-                print(f"    {C_YELLOW}- Tidak ditemukan tombol selanjutnya.{C_RESET}")
+                except Exception as ex:
+                    print(f"    {C_RED}[!] Gagal transisi ke halaman {page_num + 1} ({ex}). Mencoba klik ulang...{C_RESET}")
+                    await page.wait_for_timeout(3000)
+            
+            if not success_transition:
+                print(f"    {C_RED}[✘] Selesai memindai (tidak ada respon transisi halaman setelah 3 percobaan).{C_RESET}")
                 break
                 
         print(f"\n{C_GREEN}[+] Sukses mendeteksi total {len(unique_jobs)} lowongan magang.{C_RESET}")
