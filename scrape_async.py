@@ -492,6 +492,20 @@ async def main():
                 print("[*] Menutup Pengumuman Waspada...")
         except:
             pass
+        # Ensure we are on the correct internship search listing widget page before scanning
+        if "bf1c31dc-9341-47ff-ac76-0fa9a30065ac" not in page.url:
+            print(f"{C_BLUE}[*] Mengarahkan kembali ke halaman daftar lowongan magang...{C_RESET}")
+            await page.goto(START_URL, timeout=60000, wait_until="domcontentloaded")
+            # Wait up to 15 seconds for job list matching VACANCY_REGEX in page content
+            has_jobs = False
+            for _ in range(30):
+                content = await page.content()
+                if VACANCY_REGEX.search(content):
+                    has_jobs = True
+                    break
+                await page.wait_for_timeout(500)
+            if not has_jobs:
+                print(f"{C_RED}[!] Peringatan: Tidak dapat mendeteksi lowongan magang setelah mengarahkan halaman.{C_RESET}")
             
         unique_jobs = []
         page_num = 1
