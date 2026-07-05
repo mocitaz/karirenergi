@@ -5025,58 +5025,58 @@ export default function App() {
 
       {/* Pendaftaran Ditutup / Apresiasi Modal */}
       {showClosureModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fade-in">
-          <div className="bg-white html.dark:bg-[#1a1a1a] rounded-2xl max-w-md w-full border border-[#edece9] html.dark:border-[#2e2e2e] shadow-2xl overflow-hidden animate-scale-in flex flex-col relative">
-            {/* Top accent gradient bar */}
-            <div className="h-1.5 bg-gradient-to-r from-red-500 via-amber-500 to-green-500" />
-            
-            <div className="p-6 md:p-8 flex flex-col gap-5 relative bg-white html.dark:bg-[#191919]">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white html.dark:bg-[#191919] rounded-lg max-w-[420px] w-full border border-[#edece9] html.dark:border-[#2e2e2e] shadow-xl overflow-hidden animate-scale-in flex flex-col relative">
+            <div className="p-6 flex flex-col gap-4 relative">
               {/* Close Button */}
               <button
                 onClick={handleCloseClosureModal}
-                className="absolute top-4 right-4 p-1.5 text-[#5a5a57] hover:bg-[#edece9] html.dark:text-[#a0a0a0] html.dark:hover:bg-[#2c2c2c] rounded-lg transition-colors cursor-pointer"
+                className="absolute top-4 right-4 p-1 text-[#5a5a57] hover:bg-[#f1f1ef] html.dark:text-[#a0a0a0] html.dark:hover:bg-[#2c2c2c] rounded-md transition-colors cursor-pointer"
                 title="Tutup"
               >
                 <X className="w-4 h-4" />
               </button>
 
-              {/* Icon & Title */}
-              <div className="flex flex-col items-center text-center gap-3.5 mt-2">
-                <span className="w-14 h-14 rounded-full bg-red-50 html.dark:bg-red-950/20 flex items-center justify-center text-red-600 html.dark:text-red-400 animate-pulse">
-                  <AlertCircle className="w-7 h-7" />
+              {/* Title */}
+              <div className="flex items-start gap-3 mt-1 select-none">
+                <span className="w-10 h-10 rounded-lg bg-[#f1f1ef] html.dark:bg-[#2c2c2c] flex items-center justify-center text-[#37352f] html.dark:text-[#e3e3e2] flex-shrink-0">
+                  <Briefcase className="w-5 h-5" />
                 </span>
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-red-600 html.dark:text-red-400 bg-red-50 html.dark:bg-red-950/20 px-2.5 py-0.5 rounded-full self-center">
-                    PENDAFTARAN RESMI DITUTUP!
-                  </span>
-                  <h3 className="font-extrabold text-[18px] md:text-[20px] text-[#37352f] html.dark:text-[#e3e3e2] leading-tight">
-                    Terima Kasih Banyak dari KarirEnergi!
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="font-bold text-[16px] text-[#37352f] html.dark:text-[#e3e3e2] leading-tight">
+                    Pendaftaran Magang Pertamina Ditutup
                   </h3>
+                  <span className="text-[10px] font-medium text-red-600 html.dark:text-red-400">
+                    Selesai pada 5 Juli 2026, 23:59 WIB
+                  </span>
                 </div>
               </div>
 
+              {/* Divider */}
+              <div className="h-[1px] bg-[#edece9] html.dark:bg-[#2e2e2e] w-full my-0.5" />
+
               {/* Body Content */}
-              <div className="text-[12.5px] text-[#5a5a57] html.dark:text-[#a0a0a0] leading-relaxed flex flex-col gap-3 text-center px-1">
+              <div className="text-[13px] text-[#37352f] html.dark:text-[#a0a0a0] leading-relaxed flex flex-col gap-3 px-0.5">
                 <p>
-                  Pendaftaran program <strong>Magang Bakti Pertamina 2026</strong> telah resmi ditutup pada hari Minggu, 5 Juli 2026 pukul 23:59 WIB.
+                  Pendaftaran program <strong>Magang Bakti Pertamina 2026</strong> telah resmi berakhir.
                 </p>
                 <p>
-                  Terima kasih banyak telah menggunakan platform <strong>KarirEnergi</strong> dalam perjalanan perjuangan pencarian magang Anda di Pertamina Group.
+                  Terima kasih telah menggunakan platform <strong>KarirEnergi</strong> untuk memantau lowongan magang Anda.
                 </p>
-                <div className="font-medium text-[#37352f] html.dark:text-[#e3e3e2] bg-[#f7f7f5] html.dark:bg-[#202020] p-3.5 rounded-xl border border-[#edece9] html.dark:border-[#2e2e2e] italic mt-1">
-                  "Tetap semangat, pantang menyerah, dan semoga sukses! Semoga Anda mendapatkan hasil terbaik."
-                </div>
-                <div className="text-[11.5px] text-[#8a8a86] html.dark:text-[#707070] mt-2">
-                  Ikuti terus update & karya inspiratif lainnya di <a href="https://github.com/mocitaz" target="_blank" rel="noopener noreferrer" className="text-[#1d7bb8] html.dark:text-[#38bdf8] font-bold hover:underline">@mocitaz</a>
+                <p className="text-[12.5px] text-[#5a5a57] html.dark:text-[#909090] italic bg-[#f7f7f5] html.dark:bg-[#202020] p-3 rounded-lg border border-[#edece9]/60 html.dark:border-[#2e2e2e]/60">
+                  Semangat, semoga sukses, dan semoga mendapatkan hasil yang terbaik untuk masa depan Anda!
+                </p>
+                <div className="text-[11.5px] text-[#8a8a86] html.dark:text-[#707070] mt-1">
+                  Ikuti perkembangan & update selanjutnya di <a href="https://github.com/mocitaz" target="_blank" rel="noopener noreferrer" className="text-[#1d7bb8] html.dark:text-[#38bdf8] font-bold hover:underline">@mocitaz</a>
                 </div>
               </div>
 
               {/* Action Button */}
               <button
                 onClick={handleCloseClosureModal}
-                className="w-full py-2.5 bg-[#37352f] html.dark:bg-[#e3e3e2] text-white html.dark:text-[#1a1a1a] hover:bg-[#4d4b47] html.dark:hover:bg-white text-[13px] font-bold rounded-lg transition-all cursor-pointer shadow-sm active:scale-98 select-none text-center"
+                className="w-full py-2 bg-[#37352f] html.dark:bg-[#e3e3e2] text-white html.dark:text-[#1a1a1a] hover:bg-[#4d4b47] html.dark:hover:bg-white text-[12.5px] font-bold rounded-md transition-all cursor-pointer shadow-sm select-none text-center mt-1"
               >
-                Aamiin, Terima Kasih!
+                Tutup
               </button>
             </div>
           </div>
