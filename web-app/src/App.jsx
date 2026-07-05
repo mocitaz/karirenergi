@@ -24,7 +24,8 @@ import {
   Sun,
   Moon,
   Share2,
-  Award
+  Award,
+  AlertCircle
 } from "lucide-react";
 import lokerData from "./data/loker_data.json";
 import Fuse from "fuse.js";
@@ -1975,10 +1976,7 @@ export default function App() {
                     }`
               }`}>
                 {timeLeft.days === 0 ? (
-                  <span className="relative flex h-2 w-2 mr-2.5 flex-shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e53e3e] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#e53e3e]"></span>
-                  </span>
+                  <AlertCircle className="w-3.5 h-3.5 mr-2 text-[#e53e3e] flex-shrink-0 animate-pulse" />
                 ) : (
                   <Timer className="w-3.5 h-3.5 mr-2 text-[#5a5a57] flex-shrink-0" />
                 )}
@@ -1986,7 +1984,7 @@ export default function App() {
                   <span className={`text-[9.5px] font-extrabold uppercase tracking-wider leading-none mb-0.5 ${
                     timeLeft.days === 0 ? "text-[#e53e3e]" : "text-[#8a8a86]"
                   }`}>
-                    {timeLeft.days === 0 ? "⚠️ PENDAFTARAN SEGERA DITUTUP!" : "Batas Registrasi"}
+                    {timeLeft.days === 0 ? "PENDAFTARAN SEGERA DITUTUP!" : "Batas Registrasi"}
                   </span>
                   <span className={`font-mono font-bold leading-none select-none flex items-center gap-0.5 ${
                     timeLeft.days === 0 ? "text-[#c53030]" : "text-[#37352f]"
