@@ -437,8 +437,41 @@ async def main():
             context = await browser.new_context(storage_state=session_file)
             page = await context.new_page()
             print("[*] Menghubungi https://recruitment.pertamina.com ...")
-            await page.goto("https://recruitment.pertamina.com", timeout=60000, wait_until="domcontentloaded")
-            await page.wait_for_timeout(7000)
+            try:
+                await page.goto("https://recruitment.pertamina.com", timeout=60000, wait_until="domcontentloaded")
+                
+                # Verify session validity by checking URL or elements
+                current_url = page.url
+                is_login_page = "login" in current_url.lower() or await page.query_selector("input[type='password']") or await page.query_selector("button:has-text('Login'), :text('Login'), button:has-text('Masuk'), :text('Masuk')")
+                
+                if is_login_page:
+                    raise Exception("Redirected to login screen")
+                
+                # Wait up to 15 seconds for job cards to render
+                has_jobs = False
+                for _ in range(30):
+                    if await page.query_selector(".job-item, .card, tr, [class*='card']"):
+                        has_jobs = True
+                        break
+                    # Break early if we redirected to login during wait
+                    if "login" in page.url.lower():
+                        break
+                    await page.wait_for_timeout(500)
+                
+                if not has_jobs:
+                    raise Exception("No jobs rendered within timeout (possibly unauthorized or expired session)")
+                    
+            except Exception as e:
+                print(f"\n[!] Sesi login kedaluwarsa atau tidak valid ({e})! Menghapus sesi lama...")
+                await page.close()
+                await browser.close()
+                if os.path.exists(session_file):
+                    try:
+                        os.remove(session_file)
+                    except:
+                        pass
+                # Recursive call to trigger interactive login
+                return await main()
             
         # Clear cookies/consent modals
         try:
@@ -459,6 +492,7 @@ async def main():
             
         unique_jobs = []
         page_num = 1
+        previous_page_ids = set()
         
         print("[*] Memulai pemindaian halaman daftar loker...")
         
@@ -467,12 +501,14 @@ async def main():
             
             # Fetch current items in listing
             job_elements = await page.query_selector_all(".job-item, .card, tr, [class*='card']")
+            current_page_ids = set()
             
             for el in job_elements:
                 el_html = await el.inner_html()
                 match = VACANCY_REGEX.search(el_html)
                 if match:
                     vacancy_id = match.group(1)
+                    current_page_ids.add(vacancy_id)
                     
                     if any(j['id'] == vacancy_id for j in unique_jobs):
                         continue
@@ -508,6 +544,17 @@ async def main():
                         "kuota": kuota,
                         "pelamar": pelamar
                     })
+            
+            # Prevent infinite pagination loops (e.g., if page didn't load or loop-clicked a static button/carousel next button)
+            if not current_page_ids:
+                print("    - Tidak ditemukan lowongan di halaman ini. Selesai memindai daftar.")
+                break
+                
+            if current_page_ids == previous_page_ids:
+                print("    - Halaman stagnan (tidak berpindah). Selesai memindai daftar.")
+                break
+                
+            previous_page_ids = current_page_ids
             
             # Evaluate next page button in page context
             next_btn_handle = await page.evaluate_handle("""() => {
